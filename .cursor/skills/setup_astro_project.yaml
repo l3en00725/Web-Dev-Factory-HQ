@@ -1,0 +1,6 @@
+description: Initialize new Astro project and import scraped content.
+steps:
+  - create project folder
+  - install astro, tailwind, shadcn/ui
+  - copy content into src/pages
+  - configure astro.config.mjs

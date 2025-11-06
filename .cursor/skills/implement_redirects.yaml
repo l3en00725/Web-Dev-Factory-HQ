@@ -1,0 +1,6 @@
+description: Create redirects between legacy and new URLs.
+inputs:
+  - old_urls.csv
+  - new_urls.csv
+outputs:
+  - vercel.json or _redirects file

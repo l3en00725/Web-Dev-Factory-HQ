@@ -1,0 +1,6 @@
+description: Run Lighthouse and fix performance issues automatically.
+steps:
+  - analyze blocking scripts
+  - compress & defer assets
+  - minify HTML/CSS/JS
+  - generate performance report.json

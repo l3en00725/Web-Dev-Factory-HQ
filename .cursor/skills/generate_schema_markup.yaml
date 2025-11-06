@@ -1,0 +1,5 @@
+description: Build JSON-LD schema from site type metadata.
+inputs:
+  - business_type
+outputs:
+  - schema.json

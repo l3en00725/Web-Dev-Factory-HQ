@@ -1,0 +1,6 @@
+description: Crawl the provided domain and extract structure, text, and media.
+inputs:
+  - domain_url
+outputs:
+  - content_map.json
+  - media_assets/

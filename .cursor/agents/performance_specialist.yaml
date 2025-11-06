@@ -1,0 +1,8 @@
+name: Performance Specialist
+description: Maintain 95+ PageSpeed Insights on mobile & desktop.
+tasks:
+  - run Lighthouse audit
+  - optimize images (AVIF/WebP)
+  - purge unused CSS
+  - lazy-load media
+  - confirm CDN caching & Astro islands efficiency

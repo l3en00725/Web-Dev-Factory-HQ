@@ -1,0 +1,20 @@
+name: Site Builder
+description: Full-cycle Astro build orchestrator.
+triggers:
+  - "start new project"
+sequence:
+  - scrape_existing_site
+  - clone_repo
+  - setup_astro_project
+  - optimize_page_speed
+  - generate_schema_markup
+  - validate_llm_readability
+  - implement_redirects
+  - verify_indexation
+  - deploy_to_vercel
+checkpoints:
+  - "Confirm Astro project created"
+  - "Confirm 95+ Lighthouse score"
+  - "Confirm schema validation"
+  - "Confirm redirects tested"
+  - "Confirm deployment success"

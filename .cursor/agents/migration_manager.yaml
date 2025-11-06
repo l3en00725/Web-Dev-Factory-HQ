@@ -1,0 +1,8 @@
+name: Migration Manager
+description: Handle domain change and traffic retention.
+tasks:
+  - export existing URL map
+  - build 301 redirect list
+  - pause deploy until DNS & GSC confirmed
+  - test 404s
+  - verify indexation after switch

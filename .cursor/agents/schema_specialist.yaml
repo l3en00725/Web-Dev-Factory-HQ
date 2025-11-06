@@ -1,0 +1,7 @@
+name: Schema Specialist
+description: Inject JSON-LD structured data for SEO & LLMs.
+tasks:
+  - detect business type
+  - generate LocalBusiness / Organization / Product schema
+  - insert into Astro layout <head>
+  - validate via Google Rich Results Test

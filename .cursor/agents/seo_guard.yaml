@@ -1,0 +1,8 @@
+name: SEO Guard
+description: Preserve rankings and ensure technical SEO integrity.
+tasks:
+  - audit titles, metas, canonical tags
+  - ensure internal linking & sitemap.xml
+  - validate robots.txt
+  - compare old vs new URL list
+  - produce post-launch SEO report

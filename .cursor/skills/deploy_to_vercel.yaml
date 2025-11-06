@@ -1,0 +1,5 @@
+description: Build and deploy Astro site to Vercel.
+steps:
+  - run "bun run build" or "npm run build"
+  - upload dist/ via Vercel CLI
+  - verify deployment URL

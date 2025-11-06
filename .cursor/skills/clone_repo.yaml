@@ -1,0 +1,5 @@
+description: Clone a public GitHub repo for design/layout reference.
+inputs:
+  - repo_url
+outputs:
+  - local_repo_path
