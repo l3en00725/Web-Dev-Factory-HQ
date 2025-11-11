@@ -1,7 +1,81 @@
 name: Schema Specialist
-description: Inject JSON-LD structured data for SEO & LLMs.
+description: Inject JSON-LD structured data for SEO & LLMs across the Astro project.
+working_directory: "${astro_project_path}"
+output_directory: "output/${site_name}/schema"
+inputs:
+  - name: astro_project_path
+    type: path
+    required: true
+    description: Location of the Astro project consuming schema.
+  - name: business_type
+    type: string
+    required: true
+    description: Business classification (e.g., LocalBusiness, Organization, Product).
+  - name: location_data
+    type: object
+    required: false
+    description: Optional structured address and geo metadata.
+outputs:
+  - name: schema_file
+    type: path
+    description: Generated JSON-LD file embedded within the Astro layout.
+  - name: schema_validation
+    type: path
+    description: Report from Google Rich Results validation.
 tasks:
-  - detect business type
-  - generate LocalBusiness / Organization / Product schema
-  - insert into Astro layout <head>
-  - validate via Google Rich Results Test
+  - id: derive_schema_model
+    name: Derive schema model from business type
+    run: |
+      bun run scripts/detect-schema-model.mjs \
+        --business "{{ inputs.business_type }}" \
+        --location "{{ inputs.location_data }}" \
+        --out .cursor/tmp/schema-model.json
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - .cursor/tmp/schema-model.json contains @type
+  - id: generate_schema
+    name: Generate JSON-LD markup
+    run: |
+      mkdir -p src/components
+      bun run scripts/generate-schema.mjs \
+        --model .cursor/tmp/schema-model.json \
+        --out src/components/site-schema.json
+      bunx prettier --write src/components/site-schema.json
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - src/components/site-schema.json exists and is valid JSON
+  - id: inject_schema
+    name: Inject schema into Astro layout head
+    run: |
+      bun run scripts/attach-schema.ts \
+        --layout src/layouts/BaseLayout.astro \
+        --schema src/components/site-schema.json
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - BaseLayout.astro contains <script type="application/ld+json">
+  - id: validate_schema
+    name: Validate schema with Google Rich Results API
+    run: |
+      bun run scripts/validate-schema.mjs \
+        --schema src/components/site-schema.json \
+        --out reports/schema/validation.json
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - validation.json reports zero errors
+  - id: summarize_schema
+    name: Summarize schema deployment
+    run: |
+      mkdir -p reports/schema
+      bun run scripts/summarize-schema.mjs \
+        --schema src/components/site-schema.json \
+        --validation reports/schema/validation.json \
+        --out reports/schema/summary.md
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - summary.md describes key entity properties
+success_criteria:
+  - Schema file contains accurate entity information and required fields
+  - Google Rich Results returns pass status
+outputs_mapping:
+  schema_file: "{{ inputs.astro_project_path }}/src/components/site-schema.json"
+  schema_validation: "{{ inputs.astro_project_path }}/reports/schema/validation.json"

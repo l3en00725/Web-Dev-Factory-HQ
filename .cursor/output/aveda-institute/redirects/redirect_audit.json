@@ -1,0 +1,26 @@
+[
+  {
+    "source": "/",
+    "destination": "/",
+    "status": 301,
+    "location": "/"
+  },
+  {
+    "source": "/programs",
+    "destination": "/programs",
+    "status": 301,
+    "location": "/programs"
+  },
+  {
+    "source": "/about",
+    "destination": "/about",
+    "status": 301,
+    "location": "/about"
+  },
+  {
+    "source": "/contact",
+    "destination": "/contact",
+    "status": 301,
+    "location": "/contact"
+  }
+]

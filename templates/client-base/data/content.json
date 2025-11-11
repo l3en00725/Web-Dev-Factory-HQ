@@ -1,0 +1,17 @@
+{
+  "site": {
+    "name": "Your Business Name",
+    "description": "Your business description",
+    "phone": "+1 555-555-5555",
+    "email": "info@example.com",
+    "address": {
+      "streetAddress": "123 Main St",
+      "addressLocality": "City",
+      "addressRegion": "ST",
+      "postalCode": "12345",
+      "addressCountry": "US"
+    }
+  },
+  "pages": []
+}
+

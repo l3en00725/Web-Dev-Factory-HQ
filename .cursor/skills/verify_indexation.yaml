@@ -1,3 +1,131 @@
-description: Confirm new domain is indexed and old redirects resolve 301.
+description: Confirm new domain is indexed and redirects resolve with healthy status codes.
+inputs:
+  - name: astro_project_path
+    type: path
+    required: true
+    description: Astro project containing reports and redirect manifest.
+  - name: redirect_manifest
+    type: path
+    required: true
+    description: Path to vercel.json or redirect file.
+  - name: deployment_url
+    type: url
+    required: false
+    description: Live deployment URL to verify.
 outputs:
-  - indexation_report.md
+  - name: indexation_report
+    type: path
+    description: Markdown report summarizing indexation checks.
+  - name: redirect_health
+    type: path
+    description: JSON summary of redirect response codes.
+environment:
+  node: "20.x"
+  package_manager: bun
+steps:
+  - id: setup_tooling
+    name: Install tooling for indexation checks
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun add -D sitemap@latest node-fetch@latest p-limit@latest yargs@latest
+      mkdir -p scripts reports/indexation
+      if [ ! -f scripts/check-redirects.mjs ]; then
+        cat <<'CHECK' > scripts/check-redirects.mjs
+        import fs from "node:fs"
+        import path from "node:path"
+        import fetch from "node-fetch"
+        import pLimit from "p-limit"
+        import yargs from "yargs"
+        import { hideBin } from "yargs/helpers"
+        const argv = yargs(hideBin(process.argv))
+          .option("manifest", { type: "string", demandOption: true })
+          .option("domain", { type: "string", demandOption: false })
+          .option("out", { type: "string", demandOption: true })
+          .parse()
+        const redirects = JSON.parse(fs.readFileSync(argv.manifest, "utf-8")).redirects ?? []
+        const domain = argv.domain && argv.domain.length ? argv.domain : "http://127.0.0.1:4321"
+        const limit = pLimit(5)
+        const results = await Promise.all(
+          redirects.map((item) => limit(async () => {
+            const sourceUrl = new URL(item.source, domain).toString()
+            const res = await fetch(sourceUrl, { redirect: "manual" })
+            let targetStatus = null
+            if (res.status === 301 || res.status === 302) {
+              const target = res.headers.get("location")
+              if (target) {
+                const follow = await fetch(target)
+                targetStatus = follow.status
+              }
+            }
+            return {
+              source: item.source,
+              destination: item.destination,
+              status: res.status,
+              targetStatus
+            }
+          }))
+        )
+        fs.writeFileSync(path.resolve(argv.out), JSON.stringify(results, null, 2))
+        CHECK
+      fi
+      if [ ! -f scripts/generate-indexation-report.mjs ]; then
+        cat <<'REP' > scripts/generate-indexation-report.mjs
+        import fs from "node:fs"
+        import path from "node:path"
+        import yargs from "yargs"
+        import { hideBin } from "yargs/helpers"
+        const argv = yargs(hideBin(process.argv))
+          .option("redirects", { type: "string", demandOption: true })
+          .option("deployment", { type: "string", demandOption: false })
+          .option("out", { type: "string", demandOption: true })
+          .parse()
+        const redirects = JSON.parse(fs.readFileSync(argv.redirects, "utf-8"))
+        const failing = redirects.filter((item) => item.status !== 301 || item.targetStatus !== 200)
+        const lines = ["# Indexation & Redirect Report"]
+        lines.push(`Deployment URL: ${argv.deployment && argv.deployment.length ? argv.deployment : 'local preview'}`)
+        lines.push(`Total redirects tested: ${redirects.length}`)
+        lines.push(`Failures: ${failing.length}`)
+        if (failing.length) {
+          lines.push("\n## Failures")
+          for (const fail of failing) {
+            lines.push(`- ${fail.source} -> status ${fail.status}, target ${fail.targetStatus}`)
+          }
+        }
+        fs.mkdirSync(path.dirname(path.resolve(argv.out)), { recursive: true })
+        fs.writeFileSync(path.resolve(argv.out), lines.join("\n"))
+        REP
+      fi
+    success_criteria:
+      - Redirect verification scripts available
+  - id: run_redirect_checks
+    name: Run redirect health checks
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun run scripts/check-redirects.mjs \
+        --manifest "{{ inputs.redirect_manifest }}" \
+        --domain "{{ inputs.deployment_url }}" \
+        --out reports/indexation/redirect_health.json
+    success_criteria:
+      - redirect_health.json exists
+  - id: compile_indexation_report
+    name: Compile indexation summary
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun run scripts/generate-indexation-report.mjs \
+        --redirects reports/indexation/redirect_health.json \
+        --deployment "{{ inputs.deployment_url }}" \
+        --out reports/indexation/indexation.md
+      jq 'all(.[]; (.status == 301) and (.targetStatus == 200))' reports/indexation/redirect_health.json
+    success_criteria:
+      - indexation.md reports zero failures
+outputs_mapping:
+  indexation_report: "{{ inputs.astro_project_path }}/reports/indexation/indexation.md"
+  redirect_health: "{{ inputs.astro_project_path }}/reports/indexation/redirect_health.json"
+artifacts:
+  - path: "{{ inputs.astro_project_path }}/reports/indexation/indexation.md"
+    description: Indexation and redirect status summary.
+  - path: "{{ inputs.astro_project_path }}/reports/indexation/redirect_health.json"
+    description: Detailed redirect health metrics.

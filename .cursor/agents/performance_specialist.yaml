@@ -1,8 +1,157 @@
 name: Performance Specialist
-description: Maintain 95+ PageSpeed Insights on mobile & desktop.
+description: Maintain ≥95 PageSpeed Insights on mobile and desktop for every Astro deployment.
+working_directory: "${astro_project_path}"
+output_directory: "output/${site_name}/performance"
+inputs:
+  - name: astro_project_path
+    type: path
+    required: true
+    description: Absolute path to the Astro project being optimized.
+  - name: preview_url
+    type: url
+    required: false
+    description: Optional deployed URL; falls back to local preview.
+outputs:
+  - name: lighthouse_mobile
+    type: path
+    description: Mobile Lighthouse JSON export.
+  - name: lighthouse_desktop
+    type: path
+    description: Desktop Lighthouse JSON export.
+  - name: performance_notes
+    type: path
+    description: Markdown report summarizing optimizations applied.
+environment:
+  node: "20.x"
+  package_manager: bun
+  psi_target: ">=95"
 tasks:
-  - run Lighthouse audit
-  - optimize images (AVIF/WebP)
-  - purge unused CSS
-  - lazy-load media
-  - confirm CDN caching & Astro islands efficiency
+  - id: install_tooling
+    name: Install performance tooling
+    run: |
+      bun add -D lighthouse@latest @astrojs/image astro-compress @builder.io/qwik-city-lighthouse-budgets@latest
+      bun add -D @vercel/speed-insights
+      mkdir -p reports/performance .cursor/tmp
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - node_modules contains lighthouse
+      - package.json updated with performance tooling
+  - id: start_preview
+    name: Start Astro preview server for audits
+    run: |
+      bun run build --silent
+      bun run preview --host --port 4321 & echo $! > .cursor/tmp/preview.pid
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - Preview server running on http://127.0.0.1:4321
+  - id: run_lighthouse_mobile
+    name: Run Lighthouse mobile audit
+    run: |
+      mkdir -p reports/performance
+      TARGET_URL="{{ inputs.preview_url }}"
+      if [ -z "$TARGET_URL" ]; then TARGET_URL="http://127.0.0.1:4321"; fi
+      bunx lighthouse "$TARGET_URL" \
+        --chrome-flags="--headless" \
+        --preset=perf \
+        --only-categories=performance \
+        --throttling-method=provided \
+        --output=json \
+        --output-path=reports/performance/mobile.json
+      jq '.categories.performance.score >= 0.95' reports/performance/mobile.json
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - Mobile performance score ≥ 0.95 in Lighthouse report
+  - id: run_lighthouse_desktop
+    name: Run Lighthouse desktop audit
+    run: |
+      mkdir -p reports/performance
+      TARGET_URL="{{ inputs.preview_url }}"
+      if [ -z "$TARGET_URL" ]; then TARGET_URL="http://127.0.0.1:4321"; fi
+      bunx lighthouse "$TARGET_URL" \
+        --chrome-flags="--headless" \
+        --preset=desktop \
+        --only-categories=performance \
+        --output=json \
+        --output-path=reports/performance/desktop.json
+      jq '.categories.performance.score >= 0.95' reports/performance/desktop.json
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - Desktop performance score ≥ 0.95 in Lighthouse report
+  - id: optimize_images
+    name: Optimize images with Astro integrations
+    run: |
+      bunx astro check
+      bunx astro sync
+      bunx astro assets --silent
+      bun run scripts/convert-images.ts --src public --formats avif,webp --quality 82
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - Images converted to AVIF/WebP formats in public/
+      - Largest image < 300 KB
+  - id: purge_css
+    name: Purge unused CSS and enable Tailwind JIT safelist
+    run: |
+      bunx tailwindcss -c tailwind.config.cjs --content "src/**/*.{astro,md,mdx}" --minify -o public/assets/tailwind.min.css
+      bun run scripts/generate-tailwind-safelist.ts > tailwind.safelist.txt
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - public/assets/tailwind.min.css size reduced ≥40%
+  - id: lazy_load_media
+    name: Ensure lazy loading and defer scripts
+    run: |
+      bun run scripts/enforce-lazy-media.ts src
+      bun run scripts/defer-noncritical-scripts.ts src
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - All <img> tags include loading="lazy" unless hero
+      - Non-critical scripts include defer or type="module"
+  - id: update_budget
+    name: Update Lighthouse performance budgets
+    run: |
+      mkdir -p reports/performance
+      cat <<'BUDGET' > reports/performance/budgets.json
+      [
+        {
+          "resourceSizes": [
+            { "resourceType": "script", "budget": 150 },
+            { "resourceType": "total", "budget": 300 }
+          ],
+          "resourceCounts": [
+            { "resourceType": "third-party", "budget": 0 }
+          ]
+        }
+      ]
+      BUDGET
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - budgets.json present with strict thresholds
+  - id: stop_preview
+    name: Stop preview server
+    run: |
+      if [ -f .cursor/tmp/preview.pid ]; then
+        kill $(cat .cursor/tmp/preview.pid) || true
+        rm .cursor/tmp/preview.pid
+      fi
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - Preview server gracefully stopped
+  - id: summarize_performance
+    name: Summarize performance actions
+    run: |
+      mkdir -p reports/performance
+      bun run scripts/summarize-performance.mjs \
+        --mobile reports/performance/mobile.json \
+        --desktop reports/performance/desktop.json \
+        --budget reports/performance/budgets.json \
+        --out reports/performance/summary.md
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - reports/performance/summary.md exists with remediation notes
+success_criteria:
+  - Mobile and desktop Lighthouse scores remain ≥95 after optimizations
+  - First Contentful Paint < 1.8s on mobile
+  - CLS < 0.1 confirmed in audits
+outputs_mapping:
+  lighthouse_mobile: "{{ inputs.astro_project_path }}/reports/performance/mobile.json"
+  lighthouse_desktop: "{{ inputs.astro_project_path }}/reports/performance/desktop.json"
+  performance_notes: "{{ inputs.astro_project_path }}/reports/performance/summary.md"

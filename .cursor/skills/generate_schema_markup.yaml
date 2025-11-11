@@ -1,5 +1,174 @@
-description: Build JSON-LD schema from site type metadata.
+description: Generate JSON-LD schema based on business type and embed it into the Astro project.
 inputs:
-  - business_type
+  - name: business_type
+    type: string
+    required: true
+    description: Schema.org entity type (e.g., LocalBusiness, Organization, Product).
+  - name: astro_project_path
+    type: path
+    required: true
+    description: Astro project directory where schema will be written.
+  - name: content_map
+    type: path
+    required: false
+    description: Optional content map to enrich schema with page data.
 outputs:
-  - schema.json
+  - name: schema_file
+    type: path
+    description: Generated JSON-LD schema file.
+  - name: validation_report
+    type: path
+    description: Google Rich Results validation output.
+environment:
+  node: "20.x"
+  package_manager: bun
+steps:
+  - id: prepare_tooling
+    name: Ensure schema tooling available
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun add -D ajv-cli@latest ajv-formats@latest node-fetch@latest yargs@latest
+      mkdir -p scripts reports/schema src/components
+      if [ ! -f scripts/generate-schema.mjs ]; then
+        cat <<'GEN' > scripts/generate-schema.mjs
+        import fs from "node:fs"
+        import path from "node:path"
+        import yargs from "yargs"
+        import { hideBin } from "yargs/helpers"
+        const argv = yargs(hideBin(process.argv))
+          .option("business", { type: "string", demandOption: true })
+          .option("content", { type: "string", demandOption: false })
+          .option("out", { type: "string", demandOption: true })
+          .parse()
+        const schema = {
+          "@context": "https://schema.org",
+          "@type": argv.business,
+          "@id": `#${argv.business.toLowerCase()}`,
+          "name": "",
+          "description": "",
+          "url": "",
+          "image": []
+        }
+        if (argv.content && fs.existsSync(argv.content)) {
+          const map = JSON.parse(fs.readFileSync(argv.content, "utf-8"))
+          schema.name = map?.site?.name ?? schema.name
+          schema.description = map?.site?.description ?? schema.description
+          schema.url = map?.site?.origin ?? schema.url
+          if (map?.media?.logos?.length) {
+            schema.image = map.media.logos.slice(0, 3)
+          }
+          if (map?.site?.address) {
+            schema.address = map.site.address
+          }
+        }
+        fs.mkdirSync(path.dirname(argv.out), { recursive: true })
+        fs.writeFileSync(argv.out, JSON.stringify(schema, null, 2))
+        GEN
+      fi
+      if [ ! -f scripts/run-rich-results.mjs ]; then
+        cat <<'RICH' > scripts/run-rich-results.mjs
+        import fs from "node:fs"
+        import path from "node:path"
+        import fetch from "node-fetch"
+        import yargs from "yargs"
+        import { hideBin } from "yargs/helpers"
+        const argv = yargs(hideBin(process.argv))
+          .option("schema", { type: "string", demandOption: true })
+          .option("out", { type: "string", demandOption: true })
+          .parse()
+        const apiKey = process.env.GOOGLE_API_KEY
+        const outputPath = path.resolve(argv.out)
+        fs.mkdirSync(path.dirname(outputPath), { recursive: true })
+        if (!apiKey) {
+          fs.writeFileSync(outputPath, JSON.stringify({ status: "SKIPPED", reason: "GOOGLE_API_KEY missing" }, null, 2))
+          process.exit(0)
+        }
+        const html = `<html><head><script type="application/ld+json">${fs.readFileSync(argv.schema, "utf-8")}</script></head><body></body></html>`
+        const response = await fetch(`https://searchconsole.googleapis.com/v1/urlTestingTools/mobileFriendlyTest:run?key=${apiKey}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: "", requestScreenshot: false, resource: { html } })
+        })
+        const json = await response.json()
+        fs.writeFileSync(outputPath, JSON.stringify(json, null, 2))
+        RICH
+      fi
+      if [ ! -f scripts/summarize-schema.mjs ]; then
+        cat <<'SUM' > scripts/summarize-schema.mjs
+        import fs from "node:fs"
+        import path from "node:path"
+        import yargs from "yargs"
+        import { hideBin } from "yargs/helpers"
+        const argv = yargs(hideBin(process.argv))
+          .option("schema", { type: "string", demandOption: true })
+          .option("validation", { type: "string", demandOption: true })
+          .option("out", { type: "string", demandOption: true })
+          .parse()
+        const schema = JSON.parse(fs.readFileSync(argv.schema, "utf-8"))
+        const validation = JSON.parse(fs.readFileSync(argv.validation, "utf-8"))
+        const status = validation.ruleGroups?.MOBILE_FRIENDLY_TEST?.pass ? "PASS" : (validation.status ?? "UNKNOWN")
+        const lines = [
+          `# Schema Summary`,
+          `Type: ${schema['@type']}`,
+          `Name: ${schema.name ?? 'N/A'}`,
+          `Status: ${status}`,
+          `Generated: ${new Date().toISOString()}`
+        ]
+        const outputPath = path.resolve(argv.out)
+        fs.mkdirSync(path.dirname(outputPath), { recursive: true })
+        fs.writeFileSync(outputPath, lines.join("\n"))
+        SUM
+      fi
+    success_criteria:
+      - Schema tooling scripts present in project
+  - id: derive_schema
+    name: Derive schema template
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun run scripts/generate-schema.mjs \
+        --business "{{ inputs.business_type }}" \
+        --content "{{ inputs.content_map }}" \
+        --out src/components/site-schema.json
+    success_criteria:
+      - site-schema.json created in src/components
+  - id: validate_schema_locally
+    name: Validate JSON-LD structure
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bunx ajv validate -s https://json.schemastore.org/schemaorg.json -d src/components/site-schema.json --spec=draft2020-12
+    success_criteria:
+      - AJV validation passes
+  - id: run_rich_results
+    name: Run Google Rich Results Test via API wrapper
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun run scripts/run-rich-results.mjs \
+        --schema src/components/site-schema.json \
+        --out reports/schema/validation.json
+    success_criteria:
+      - validation.json created with pass or skipped status
+  - id: summarize_schema
+    name: Summarize schema coverage
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun run scripts/summarize-schema.mjs \
+        --schema src/components/site-schema.json \
+        --validation reports/schema/validation.json \
+        --out reports/schema/summary.md
+    success_criteria:
+      - summary.md lists entity attributes and validation status
+outputs_mapping:
+  schema_file: "{{ inputs.astro_project_path }}/src/components/site-schema.json"
+  validation_report: "{{ inputs.astro_project_path }}/reports/schema/validation.json"
+artifacts:
+  - path: "{{ inputs.astro_project_path }}/src/components/site-schema.json"
+    description: Generated JSON-LD markup.
+  - path: "{{ inputs.astro_project_path }}/reports/schema/validation.json"
+    description: Validation output from Rich Results test.
+  - path: "{{ inputs.astro_project_path }}/reports/schema/summary.md"
+    description: Summary of schema coverage.

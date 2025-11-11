@@ -1,5 +1,59 @@
-description: Clone a public GitHub repo for design/layout reference.
+description: Clone a public GitHub repo for design/layout reference and prepare it for inspection.
 inputs:
-  - repo_url
+  - name: repo_url
+    type: url
+    required: true
+    description: Git repository to clone.
+  - name: destination
+    type: path
+    required: true
+    description: Local directory where the repository should be cloned.
 outputs:
-  - local_repo_path
+  - name: local_repo_path
+    type: path
+    description: Path to the cloned repository.
+  - name: commit_sha
+    type: string
+    description: Resolved commit SHA for reproducibility.
+steps:
+  - id: prepare_destination
+    name: Prepare destination directory
+    run: |
+      set -euo pipefail
+      rm -rf "{{ inputs.destination }}"
+      mkdir -p "{{ inputs.destination }}"
+    success_criteria:
+      - Destination directory exists and is empty
+  - id: clone_reference
+    name: Clone repository shallowly
+    run: |
+      set -euo pipefail
+      git clone --depth=1 "{{ inputs.repo_url }}" "{{ inputs.destination }}"
+    success_criteria:
+      - .git directory present in destination
+  - id: resolve_commit
+    name: Resolve commit SHA for reference
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.destination }}"
+      git rev-parse HEAD > .cursor_commit_sha.txt
+    success_criteria:
+      - .cursor_commit_sha.txt contains 40-char SHA1
+  - id: install_dependencies
+    name: Install dependencies for inspection (optional)
+    run: |
+      set -euo pipefail
+      if [ -f "{{ inputs.destination }}/package.json" ]; then
+        cd "{{ inputs.destination }}"
+        bun install --frozen-lockfile || npm install --legacy-peer-deps
+      fi
+    success_criteria:
+      - node_modules directory exists when package.json present
+artifacts:
+  - path: "{{ inputs.destination }}"
+    description: Cloned repository ready for reference.
+  - path: "{{ inputs.destination }}/.cursor_commit_sha.txt"
+    description: Commit SHA used for reference.
+outputs_mapping:
+  local_repo_path: "{{ inputs.destination }}"
+  commit_sha: "{{ inputs.destination }}/.cursor_commit_sha.txt"

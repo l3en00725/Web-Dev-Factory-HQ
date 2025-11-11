@@ -1,6 +1,164 @@
-description: Run Lighthouse and fix performance issues automatically.
+description: Run Lighthouse audits and enforce ≥95 PSI performance for the Astro project.
+inputs:
+  - name: astro_project_path
+    type: path
+    required: true
+    description: Astro project directory to optimize.
+  - name: media_assets
+    type: path
+    required: true
+    description: Directory of optimized media assets to reconcile.
+  - name: target_url
+    type: url
+    required: false
+    description: Optional deployed URL for audits; defaults to local preview.
+outputs:
+  - name: performance_report
+    type: path
+    description: Consolidated Lighthouse JSON with mobile/desktop scores.
+  - name: mobile_report
+    type: path
+    description: Mobile Lighthouse JSON output.
+  - name: desktop_report
+    type: path
+    description: Desktop Lighthouse JSON output.
+  - name: performance_summary
+    type: path
+    description: Markdown summary of optimizations and scores.
+environment:
+  node: "20.x"
+  package_manager: bun
+  browsers:
+    - chrome
 steps:
-  - analyze blocking scripts
-  - compress & defer assets
-  - minify HTML/CSS/JS
-  - generate performance report.json
+  - id: install_tooling
+    name: Install performance and auditing tooling
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun add -D lighthouse@latest @builder.io/qwik-city-lighthouse-budgets@latest critique-images@latest tailwindcss@latest
+      bun add -D @vercel/speed-insights astro-compress @astrojs/image @astrojs/sitemap
+      mkdir -p reports/performance .cursor/tmp
+    success_criteria:
+      - node_modules contains lighthouse and @astrojs/image
+  - id: sync_media
+    name: Sync optimized media into project
+    run: |
+      set -euo pipefail
+      PROJECT="{{ inputs.astro_project_path }}"
+      rsync -av --delete "{{ inputs.media_assets }}/" "$PROJECT/public/media/"
+      bun run scripts/generate-picture-components.mjs \
+        --dir "$PROJECT/public/media" \
+        --out "$PROJECT/src/components/media"
+    success_criteria:
+      - public/media mirrors optimized assets directory
+  - id: configure_performance
+    name: Configure Astro for high performance
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun run scripts/enable-performance-defaults.mjs \
+        --astro-config astro.config.mjs \
+        --tailwind-config tailwind.config.cjs \
+        --minify true \
+        --islands true \
+        --preload-fonts true
+    success_criteria:
+      - astro.config.mjs includes compress and image integrations
+  - id: purge_css
+    name: Purge unused CSS using Tailwind JIT
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bunx tailwindcss -c tailwind.config.cjs --content "src/**/*.{astro,md,mdx,tsx,jsx}" --minify -o public/assets/tailwind.min.css
+      bun run scripts/inject-critical-css.mjs --out public/assets/critical.css
+    success_criteria:
+      - public/assets/tailwind.min.css size < 120 KB
+  - id: enforce_lazy_loading
+    name: Enforce lazy loading and script deferral
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun run scripts/enforce-lazy-media.ts src
+      bun run scripts/defer-noncritical-scripts.ts src
+      bun run scripts/inline-preload-fonts.mjs src/layouts/BaseLayout.astro
+    success_criteria:
+      - No <img> without loading="lazy" or decoding="async"
+  - id: build_site
+    name: Build optimized Astro site
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun run build
+      bun run preview --host --port 4321 & echo $! > .cursor/tmp/preview.pid
+    success_criteria:
+      - dist/ directory generated
+      - Preview server PID recorded
+  - id: run_lighthouse_mobile
+    name: Run Lighthouse mobile audit
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      TARGET_URL="{{ inputs.target_url }}"
+      if [ -z "$TARGET_URL" ]; then TARGET_URL="http://127.0.0.1:4321"; fi
+      bunx lighthouse "$TARGET_URL" \
+        --chrome-flags="--headless" \
+        --only-categories=performance \
+        --preset=perf \
+        --throttling-method=simulate \
+        --output=json \
+        --output-path=reports/performance/mobile.json
+      jq '.categories.performance.score >= 0.95' reports/performance/mobile.json
+    success_criteria:
+      - Mobile score >= 0.95
+  - id: run_lighthouse_desktop
+    name: Run Lighthouse desktop audit
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      TARGET_URL="{{ inputs.target_url }}"
+      if [ -z "$TARGET_URL" ]; then TARGET_URL="http://127.0.0.1:4321"; fi
+      bunx lighthouse "$TARGET_URL" \
+        --chrome-flags="--headless" \
+        --only-categories=performance \
+        --preset=desktop \
+        --output=json \
+        --output-path=reports/performance/desktop.json
+      jq '.categories.performance.score >= 0.95' reports/performance/desktop.json
+    success_criteria:
+      - Desktop score >= 0.95
+  - id: consolidate_reports
+    name: Consolidate Lighthouse reports
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun run scripts/merge-lighthouse.mjs \
+        --mobile reports/performance/mobile.json \
+        --desktop reports/performance/desktop.json \
+        --out reports/performance/lighthouse.json
+      bun run scripts/summarize-performance.mjs \
+        --report reports/performance/lighthouse.json \
+        --out reports/performance/summary.md
+    success_criteria:
+      - lighthouse.json includes combined metrics
+  - id: stop_preview
+    name: Stop preview server
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      if [ -f .cursor/tmp/preview.pid ]; then
+        kill $(cat .cursor/tmp/preview.pid) || true
+        rm .cursor/tmp/preview.pid
+      fi
+    success_criteria:
+      - Preview server stopped
+outputs_mapping:
+  performance_report: "{{ inputs.astro_project_path }}/reports/performance/lighthouse.json"
+  mobile_report: "{{ inputs.astro_project_path }}/reports/performance/mobile.json"
+  desktop_report: "{{ inputs.astro_project_path }}/reports/performance/desktop.json"
+  performance_summary: "{{ inputs.astro_project_path }}/reports/performance/summary.md"
+artifacts:
+  - path: "{{ inputs.astro_project_path }}/reports/performance/lighthouse.json"
+    description: Combined Lighthouse metrics for PSI verification.
+  - path: "{{ inputs.astro_project_path }}/reports/performance/summary.md"
+    description: Performance remediation summary.

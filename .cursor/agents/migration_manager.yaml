@@ -1,8 +1,98 @@
 name: Migration Manager
-description: Handle domain change and traffic retention.
+description: Handle domain change and traffic retention with zero traffic loss.
+working_directory: "${astro_project_path}"
+output_directory: "output/${site_name}/migration"
+inputs:
+  - name: domain_url
+    type: string
+    required: true
+    description: Legacy domain to migrate from.
+  - name: astro_project_path
+    type: path
+    required: true
+    description: New Astro project path for redirect validation.
+  - name: deployment_url
+    type: url
+    required: false
+    description: Vercel preview or production URL for verification.
+outputs:
+  - name: redirect_manifest
+    type: path
+    description: Finalized 301 redirect configuration.
+  - name: migration_checklist
+    type: path
+    description: Completed migration readiness checklist.
+  - name: gsc_submission
+    type: path
+    description: Search Console verification log.
 tasks:
-  - export existing URL map
-  - build 301 redirect list
-  - pause deploy until DNS & GSC confirmed
-  - test 404s
-  - verify indexation after switch
+  - id: export_url_map
+    name: Export existing URL map
+    run: |
+      mkdir -p reports/migration
+      bun run scripts/export-url-map.mjs \
+        --domain {{ inputs.domain_url }} \
+        --out reports/migration/legacy_urls.csv
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - legacy_urls.csv contains >= 1 URL
+  - id: build_redirects
+    name: Build 301 redirect list
+    run: |
+      bun run scripts/generate-redirects.mjs \
+        --legacy reports/migration/legacy_urls.csv \
+        --inventory reports/url_inventory.csv \
+        --out vercel.json
+      bunx prettier --write vercel.json
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - vercel.json exists with >0 redirect entries
+  - id: pause_deploy_for_dns
+    name: Pause deploy until DNS & Search Console confirmed
+    run: |
+      bun run scripts/wait-for-dns.mjs \
+        --domain {{ inputs.domain_url }} \
+        --timeout 900
+      bun run scripts/request-gsc-verification.mjs \
+        --domain {{ inputs.domain_url }} \
+        --out reports/migration/gsc_verification.json
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - gsc_verification.json status success
+  - id: test_404s
+    name: Test 404 handling on new project
+    run: |
+      bun run scripts/test-404s.mjs \
+        --domain {{ inputs.deployment_url }} \
+        --out reports/migration/404_report.json
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - 404_report.json shows custom 404 template and zero soft 404s
+  - id: verify_redirects
+    name: Verify redirect behavior
+    run: |
+      bun run scripts/check-redirects.mjs \
+        --legacy reports/migration/legacy_urls.csv \
+        --redirects vercel.json \
+        --out reports/migration/redirect_checks.json
+      jq '.failures | length == 0' reports/migration/redirect_checks.json
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - All redirects return 301 -> 200 chain in under 1s
+  - id: compile_migration_checklist
+    name: Compile migration checklist
+    run: |
+      bun run scripts/compile-migration-checklist.mjs \
+        --redirects reports/migration/redirect_checks.json \
+        --dns reports/migration/gsc_verification.json \
+        --out reports/migration/checklist.md
+    cwd: "{{ inputs.astro_project_path }}"
+    success_criteria:
+      - checklist.md includes DNS, redirects, GSC, analytics steps
+success_criteria:
+  - Redirect manifest validated with zero failures
+  - DNS and GSC verification completed before launch
+outputs_mapping:
+  redirect_manifest: "{{ inputs.astro_project_path }}/vercel.json"
+  migration_checklist: "{{ inputs.astro_project_path }}/reports/migration/checklist.md"
+  gsc_submission: "{{ inputs.astro_project_path }}/reports/migration/gsc_verification.json"

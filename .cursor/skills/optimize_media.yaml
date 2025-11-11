@@ -1,0 +1,102 @@
+name: Optimize Media
+description: Converts downloaded images to modern formats (AVIF, WebP) with responsive sizes for maximum PageSpeed performance
+
+inputs:
+  - name: raw_media_path
+    type: path
+    required: true
+    description: Directory containing original images from scrape
+  
+  - name: output_path
+    type: path
+    required: true
+    description: Destination directory for optimized images
+  
+  - name: formats
+    type: array
+    default: ["avif", "webp", "jpg"]
+    description: Output formats to generate
+  
+  - name: max_width
+    type: integer
+    default: 1200
+    description: Maximum width for largest responsive size
+  
+  - name: quality_avif
+    type: integer
+    default: 80
+    description: AVIF compression quality (0-100)
+  
+  - name: quality_webp
+    type: integer
+    default: 85
+    description: WebP compression quality (0-100)
+  
+  - name: quality_jpg
+    type: integer
+    default: 90
+    description: JPG compression quality (0-100)
+
+steps:
+  - id: analyze_images
+    description: Scan input directory and identify all image files
+    run: |
+      find {{ inputs.raw_media_path }} -type f \
+        \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) \
+        > /tmp/image-list.txt
+      echo "Found $(wc -l < /tmp/image-list.txt) images to optimize"
+  
+  - id: optimize_batch
+    description: Process each image through sharp library with format conversion
+    run: |
+      bun run scripts/optimize-media.mjs \
+        --input "{{ inputs.raw_media_path }}" \
+        --output "{{ inputs.output_path }}" \
+        --formats {{ inputs.formats | join: ',' }} \
+        --max-width {{ inputs.max_width }} \
+        --quality-avif {{ inputs.quality_avif }} \
+        --quality-webp {{ inputs.quality_webp }} \
+        --quality-jpg {{ inputs.quality_jpg }}
+  
+  - id: generate_map
+    description: Create JSON mapping of old URLs to new optimized paths
+    outputs: "{{ inputs.output_path }}/image-map.json"
+    
+  - id: calculate_savings
+    description: Report total file size reduction
+    run: |
+      echo "Optimization complete. Check image-map.json for details."
+
+outputs:
+  - name: optimized_media_path
+    type: path
+    description: Directory containing optimized images in multiple formats
+  
+  - name: image_map
+    type: path
+    description: JSON file mapping old URLs to new optimized paths with sizes
+
+validation:
+  - All images converted to at least AVIF + WebP formats
+  - Responsive sizes generated: 400px, 800px, 1200px widths
+  - image-map.json exists and contains valid JSON
+  - Total file size reduction >= 60% compared to originals
+  - No images exceed 500KB in any format
+
+performance_targets:
+  - Processing time: <30 seconds for 50 images
+  - Memory usage: <2GB peak
+  - Concurrent processing: 4 images at a time
+
+error_handling:
+  - Skip corrupted images with warning
+  - Continue processing on individual failures
+  - Log all errors to optimization.log
+  - Return success if >80% of images processed
+
+notes: |
+  This skill is critical for achieving 95+ PageSpeed scores.
+  AVIF format provides 40-50% smaller files than WebP.
+  WebP provides fallback for older browsers.
+  JPG provides universal fallback compatibility.
+

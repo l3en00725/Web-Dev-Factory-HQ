@@ -1,3 +1,114 @@
-description: Check heading hierarchy, FAQs, and semantic structure for LLM visibility.
+description: Validate that generated Astro pages follow an LLM-friendly heading hierarchy and FAQ structure.
+inputs:
+  - name: astro_project_path
+    type: path
+    required: true
+    description: Astro project directory to analyze.
 outputs:
-  - llm_readability_report.md
+  - name: readability_report
+    type: path
+    description: Markdown report summarizing findings.
+  - name: outline_json
+    type: path
+    description: JSON outline of headings per page.
+steps:
+  - id: install_readability_tools
+    name: Install readability analysis tooling
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun add -D rehype-parse@latest unified@latest jsdom@latest yargs@latest
+      mkdir -p scripts reports/readability
+      if [ ! -f scripts/analyze-headings.mjs ]; then
+        cat <<'ANALYZE' > scripts/analyze-headings.mjs
+        import fs from "node:fs"
+        import path from "node:path"
+        import { JSDOM } from "jsdom"
+        import yargs from "yargs"
+        import { hideBin } from "yargs/helpers"
+        const argv = yargs(hideBin(process.argv))
+          .option("dist", { type: "string", demandOption: true })
+          .option("out", { type: "string", demandOption: true })
+          .parse()
+        const pagesDir = path.resolve(argv.dist)
+        const outline = {}
+        for (const file of fs.readdirSync(pagesDir)) {
+          if (!file.endsWith(".html")) continue
+          const html = fs.readFileSync(path.join(pagesDir, file), "utf-8")
+          const dom = new JSDOM(html)
+          const headings = Array.from(dom.window.document.querySelectorAll("h1,h2,h3")).map((el) => ({
+            level: Number(el.tagName.replace("H", "")),
+            text: el.textContent?.trim()
+          }))
+          outline[`/${file.replace(/index.html$/, "").replace(/\.html$/, "")}`] = headings
+        }
+        fs.writeFileSync(path.resolve(argv.out), JSON.stringify(outline, null, 2))
+        ANALYZE
+      fi
+      if [ ! -f scripts/generate-readability-report.mjs ]; then
+        cat <<'REPORT' > scripts/generate-readability-report.mjs
+        import fs from "node:fs"
+        import path from "node:path"
+        import yargs from "yargs"
+        import { hideBin } from "yargs/helpers"
+        const argv = yargs(hideBin(process.argv))
+          .option("outline", { type: "string", demandOption: true })
+          .option("out", { type: "string", demandOption: true })
+          .parse()
+        const outline = JSON.parse(fs.readFileSync(argv.outline, "utf-8"))
+        const lines = ["# LLM Readability Report"]
+        for (const [route, headings] of Object.entries(outline)) {
+          const hasH1 = headings.some((h) => h.level === 1)
+          const hasFAQ = headings.some((h) => /faq/i.test(h.text ?? ""))
+          lines.push(`\n## ${route}`)
+          lines.push(`Headings: ${headings.length}`)
+          lines.push(`Contains H1: ${hasH1 ? 'Yes' : 'No'}`)
+          lines.push(`Contains FAQ Section: ${hasFAQ ? 'Yes' : 'No'}`)
+          const orderIssue = headings.some((h, index, arr) => index > 0 && h.level - arr[index - 1].level > 1)
+          if (orderIssue) {
+            lines.push("- Detected heading level jumps. Consider adjusting hierarchy.")
+          } else {
+            lines.push("- Heading hierarchy sequential.")
+          }
+        }
+        fs.writeFileSync(path.resolve(argv.out), lines.join("\n"))
+        REPORT
+      fi
+    success_criteria:
+      - Readability analysis scripts available
+  - id: build_static_html
+    name: Build project to static HTML for analysis
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun run build
+    success_criteria:
+      - dist/ directory populated
+  - id: extract_headings
+    name: Extract headings per page
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun run scripts/analyze-headings.mjs \
+        --dist dist \
+        --out reports/readability/outline.json
+    success_criteria:
+      - outline.json includes entries for each page
+  - id: compile_report
+    name: Compile readability report
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun run scripts/generate-readability-report.mjs \
+        --outline reports/readability/outline.json \
+        --out reports/readability/report.md
+    success_criteria:
+      - report.md highlights missing headings or FAQ sections
+outputs_mapping:
+  readability_report: "{{ inputs.astro_project_path }}/reports/readability/report.md"
+  outline_json: "{{ inputs.astro_project_path }}/reports/readability/outline.json"
+artifacts:
+  - path: "{{ inputs.astro_project_path }}/reports/readability/report.md"
+    description: LLM readability findings.
+  - path: "{{ inputs.astro_project_path }}/reports/readability/outline.json"
+    description: Heading outline per page.

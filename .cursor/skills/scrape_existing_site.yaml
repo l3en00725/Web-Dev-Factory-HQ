@@ -1,6 +1,112 @@
-description: Crawl the provided domain and extract structure, text, and media.
+description: Crawl the provided domain and extract structure, text, and media optimized for Astro ingestion.
 inputs:
-  - domain_url
+  - name: domain_url
+    type: url
+    required: true
+    description: Primary domain to crawl.
+  - name: output_dir
+    type: path
+    required: true
+    description: Directory where scraped content and media will be written.
+  - name: user_agent
+    type: string
+    required: false
+    default: "Web-Dev-Factory-HQ Bot"
+    description: User agent string for polite crawling.
 outputs:
-  - content_map.json
-  - media_assets/
+  - name: content_map
+    type: path
+    description: JSON map of pages with semantic structure for Astro import.
+  - name: media_assets
+    type: path
+    description: Directory containing optimized AVIF/WebP media.
+  - name: url_inventory
+    type: path
+    description: CSV containing old URL inventory for redirect planning.
+environment:
+  node: "20.x"
+  package_manager: bun
+  tools:
+    - playwright
+    - sharp
+steps:
+  - id: prepare_output
+    name: Prepare output workspace
+    run: |
+      set -euo pipefail
+      mkdir -p "{{ inputs.output_dir }}"/media_assets
+      mkdir -p "{{ inputs.output_dir }}"/raw_html
+      mkdir -p "{{ inputs.output_dir }}"/logs
+    success_criteria:
+      - Output directories exist before crawling
+  - id: install_dependencies
+    name: Install scraping dependencies
+    run: |
+      set -euo pipefail
+      bun add -D playwright@latest sitemap-stream-parser@latest marked@latest sharp@latest
+    cwd: "{{ workspace }}"
+    success_criteria:
+      - node_modules/playwright exists
+  - id: generate_url_list
+    name: Generate discoverable URL list
+    run: |
+      set -euo pipefail
+      bunx sitemap-stream-parser "{{ inputs.domain_url }}" \
+        --include "^{{ inputs.domain_url }}" \
+        --max-depth 5 \
+        --out "{{ inputs.output_dir }}/url_inventory.csv"
+    success_criteria:
+      - url_inventory.csv contains header row and at least one path
+  - id: crawl_pages
+    name: Crawl pages and capture HTML + metadata
+    run: |
+      set -euo pipefail
+      bun run scripts/crawl-site.mjs \
+        --urls "{{ inputs.output_dir }}/url_inventory.csv" \
+        --out "{{ inputs.output_dir }}/raw_html" \
+        --user-agent "{{ inputs.user_agent }}" \
+        --log "{{ inputs.output_dir }}/logs/crawl.log"
+    success_criteria:
+      - crawl.log exists with HTTP 200 entries
+  - id: extract_semantics
+    name: Extract semantic content map
+    run: |
+      set -euo pipefail
+      bun run scripts/extract-semantic-structure.mjs \
+        --html "{{ inputs.output_dir }}/raw_html" \
+        --out "{{ inputs.output_dir }}/content_map.json" \
+        --min-heading-depth 3 \
+        --llm-readable true
+    success_criteria:
+      - content_map.json includes keys: slug, title, headings, sections
+  - id: download_media
+    name: Download and optimize media
+    run: |
+      set -euo pipefail
+      bun run scripts/download-media.mjs \
+        --urls "{{ inputs.output_dir }}/url_inventory.csv" \
+        --out "{{ inputs.output_dir }}/media_assets"
+      bun run scripts/convert-media.mjs \
+        --src "{{ inputs.output_dir }}/media_assets" \
+        --formats avif,webp \
+        --quality 82 \
+        --max-width 1920
+    success_criteria:
+      - media_assets directory populated with AVIF and WebP renditions
+  - id: summarize_scrape
+    name: Summarize crawl results
+    run: |
+      set -euo pipefail
+      bun run scripts/summarize-crawl.mjs \
+        --content "{{ inputs.output_dir }}/content_map.json" \
+        --urls "{{ inputs.output_dir }}/url_inventory.csv" \
+        --out "{{ inputs.output_dir }}/logs/summary.md"
+    success_criteria:
+      - summary.md reports page count and missing assets
+artifacts:
+  - path: "{{ inputs.output_dir }}/content_map.json"
+    description: Structured content map ready for Astro import.
+  - path: "{{ inputs.output_dir }}/media_assets"
+    description: Optimized media assets in AVIF/WebP.
+  - path: "{{ inputs.output_dir }}/url_inventory.csv"
+    description: Legacy URL inventory for migration.

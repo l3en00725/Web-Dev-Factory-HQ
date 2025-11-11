@@ -1,5 +1,87 @@
-description: Build and deploy Astro site to Vercel.
+description: Build and deploy the Astro site to Vercel ensuring PSI ≥95 before release.
+inputs:
+  - name: astro_project_path
+    type: path
+    required: true
+    description: Astro project directory to deploy.
+  - name: performance_report
+    type: path
+    required: true
+    description: Lighthouse performance report to confirm ≥95 scores.
+  - name: vercel_team
+    type: string
+    required: false
+    description: Optional Vercel team slug for deployment context.
+outputs:
+  - name: deployment_url
+    type: path
+    description: File containing deployed Vercel URL.
+  - name: deployment_log
+    type: path
+    description: Log output from Vercel CLI.
+environment:
+  node: "20.x"
+  package_manager: bun
+  cli:
+    - vercel
 steps:
-  - run "bun run build" or "npm run build"
-  - upload dist/ via Vercel CLI
-  - verify deployment URL
+  - id: validate_performance
+    name: Validate Lighthouse performance gate
+    run: |
+      set -euo pipefail
+      SCORE=$(jq -r '.categories.performance.score' "{{ inputs.performance_report }}")
+      awk "BEGIN { exit !( $SCORE >= 0.95 ) }"
+    success_criteria:
+      - Performance score ≥0.95 prior to deployment
+  - id: install_vercel_cli
+    name: Install Vercel CLI and prepare token
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun add -D vercel@latest
+      mkdir -p reports/deploy
+      if [ -z "$VERCEL_TOKEN" ]; then
+        echo "VERCEL_TOKEN is required" >&2
+        exit 1
+      fi
+    success_criteria:
+      - vercel CLI available and token provided
+  - id: build_project
+    name: Build Astro project for production
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      bun run build
+    success_criteria:
+      - dist/ directory exists
+  - id: deploy_preview
+    name: Deploy to Vercel and capture URL
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      DEPLOY_ARGS="--confirm --prebuilt"
+      if [ -n "{{ inputs.vercel_team }}" ]; then
+        DEPLOY_ARGS="$DEPLOY_ARGS --scope {{ inputs.vercel_team }}"
+      fi
+      bunx vercel deploy $DEPLOY_ARGS --token "$VERCEL_TOKEN" --yes > reports/deploy/vercel.log
+      DEPLOY_URL=$(tail -n 1 reports/deploy/vercel.log | awk '{print $NF}')
+      echo "$DEPLOY_URL" > reports/deploy/url.txt
+    success_criteria:
+      - Vercel log generated and URL captured
+  - id: run_smoke_tests
+    name: Run post-deploy smoke tests
+    run: |
+      set -euo pipefail
+      cd "{{ inputs.astro_project_path }}"
+      DEPLOY_URL=$(cat reports/deploy/url.txt)
+      bun run scripts/smoke-test.mjs --url "$DEPLOY_URL"
+    success_criteria:
+      - Smoke tests exit with code 0
+outputs_mapping:
+  deployment_url: "{{ inputs.astro_project_path }}/reports/deploy/url.txt"
+  deployment_log: "{{ inputs.astro_project_path }}/reports/deploy/vercel.log"
+artifacts:
+  - path: "{{ inputs.astro_project_path }}/reports/deploy/vercel.log"
+    description: Vercel deployment log.
+  - path: "{{ inputs.astro_project_path }}/reports/deploy/url.txt"
+    description: Output containing deployment URL.

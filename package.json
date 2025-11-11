@@ -1,0 +1,26 @@
+{
+  "name": "web-dev-factory-hq",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "lint": "echo 'No lint configured'",
+    "build:aveda": "cd sites/aveda-institute && ~/.bun/bin/bun run build",
+    "new-site": "bun run scripts/clone-template.mjs --name",
+    "build:site": "bun run scripts/build-site.mjs --site",
+    "deploy:site": "bun run scripts/deploy.mjs --site",
+    "pipeline:full": "bun run scripts/run-pipeline.mjs --site",
+    "install-form": "bun run scripts/install-form.mjs",
+    "choose-form": "bun run scripts/choose-form.mjs",
+    "optimize:images": "bun run scripts/optimize-media.mjs"
+  },
+  "dependencies": {
+    "cheerio": "^1.1.2",
+    "sharp": "^0.33.0",
+    "resend": "^3.0.0",
+    "prompts": "^2.4.2",
+    "chalk": "^5.3.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1"
+  }
+}

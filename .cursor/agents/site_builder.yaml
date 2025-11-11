@@ -1,20 +1,196 @@
 name: Site Builder
-description: Full-cycle Astro build orchestrator.
+description: Full-cycle Astro build orchestrator for Cursor automation.
 triggers:
-  - "start new project"
+  - start new project
+working_directory: "sites/${project_slug}"
+output_directory: "output/${project_slug}"
+inputs:
+  - name: domain_url
+    type: string
+    required: true
+    description: Primary source domain to migrate into Astro.
+  - name: repo_url
+    type: string
+    required: false
+    description: Optional GitHub repository for design or component reference.
+  - name: business_type
+    type: string
+    required: true
+    description: Business classification used for JSON-LD schema generation.
+  - name: project_slug
+    type: string
+    required: true
+    description: Directory name inside /sites for the generated Astro project.
+outputs:
+  - name: astro_project_path
+    type: path
+    description: Absolute path to the generated Astro project directory.
+  - name: performance_report
+    type: path
+    description: Aggregated Lighthouse results proving ≥95 PSI.
+  - name: seo_report
+    type: path
+    description: Migration, schema, and indexation verification summary.
+environment:
+  node: "20.x"
+  package_manager: bun
+  astro_version: latest
+  psi_target: ">=95"
 sequence:
-  - scrape_existing_site
-  - clone_repo
-  - setup_astro_project
-  - optimize_page_speed
-  - generate_schema_markup
-  - validate_llm_readability
-  - implement_redirects
-  - verify_indexation
-  - deploy_to_vercel
+  - id: scrape_existing_site
+    title: Scrape existing site assets
+    skill: scrape_existing_site
+    inputs:
+      domain_url: "{{ inputs.domain_url }}"
+      output_dir: "{{ workspace }}/.cursor/output/{{ inputs.project_slug }}/scrape"
+    outputs:
+      content_map: "{{ workspace }}/.cursor/output/{{ inputs.project_slug }}/scrape/content_map.json"
+      media_assets: "{{ workspace }}/.cursor/output/{{ inputs.project_slug }}/scrape/media_assets"
+      url_inventory: "{{ workspace }}/.cursor/output/{{ inputs.project_slug }}/scrape/url_map.csv"
+    success_criteria:
+      - content_map.json contains at least one page node with H1 present
+      - Media assets optimized as AVIF/WebP when source allows
+  - id: optimize_images
+    title: Optimize images to AVIF/WebP/JPG
+    skill: optimize_media
+    inputs:
+      raw_media_path: "{{ sequence.scrape_existing_site.outputs.media_assets }}"
+      output_path: "{{ workspace }}/sites/{{ inputs.project_slug }}/public/media"
+      formats: ["avif", "webp", "jpg"]
+      max_width: 1200
+      quality_avif: 80
+      quality_webp: 85
+      quality_jpg: 90
+    outputs:
+      optimized_media_path: "{{ workspace }}/sites/{{ inputs.project_slug }}/public/media"
+      image_map: "{{ workspace }}/sites/{{ inputs.project_slug }}/public/media/image-map.json"
+    success_criteria:
+      - All images converted to AVIF, WebP, and JPG formats
+      - Responsive sizes generated (400px, 800px, 1200px)
+      - image-map.json created for import step
+    dependencies:
+      - scrape_existing_site
+  - id: clone_reference_repo
+    title: Clone reference repository
+    skill: clone_repo
+    when: "inputs.repo_url != ''"
+    inputs:
+      repo_url: "{{ inputs.repo_url }}"
+      destination: "{{ workspace }}/.cursor/cache/{{ inputs.project_slug }}/reference"
+    outputs:
+      local_repo_path: "{{ workspace }}/.cursor/cache/{{ inputs.project_slug }}/reference"
+    success_criteria:
+      - Reference repository cloned with git clean status
+  - id: setup_astro_project
+    title: Setup Astro project and import content
+    skill: setup_astro_project
+    inputs:
+      project_slug: "{{ inputs.project_slug }}"
+      content_map: "{{ sequence.scrape_existing_site.outputs.content_map }}"
+      media_assets: "{{ sequence.optimize_images.outputs.optimized_media_path }}"
+      image_map: "{{ sequence.optimize_images.outputs.image_map }}"
+      reference_repo: "{{ sequence.clone_reference_repo.outputs.local_repo_path }}"
+      business_type: "{{ inputs.business_type }}"
+    outputs:
+      astro_project_path: "{{ workspace }}/sites/{{ inputs.project_slug }}"
+      url_inventory: "{{ workspace }}/sites/{{ inputs.project_slug }}/reports/url_inventory.csv"
+    success_criteria:
+      - Astro project installs dependencies with bun install in under two minutes
+      - Tailwind + shadcn/ui configured and first build succeeds
+      - Imported content mapped to Astro routes respecting heading hierarchy
+    dependencies:
+      - scrape_existing_site
+      - optimize_images
+  - id: optimize_page_speed
+    title: Achieve ≥95 Lighthouse performance
+    skill: optimize_page_speed
+    inputs:
+      astro_project_path: "{{ sequence.setup_astro_project.outputs.astro_project_path }}"
+      media_assets: "{{ sequence.scrape_existing_site.outputs.media_assets }}"
+    outputs:
+      performance_report: "{{ sequence.setup_astro_project.outputs.astro_project_path }}/reports/performance/lighthouse.json"
+    success_criteria:
+      - Mobile and desktop PSI performance >= 95
+      - Largest contentful paint < 2.5s on throttled mobile
+  - id: generate_schema_markup
+    title: Generate JSON-LD schema
+    skill: generate_schema_markup
+    inputs:
+      business_type: "{{ inputs.business_type }}"
+      astro_project_path: "{{ sequence.setup_astro_project.outputs.astro_project_path }}"
+    outputs:
+      schema_file: "{{ sequence.setup_astro_project.outputs.astro_project_path }}/src/components/site-schema.json"
+    success_criteria:
+      - Schema validates via Google Rich Results (no warnings)
+  - id: validate_llm_readability
+    title: Validate LLM readability
+    skill: validate_llm_readability
+    inputs:
+      astro_project_path: "{{ sequence.setup_astro_project.outputs.astro_project_path }}"
+    outputs:
+      readability_report: "{{ sequence.setup_astro_project.outputs.astro_project_path }}/reports/llm_readability.md"
+    success_criteria:
+      - Documented H1-H3 structure present on all pages
+      - FAQ markup detected for visitor questions
+  - id: implement_redirects
+    title: Implement 301 redirect mapping
+    skill: implement_redirects
+    inputs:
+      astro_project_path: "{{ sequence.setup_astro_project.outputs.astro_project_path }}"
+      old_urls: "{{ sequence.scrape_existing_site.outputs.url_inventory }}"
+      new_urls: "{{ sequence.setup_astro_project.outputs.url_inventory }}"
+    outputs:
+      redirect_manifest: "{{ sequence.setup_astro_project.outputs.astro_project_path }}/vercel.json"
+    success_criteria:
+      - 100% of legacy URLs mapped with 301 status
+  - id: verify_indexation
+    title: Verify indexation and redirect health
+    skill: verify_indexation
+    inputs:
+      astro_project_path: "{{ sequence.setup_astro_project.outputs.astro_project_path }}"
+      redirect_manifest: "{{ sequence.implement_redirects.outputs.redirect_manifest }}"
+    outputs:
+      indexation_report: "{{ sequence.setup_astro_project.outputs.astro_project_path }}/reports/indexation.md"
+    success_criteria:
+      - All redirects return 301 followed by 200 within < 1s
+  - id: deploy_to_vercel
+    title: Deploy Astro project to Vercel
+    skill: deploy_to_vercel
+    inputs:
+      astro_project_path: "{{ sequence.setup_astro_project.outputs.astro_project_path }}"
+      performance_report: "{{ sequence.optimize_page_speed.outputs.performance_report }}"
+    outputs:
+      deployment_url: "{{ workspace }}/.cursor/output/{{ inputs.project_slug }}/deployment_url.txt"
+    success_criteria:
+      - Vercel preview returns HTTP 200 with cache-control headers set
 checkpoints:
-  - "Confirm Astro project created"
-  - "Confirm 95+ Lighthouse score"
-  - "Confirm schema validation"
-  - "Confirm redirects tested"
-  - "Confirm deployment success"
+  - id: astro_project_created
+    description: Confirm Astro project scaffolded with Tailwind and shadcn/ui installed.
+    verify:
+      - "[ -f {{ sequence.setup_astro_project.outputs.astro_project_path }}/astro.config.mjs ]"
+      - "[ -d {{ sequence.setup_astro_project.outputs.astro_project_path }}/src/pages ]"
+  - id: lighthouse_pass
+    description: Confirm Lighthouse mobile/desktop scores ≥ 95.
+    verify:
+      - "jq '.categories.performance.score >= 0.95' {{ sequence.optimize_page_speed.outputs.performance_report }}"
+  - id: schema_validation
+    description: Confirm schema validates without errors.
+    verify:
+      - "grep '@type' {{ sequence.generate_schema_markup.outputs.schema_file }}"
+  - id: redirects_tested
+    description: Confirm redirects tested via migration_manager suite.
+    verify:
+      - "[ -f {{ sequence.implement_redirects.outputs.redirect_manifest }} ]"
+  - id: deployment_success
+    description: Confirm deployment URL responds with 200.
+    verify:
+      - "curl -I $(cat {{ sequence.deploy_to_vercel.outputs.deployment_url }}) | grep '200'"
+artifacts:
+  - path: "{{ sequence.optimize_page_speed.outputs.performance_report }}"
+    description: Consolidated Lighthouse audit JSON.
+  - path: "{{ sequence.generate_schema_markup.outputs.schema_file }}"
+    description: JSON-LD schema attached to Astro layout.
+  - path: "{{ sequence.verify_indexation.outputs.indexation_report }}"
+    description: Indexation and redirect verification notes.
+  - path: "{{ sequence.deploy_to_vercel.outputs.deployment_url }}"
+    description: Vercel deployment URL for final QA.
