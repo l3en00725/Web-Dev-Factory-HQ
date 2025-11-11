@@ -1,0 +1,211 @@
+================================================================================
+VERCEL ENVIRONMENT VARIABLES - BLUE LAWNS
+================================================================================
+
+Copy these exact values into your Vercel dashboard:
+Project Settings → Environment Variables
+
+================================================================================
+STEP-BY-STEP INSTRUCTIONS
+================================================================================
+
+1. Go to: https://vercel.com/dashboard
+2. Select your "Blue Lawns" project
+3. Click on "Settings" tab
+4. Click on "Environment Variables" in left sidebar
+5. For each variable below, click "Add New"
+6. Copy the Name and Value exactly as shown
+7. Check ALL THREE environments: Production, Preview, Development
+8. Click "Save"
+
+================================================================================
+REQUIRED ENVIRONMENT VARIABLES
+================================================================================
+
+Variable 1 of 4:
+───────────────
+Name:  ZAPIER_WEBHOOK_URL_POOL
+Value: https://hooks.zapier.com/hooks/catch/4454012/u86hwqk/
+Envs:  ☑ Production  ☑ Preview  ☑ Development
+
+
+Variable 2 of 4:
+───────────────
+Name:  ECOAST_POOL_EMAIL
+Value: leads@ecoastpools.com
+Envs:  ☑ Production  ☑ Preview  ☑ Development
+
+
+Variable 3 of 4:
+───────────────
+Name:  CONTACT_EMAIL
+Value: info@bluelawns.com
+Envs:  ☑ Production  ☑ Preview  ☑ Development
+
+
+Variable 4 of 4:
+───────────────
+Name:  RESEND_API_KEY
+Value: <Get from: https://resend.com/api-keys>
+Envs:  ☑ Production  ☑ Preview  ☑ Development
+
+Note: You need to sign up at resend.com and get your API key.
+      Free tier supports 100 emails/day which is plenty for testing.
+
+================================================================================
+OPTIONAL ENVIRONMENT VARIABLES
+================================================================================
+
+Variable (Optional):
+───────────────────
+Name:  GOOGLE_ANALYTICS_ID
+Value: G-MSCK89LLJ1
+Envs:  ☑ Production  ☑ Preview  ☑ Development
+
+================================================================================
+VERIFICATION
+================================================================================
+
+After adding all variables:
+
+1. Go back to your project dashboard
+2. You should see a new deployment triggered automatically
+3. Wait for deployment to complete (1-2 minutes)
+4. Test the form at: https://your-domain.vercel.app/pools
+
+================================================================================
+TESTING THE INTEGRATION
+================================================================================
+
+Once environment variables are set:
+
+1. Go to your deployed site: https://[your-project].vercel.app/pools
+2. Fill out the pool service form
+3. Submit it
+4. Check these three places:
+
+   ✓ Zapier Task History: https://zapier.com/app/history
+     - Should show a successful task
+   
+   ✓ Jobber Dashboard: [Your Jobber URL]
+     - Should show new client request
+   
+   ✓ Email: leads@ecoastpools.com
+     - Should receive notification email
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+If form submission fails:
+
+1. Check Vercel deployment logs:
+   - Go to Deployments tab
+   - Click on latest deployment
+   - Check "Functions" tab for errors
+
+2. Verify all environment variables:
+   - Go to Settings → Environment Variables
+   - Confirm all 4 required variables are set
+   - Ensure they're set for all 3 environments
+
+3. Check for typos:
+   - Webhook URL must be exact
+   - No extra spaces
+   - No missing characters
+
+4. Redeploy if needed:
+   - Go to Deployments tab
+   - Click on latest deployment
+   - Click "..." menu → Redeploy
+
+================================================================================
+WEBHOOK TEST RESULTS
+================================================================================
+
+Webhook URL: https://hooks.zapier.com/hooks/catch/4454012/u86hwqk/
+
+Test Date: November 11, 2025
+Status: ✅ ACTIVE & RESPONDING
+
+Test Response:
+{
+  "attempt": "019a7467-a3e7-2c98-b140-1c6cf76ddf0e",
+  "id": "019a7467-a3e7-2c98-b140-1c6cf76ddf0e",
+  "request_id": "019a7467-a3e7-2c98-b140-1c6cf76ddf0e",
+  "status": "success"
+}
+
+================================================================================
+NEXT STEPS AFTER VERCEL SETUP
+================================================================================
+
+1. Complete Zap configuration in Zapier (if not done):
+   - Go to: https://zapier.com/app/zaps
+   - Configure Jobber action
+   - Map all fields
+   - Turn ON the Zap
+
+2. Test the complete flow:
+   - Submit form from your deployed site
+   - Verify lead in Jobber
+   - Verify email received
+
+3. Monitor first 10 leads:
+   - Check daily for any issues
+   - Verify data quality
+   - Track response times
+
+================================================================================
+SUPPORT
+================================================================================
+
+Documentation:
+- Setup Guide: integrations/zapier/SETUP-GUIDE.md
+- Quick Start: output/blue-lawns/ZAPIER-QUICK-START.md
+- Webhook Config: output/blue-lawns/WEBHOOK-CONFIGURED.md
+
+Questions?
+- Vercel Support: https://vercel.com/support
+- Zapier Help: https://help.zapier.com/
+- Resend Docs: https://resend.com/docs
+
+================================================================================
+CHECKLIST
+================================================================================
+
+Setup:
+□ Signed into Vercel dashboard
+□ Located Blue Lawns project
+□ Navigated to Settings → Environment Variables
+□ Added ZAPIER_WEBHOOK_URL_POOL
+□ Added ECOAST_POOL_EMAIL
+□ Added CONTACT_EMAIL
+□ Added RESEND_API_KEY (from resend.com)
+□ Added GOOGLE_ANALYTICS_ID (optional)
+□ Selected all 3 environments for each
+□ Saved all variables
+□ Waited for automatic redeployment
+
+Testing:
+□ Visited deployed site /pools page
+□ Submitted test form
+□ Checked Zapier Task History
+□ Verified lead in Jobber
+□ Verified email received
+
+Production:
+□ Monitoring first 10 leads
+□ Checking success rates daily
+□ Verifying data quality
+□ Tracking response times
+
+================================================================================
+STATUS: READY FOR VERCEL CONFIGURATION
+================================================================================
+
+Webhook: ✅ Configured & Tested
+Documentation: ✅ Complete
+Next Step: Add environment variables to Vercel (5 minutes)
+
+================================================================================

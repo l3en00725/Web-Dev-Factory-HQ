@@ -1,0 +1,34 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Badge from '../components/ui/badge.astro';
+import Card from '../components/ui/card.astro';
+import Button from '../components/ui/button.astro';
+import Container from '../components/container.astro';
+
+const meta = {
+  title: 'About Blue Lawns | Professional Landscaping Services Cape May County NJ',
+  description: 'Learn about Blue Lawns, Cape May County\'s trusted lawn care and landscaping company. Serving Ocean View, Avalon, Stone Harbor, Wildwood, and Cape May with expert outdoor property care. Licensed & insured.'
+};
+---
+
+<Layout title={meta.title}>
+  <Container>
+  <section class="hero">
+    <div class="hero__content space-y-4">
+      <Badge>About Aveda Institute</Badge>
+      <h1 class="hero__title">About Aveda Institute</h1>
+      <p class="hero__lead">Aveda Institute empowers future beauty professionals.</p>
+      <div class="hero__actions">
+        <Button href="/contact">Book a visit</Button>
+        <Button variant="outline" href="/about">Explore programs</Button>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid gap-8 md:grid-cols-2">
+
+  </div>
+
+
+  </Container>
+</Layout>

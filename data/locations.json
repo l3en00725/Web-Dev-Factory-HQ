@@ -1,0 +1,8 @@
+[
+  { "city": "Cape May", "state": "NJ", "lat": 38.9351, "lng": -74.9060 },
+  { "city": "Stone Harbor", "state": "NJ", "lat": 39.0501, "lng": -74.7596 },
+  { "city": "Avalon", "state": "NJ", "lat": 39.1018, "lng": -74.7163 },
+  { "city": "Ocean City", "state": "NJ", "lat": 39.2776, "lng": -74.5746 },
+  { "city": "Wildwood", "state": "NJ", "lat": 38.9912, "lng": -74.8148 }
+]
+

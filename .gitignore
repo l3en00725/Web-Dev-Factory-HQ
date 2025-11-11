@@ -1,0 +1,39 @@
+# Environment Variables
+.env
+.env.local
+.env.production
+.env.development
+
+# Dependencies
+node_modules/
+bun.lockb
+
+# Build outputs
+dist/
+.astro/
+
+# Logs
+*.log
+logs/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+.cache/
+
+# Vercel
+.vercel
+
+# Testing
+coverage/
+.nyc_output/
+

@@ -1,0 +1,85 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Container from '../components/container.astro';
+import Badge from '../components/ui/badge.astro';
+import Card from '../components/ui/card.astro';
+import Button from '../components/ui/button.astro';
+
+const meta = {
+  title: 'Professional Lawn Care & Landscaping | Blue Lawns Cape May County NJ',
+  description: 'Expert lawn care, landscaping, and pool services in Cape May County, NJ. Serving Ocean View, Avalon, Stone Harbor, Wildwood, Cape May. Weekly maintenance, custom designs, seasonal cleanup. Call 609-425-2954.'
+};
+---
+
+<Layout title={meta.title}>
+  <Container>
+    <section class="hero">
+      <div class="hero__content space-y-4">
+        <Badge>Professional Lawn Care & Landscaping in Cape May County</Badge>
+        <h1 class="hero__title">Expert Lawn Care & Landscaping Services in Cape May County, NJ</h1>
+        <p class="hero__lead">Blue Lawns provides professional lawn care, landscaping, hardscaping, and pool services throughout Cape May County. From Ocean View to Cape May, we deliver exceptional outdoor property care for residential and commercial clients. Weekly maintenance, custom designs, seasonal cleanup, and year-round service.</p>
+        <div class="hero__actions flex gap-4">
+          <Button href="/contact">Request a Quote</Button>
+          <Button href="/services" variant="outline">Our Services</Button>
+        </div>
+      </div>
+    </section>
+  </Container>
+
+  <!-- Botpress Chat Container - Full Width Below Hero -->
+  <section id="botpress-chat" class="w-full bg-white py-8 border-t border-gray-100">
+    <div class="container mx-auto px-4">
+      <div id="bp-webchat"></div>
+    </div>
+  </section>
+
+  <Container>
+
+  <!-- Service Area Section -->
+  <section class="section bg-gray-50">
+    <div class="section__inner max-w-4xl mx-auto">
+      <h2 class="section__heading text-center mb-8">Serving Cape May County, New Jersey</h2>
+      <p class="text-lg text-center mb-8">Blue Lawns provides expert lawn care and landscaping services throughout Cape May County. Our professional team serves homeowners and businesses across the region with reliable, high-quality outdoor property care.</p>
+      
+      <div class="grid md:grid-cols-2 gap-6 mt-8">
+        <div>
+          <h3 class="text-xl font-bold text-green-800 mb-3">🏡 Residential Areas</h3>
+          <ul class="space-y-2">
+            <li><strong>Ocean View, NJ</strong> - Our home base at 57 W Katherine Ave</li>
+            <li><strong>Avalon & Stone Harbor</strong> - Premium coastal property care</li>
+            <li><strong>Cape May</strong> - Historic home landscaping specialists</li>
+            <li><strong>Sea Isle City</strong> - Year-round maintenance programs</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-green-800 mb-3">🏢 Commercial & Vacation Properties</h3>
+          <ul class="space-y-2">
+            <li><strong>Wildwood, Wildwood Crest & North Wildwood</strong> - Vacation home maintenance</li>
+            <li><strong>Cape May Court House</strong> - Commercial landscaping</li>
+            <li><strong>Rio Grande</strong> - Custom landscape design</li>
+            <li><strong>7 Mile Island</strong> - Coastal erosion control</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-8 p-6 bg-green-50 rounded-lg border border-green-200 text-center">
+        <p class="text-lg font-semibold text-green-900 mb-2">📍 Visit Us</p>
+        <p class="text-gray-700">57 W. Katherine Ave Unit B, Ocean View, NJ 08230</p>
+        <p class="text-gray-700 mt-2">📞 Call: <a href="tel:609-425-2954" class="text-green-700 font-bold hover:underline">609-425-2954</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Overview -->
+  <section class="section">
+    <div class="section__inner">
+      <h2 class="section__heading text-center mb-8">Our Cape May County Services</h2>
+      <div class="grid gap-8 md:grid-cols-3">
+        <Card title="Lawn Care & Maintenance" description="Weekly mowing, edging, trimming, and fertilization services for residential and commercial properties throughout Cape May County." />
+        <Card title="Landscaping & Design" description="Custom landscape design, installation, hardscaping, and coastal erosion control for Ocean View, Avalon, Stone Harbor properties." />
+        <Card title="Pool Service" description="Professional pool maintenance and cleaning via our Ecoast Pool Service partnership. Serving vacation homes and year-round residents." />
+      </div>
+    </div>
+  </section>
+  </Container>
+</Layout>

@@ -1,0 +1,60 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Badge from '../components/ui/badge.astro';
+import Card from '../components/ui/card.astro';
+import Button from '../components/ui/button.astro';
+import Container from '../components/container.astro';
+
+const meta = {
+  title: 'Exclusive Lawn Care Memberships | Blue Lawns',
+  description: 'Join Blue Lawns membership for tailored lawn maintenance packages in Cape May County. Regular cuttings, seasonal cleanups, sprinkler services. Serving Ocean View, Avalon, Stone Harbor, Wildwood, Cape May.'
+};
+---
+
+<Layout title={meta.title}>
+  <Container>
+  <section class="hero">
+    <div class="hero__content space-y-4">
+      <Badge>Exclusive Lawn Care Memberships | Blue Lawns</Badge>
+      <h1 class="hero__title">Choose Your Membership Plan</h1>
+      <p class="hero__lead"></p>
+      <div class="hero__actions">
+        <Button href="/contact">Book a visit</Button>
+        <Button variant="outline" href="/about">Explore programs</Button>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid gap-8 md:grid-cols-2">
+    <Card title="Our past projects of landscaping work" description="" />
+    <Card title="Our recent work of landscaping work" description="" />
+    <Card title="What our clients say" description="" />
+    <Card title="We’ve pulled together some basics to help you get started" description="" />
+  </div>
+
+      <section class="section">
+        <div class="section__inner">
+          <h2 class="section__heading">Our past projects of landscaping work</h2>
+          <p class="section__body"></p>
+        </div>
+      </section>
+      <section class="section">
+        <div class="section__inner">
+          <h2 class="section__heading">Our recent work of landscaping work</h2>
+          <p class="section__body"></p>
+        </div>
+      </section>
+      <section class="section">
+        <div class="section__inner">
+          <h2 class="section__heading">What our clients say</h2>
+          <p class="section__body"></p>
+        </div>
+      </section>
+      <section class="section">
+        <div class="section__inner">
+          <h2 class="section__heading">We’ve pulled together some basics to help you get started</h2>
+          <p class="section__body"></p>
+        </div>
+      </section>
+  </Container>
+</Layout>

@@ -1,0 +1,36 @@
+{
+  "botId": "e1a8e8ce-61e1-4ba5-baa2-782a7ae7e4db",
+  "status": "connected",
+  "notes": "Personal Access Token stored in .env. Ready to create bot in Botpress Cloud.",
+  "created": "2025-11-11",
+  "updated": "2025-11-11",
+  "purpose": "Lead capture and customer service chatbot for Blue Lawns website",
+  "credentials": {
+    "stored": true,
+    "location": "/sites/blue-lawns/.env",
+    "variable": "BOTPRESS_PAT",
+    "secured": true
+  },
+  "integration": {
+    "type": "webchat",
+    "position": "full-width-below-hero",
+    "page": "homepage"
+  },
+  "configuration": {
+    "containerWidth": "100%",
+    "layoutWidth": "100%",
+    "showCloseButton": false,
+    "showPoweredBy": false,
+    "theme": "light"
+  },
+  "nextSteps": [
+    "✅ Personal Access Token stored securely",
+    "Create bot in Botpress Cloud dashboard",
+    "Get Bot ID from dashboard",
+    "Update bot ID in botpress-init.js",
+    "Configure conversation flows",
+    "Test integration locally",
+    "Deploy to production"
+  ]
+}
+

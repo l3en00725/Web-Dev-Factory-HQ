@@ -1,0 +1,33 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Container from '../../components/container.astro';
+import Badge from '../../components/ui/badge.astro';
+import Card from '../../components/ui/card.astro';
+import Button from '../../components/ui/button.astro';
+
+const meta = {
+  title: 'Lawn Care Tips & Expert Advice | Blue Lawns Knowledge Base',
+  description: 'Aveda Institute empowers future beauty professionals.'
+};
+---
+
+<Layout title={meta.title} description={meta.description}>
+  <section class="hero">
+    <div class="hero__content space-y-4">
+      <Badge>Lawn Care Tips & Expert Advice | Blue Lawns Knowledge Base</Badge>
+      <h1 class="hero__title">Knowledge Base</h1>
+      <p class="hero__lead">Aveda Institute empowers future beauty professionals.</p>
+      <div class="hero__actions">
+        <Button href="/contact">Book a visit</Button>
+        <Button variant="outline" href="/about">Explore programs</Button>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid gap-8 md:grid-cols-2">
+
+  </div>
+
+
+  </Container>
+</Layout>

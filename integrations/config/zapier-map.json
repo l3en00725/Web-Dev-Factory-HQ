@@ -1,0 +1,163 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-11-11T00:00:00Z",
+  "integrations": [
+    {
+      "site": "blue-lawns",
+      "lead_type": "Pool Lead",
+      "description": "Routes pool service inquiries from Blue Lawns to Ecoast Pool Service",
+      "form_endpoint": "/api/submit-pool-lead",
+      "webhook": {
+        "service": "Zapier",
+        "trigger_type": "Webhooks by Zapier - Catch Hook",
+        "env_variable": "ZAPIER_WEBHOOK_URL_POOL",
+        "url_pattern": "https://hooks.zapier.com/hooks/catch/{account_id}/{hook_id}",
+        "configured": false,
+        "last_tested": null,
+        "test_status": null
+      },
+      "destinations": [
+        {
+          "service": "Jobber",
+          "action": "Create Client Request",
+          "field_mappings": {
+            "first_name": "Split Name (first part)",
+            "last_name": "Split Name (last part)",
+            "email": "Email",
+            "phone": "Phone",
+            "city": "City",
+            "service_address": "City + ', NJ'",
+            "request_details": "Message",
+            "custom_fields": {
+              "lead_type": "Lead Type",
+              "lead_source": "Lead Source",
+              "service_interest": "Service Interest"
+            },
+            "tags": ["Blue Lawns", "Pool Lead"]
+          },
+          "client_hub_url": "https://clienthub.getjobber.com/client_hubs/c7073ac4-949a-4ae1-9cee-a723ddb9c5d1/public/work_request/new"
+        },
+        {
+          "service": "Email (Resend)",
+          "action": "Send Email",
+          "recipients": {
+            "to": ["leads@ecoastpools.com"],
+            "cc": ["info@bluelawns.com"],
+            "reply_to": "Customer Email"
+          },
+          "env_variables": {
+            "api_key": "RESEND_API_KEY",
+            "to_email": "ECOAST_POOL_EMAIL",
+            "cc_email": "CONTACT_EMAIL"
+          }
+        },
+        {
+          "service": "Email (via Zapier)",
+          "action": "Send Outbound Email",
+          "recipients": {
+            "to": "leads@ecoastpools.com",
+            "from": "noreply@bluelawns.com"
+          },
+          "subject_template": "🏊 New Pool Lead from Blue Lawns - {{City}}",
+          "optional": true,
+          "notes": "Redundant email notification via Zapier for reliability"
+        }
+      ],
+      "tracking_fields": {
+        "hidden_fields": [
+          {
+            "field": "lead_source",
+            "value": "Blue Lawns",
+            "description": "Identifies the originating website"
+          },
+          {
+            "field": "lead_type",
+            "value": "Pool Lead",
+            "description": "Categorizes the service type"
+          },
+          {
+            "field": "service_interest",
+            "value": "Pool Maintenance",
+            "description": "Primary service category"
+          },
+          {
+            "field": "referral_url",
+            "value": "Dynamic (page URL)",
+            "description": "Specific page where form was submitted"
+          },
+          {
+            "field": "timestamp",
+            "value": "Dynamic (ISO 8601)",
+            "description": "Exact submission time"
+          }
+        ],
+        "analytics": {
+          "google_analytics": {
+            "event_name": "form_submit",
+            "event_category": "pool_service_request",
+            "event_label": "Pool Lead"
+          }
+        }
+      },
+      "monitoring": {
+        "success_rate_target": 99,
+        "response_time_target_seconds": 5,
+        "email_delivery_target": 98,
+        "alert_email": "info@bluelawns.com",
+        "log_file": "output/blue-lawns/webhook-test-log.json"
+      },
+      "documentation": [
+        "integrations/zapier/SETUP-GUIDE.md",
+        "output/blue-lawns/tracking-map.md",
+        "output/blue-lawns/deployment-readiness.md"
+      ],
+      "status": {
+        "code_complete": true,
+        "webhook_configured": false,
+        "zap_active": false,
+        "tested_end_to_end": false,
+        "production_ready": false
+      }
+    }
+  ],
+  "testing": {
+    "test_script": "integrations/zapier/testWebhook.js",
+    "quickstart_script": "integrations/zapier/quickstart.sh",
+    "test_payload": {
+      "name": "Test User",
+      "email": "test@example.com",
+      "phone": "609-555-0123",
+      "city": "Cape May",
+      "service_type": "Weekly Pool Cleaning",
+      "message": "Test submission",
+      "lead_source": "Blue Lawns",
+      "lead_type": "Pool Lead",
+      "service_interest": "Pool Maintenance"
+    }
+  },
+  "deployment": {
+    "required_env_variables": [
+      "ZAPIER_WEBHOOK_URL_POOL",
+      "ECOAST_POOL_EMAIL",
+      "RESEND_API_KEY",
+      "CONTACT_EMAIL"
+    ],
+    "optional_env_variables": [
+      "GOOGLE_ANALYTICS_ID",
+      "CALLRAIL_TRACKING_NUMBER",
+      "JOBBER_API_KEY"
+    ],
+    "vercel_setup": {
+      "project": "blue-lawns",
+      "environment": ["production", "preview", "development"],
+      "dashboard_url": "https://vercel.com/dashboard"
+    }
+  },
+  "support": {
+    "zapier_help": "https://help.zapier.com/",
+    "jobber_help": "https://support.getjobber.com/",
+    "resend_docs": "https://resend.com/docs",
+    "project_docs": "output/blue-lawns/"
+  }
+}
+

@@ -1,0 +1,75 @@
+---
+import { SEO } from "astro-seo";
+import Footer from "@/components/footer.astro";
+import Navbar from "@/components/navbar/navbar.astro";
+import siteSchema from "@/components/site-schema.json";
+import "@fontsource-variable/inter/index.css";
+import "@fontsource-variable/bricolage-grotesque";
+import "../styles/global.css";
+
+export interface Props {
+  title: string;
+}
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+
+const resolvedImageWithDomain = new URL(
+  "/opengraph.jpg",
+  Astro.site
+).toString();
+
+const { title } = Astro.props;
+
+const makeTitle = title
+  ? title + " | " + "Blue Lawns"
+  : "Blue Lawns - Professional Lawn Care, Landscaping & Pool Maintenance";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- <link rel="preload" as="image" href={src} alt="Hero" /> -->
+    <SEO
+      title={makeTitle}
+      description="Blue Lawns provides expert lawn care, landscaping, and pool maintenance services. Professional, reliable, and affordable outdoor property care."
+      canonical={canonicalURL}
+      twitter={{
+        creator: "@bluelawns",
+        site: "@bluelawns",
+        card: "summary_large_image",
+      }}
+      openGraph={{
+        basic: {
+          url: canonicalURL,
+          type: "website",
+          title: `Blue Lawns - Professional Lawn Care & Landscaping`,
+          image: resolvedImageWithDomain,
+        },
+        image: {
+          alt: "Astroship Homepage Screenshot",
+        },
+      }}
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(siteSchema)} />
+  </head>
+  <body>
+    <Navbar />
+    <slot />
+    <Footer />
+    <style is:global>
+      /* Improve Page speed */
+      /* https://css-tricks.com/almanac/properties/c/content-visibility/ */
+      img {
+        content-visibility: auto;
+      }
+    </style>
+    
+    <!-- Botpress Webchat Initialization -->
+    <script is:inline src="/js/botpress-init.js"></script>
+  </body>
+</html>

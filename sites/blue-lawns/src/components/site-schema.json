@@ -1,0 +1,114 @@
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Blue Lawns",
+  "description": "Professional lawn care, landscaping, and pool maintenance services. Expert outdoor property care for residential and commercial properties.",
+  "url": "https://bluelawns.com",
+  "telephone": "+1-609-425-2954",
+  "email": "info@bluelawns.com",
+  "priceRange": "$$",
+  "areaServed": [
+    {
+      "@type": "City",
+      "name": "Ocean View",
+      "containedIn": {
+        "@type": "State",
+        "name": "New Jersey"
+      }
+    },
+    {
+      "@type": "City",
+      "name": "Cape May"
+    },
+    {
+      "@type": "City",
+      "name": "Avalon"
+    },
+    {
+      "@type": "City",
+      "name": "Stone Harbor"
+    },
+    {
+      "@type": "City",
+      "name": "Sea Isle City"
+    },
+    {
+      "@type": "City",
+      "name": "Wildwood"
+    },
+    {
+      "@type": "City",
+      "name": "Wildwood Crest"
+    },
+    {
+      "@type": "City",
+      "name": "North Wildwood"
+    },
+    {
+      "@type": "City",
+      "name": "Cape May Court House"
+    },
+    {
+      "@type": "City",
+      "name": "Rio Grande"
+    }
+  ],
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "57 W. Katherine Ave Unit B",
+    "addressLocality": "Ocean View",
+    "addressRegion": "NJ",
+    "postalCode": "08230",
+    "addressCountry": "US"
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "opens": "07:00",
+      "closes": "18:00"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "Saturday",
+      "opens": "08:00",
+      "closes": "14:00"
+    }
+  ],
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Lawn Care Services",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Lawn Care",
+          "description": "Regular mowing, edging, fertilizing, and weed control"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Landscaping",
+          "description": "Custom landscape design and installation"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Pool Maintenance",
+          "description": "Weekly pool cleaning and maintenance services"
+        }
+      }
+    ]
+  }
+}

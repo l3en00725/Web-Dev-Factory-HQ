@@ -1,0 +1,68 @@
+{
+  "blueLawns": {
+    "name": "Blue Lawns",
+    "logo": "/media/blue-lawns-logo.webp",
+    "logoAlt": "/opengraph.jpg",
+    "primaryColor": "#00843D",
+    "secondaryColor": "#0A7541",
+    "accentColor": "#F2F7F3",
+    "textColor": "#1F2937",
+    "fontFamily": "Inter, Bricolage Grotesque, sans-serif",
+    "phone": "609-425-2954",
+    "email": "info@bluelawns.com",
+    "address": {
+      "street": "57 W. Katherine Ave Unit B",
+      "city": "Ocean View",
+      "state": "NJ",
+      "zip": "08230"
+    },
+    "serviceArea": "Cape May County, NJ",
+    "serviceCities": [
+      "Ocean View",
+      "Cape May",
+      "Avalon",
+      "Stone Harbor",
+      "Sea Isle City",
+      "Wildwood",
+      "Wildwood Crest",
+      "North Wildwood",
+      "Cape May Court House",
+      "Rio Grande"
+    ],
+    "services": [
+      "Lawn Care",
+      "Landscaping",
+      "Fencing",
+      "Seasonal Cleanup",
+      "Commercial Services"
+    ]
+  },
+  "ecoastPools": {
+    "name": "Ecoast Pool Service",
+    "logo": "https://cdn.prod.website-files.com/67c9a85171000a77547bc62d/67d000e1abb2df4398a159ba_Logo%20with%20Tagline%202.png",
+    "primaryColor": "#0099CC",
+    "secondaryColor": "#0077AA",
+    "accentColor": "#E6F7FB",
+    "textColor": "#1F2937",
+    "fontFamily": "Jost, Bebas Neue, sans-serif",
+    "phone": "609-425-2954",
+    "email": "leads@ecoastpools.com",
+    "address": {
+      "street": "1011 Rt. 9 South",
+      "city": "Cape May Court House",
+      "state": "NJ",
+      "zip": "08210"
+    },
+    "serviceArea": "Cape May County, NJ",
+    "services": [
+      "Weekly Pool Cleaning",
+      "Pool Opening & Closing",
+      "Chemical Balancing",
+      "Pool Equipment Care",
+      "Spa Care",
+      "Year-Round Pool Maintenance"
+    ],
+    "website": "https://ecoastpoolservice.com",
+    "jobberUrl": "https://clienthub.getjobber.com/client_hubs/c7073ac4-949a-4ae1-9cee-a723ddb9c5d1/public/work_request/new"
+  }
+}

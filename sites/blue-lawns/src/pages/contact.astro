@@ -1,0 +1,34 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Badge from '../components/ui/badge.astro';
+import Card from '../components/ui/card.astro';
+import Button from '../components/ui/button.astro';
+import Container from '../components/container.astro';
+
+const meta = {
+  title: 'Contact Blue Lawns | Lawn Care Services Cape May County NJ',
+  description: 'Contact Blue Lawns for lawn care and landscaping in Cape May County. Call 609-425-2954 or visit 57 W Katherine Ave Unit B, Ocean View, NJ 08230. Serving Avalon, Wildwood, Stone Harbor, Cape May.'
+};
+---
+
+<Layout title={meta.title}>
+  <Container>
+  <section class="hero">
+    <div class="hero__content space-y-4">
+      <Badge>Contact Blue Lawns | Request a Quote Today</Badge>
+      <h1 class="hero__title">Contact Our Landscaping Experts for Expert Advice and Services</h1>
+      <p class="hero__lead">Aveda Institute empowers future beauty professionals.</p>
+      <div class="hero__actions">
+        <Button href="/contact">Book a visit</Button>
+        <Button variant="outline" href="/about">Explore programs</Button>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid gap-8 md:grid-cols-2">
+
+  </div>
+
+
+  </Container>
+</Layout>
