@@ -1,0 +1,129 @@
+name: Generate Sitemap
+description: Scans Astro project pages and generates an optimized sitemap.xml with priorities and change frequencies
+
+inputs:
+  - name: site_path
+    type: path
+    required: true
+    description: Root path of the Astro site
+  
+  - name: domain_url
+    type: string
+    required: true
+    description: Base URL of the deployed site (e.g., https://example.com)
+  
+  - name: output_path
+    type: path
+    required: false
+    default: "public/sitemap.xml"
+    description: Output location for sitemap.xml relative to site_path
+
+steps:
+  - id: scan_pages
+    description: Recursively scan src/pages directory for all routes
+    run: |
+      echo "📄 Scanning pages in {{ inputs.site_path }}/src/pages/"
+      find "{{ inputs.site_path }}/src/pages" -type f \
+        \( -name "*.astro" -o -name "*.md" -o -name "*.mdx" \) \
+        | grep -v "404" \
+        | sort > /tmp/page-list.txt
+      echo "Found $(wc -l < /tmp/page-list.txt) pages"
+  
+  - id: generate_sitemap_xml
+    description: Create sitemap.xml with priorities and changefreq
+    run: |
+      bun run scripts/generate-sitemap.mjs \
+        --project "{{ inputs.site_path }}" \
+        --domain "{{ inputs.domain_url }}" \
+        --out "{{ inputs.site_path }}/{{ inputs.output_path }}"
+  
+  - id: validate_sitemap
+    description: Validate sitemap.xml format
+    run: |
+      if command -v xmllint >/dev/null 2>&1; then
+        xmllint --noout "{{ inputs.site_path }}/{{ inputs.output_path }}" \
+          && echo "✅ Sitemap XML is valid"
+      else
+        echo "⚠️  xmllint not installed, skipping validation"
+      fi
+  
+  - id: generate_robots_txt
+    description: Ensure robots.txt references sitemap
+    run: |
+      ROBOTS_PATH="{{ inputs.site_path }}/public/robots.txt"
+      if [ ! -f "$ROBOTS_PATH" ]; then
+        cat > "$ROBOTS_PATH" <<EOF
+      # Allow all crawlers
+      User-agent: *
+      Allow: /
+      
+      # Allow AI crawlers
+      User-agent: GPTBot
+      Allow: /
+      
+      User-agent: CCBot
+      Allow: /
+      
+      User-agent: ChatGPT-User
+      Allow: /
+      
+      User-agent: anthropic-ai
+      Allow: /
+      
+      User-agent: Claude-Web
+      Allow: /
+      
+      # Sitemap
+      Sitemap: {{ inputs.domain_url }}/sitemap.xml
+      EOF
+        echo "✅ Created robots.txt"
+      else
+        if ! grep -q "Sitemap:" "$ROBOTS_PATH"; then
+          echo "" >> "$ROBOTS_PATH"
+          echo "Sitemap: {{ inputs.domain_url }}/sitemap.xml" >> "$ROBOTS_PATH"
+          echo "✅ Added sitemap to robots.txt"
+        else
+          echo "✅ robots.txt already references sitemap"
+        fi
+      fi
+
+outputs:
+  - name: sitemap_path
+    type: path
+    description: Full path to generated sitemap.xml
+  
+  - name: robots_path
+    type: path
+    description: Full path to robots.txt
+
+validation:
+  - sitemap.xml exists in public/ directory
+  - sitemap.xml contains at least one <url> entry
+  - sitemap.xml passes xmllint validation
+  - robots.txt exists and references sitemap
+  - All URLs use HTTPS protocol
+  - No URLs return 404 errors
+
+performance_targets:
+  - Generation time: <5 seconds for 100 pages
+  - Sitemap size: <50MB (Google limit)
+  - Max URLs: 50,000 per sitemap (create index if larger)
+
+error_handling:
+  - If src/pages not found, fail with clear error
+  - If domain_url missing protocol, prepend https://
+  - If xmllint not available, skip validation with warning
+  - Create public/ directory if it doesn't exist
+
+notes: |
+  This skill generates a compliant XML sitemap with SEO best practices:
+  - Homepage gets priority 1.0
+  - Service/product pages get priority 0.8
+  - Blog posts get priority 0.6
+  - Other pages get priority 0.5
+  - Change frequency set based on content type
+  - lastmod uses file modification time
+  
+  For sites with >50k pages, consider sitemap index generation.
+  Sitemap should be submitted to Google Search Console and Bing Webmaster Tools.
+

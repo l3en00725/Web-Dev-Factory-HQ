@@ -1,0 +1,230 @@
+name: Weekly Pipeline Run
+
+on:
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch: # Allow manual trigger
+    inputs:
+      site:
+        description: 'Site name to run pipeline for (leave empty for all sites)'
+        required: false
+        type: string
+      mode:
+        description: 'Pipeline mode'
+        required: true
+        type: choice
+        options:
+          - light
+          - full
+        default: light
+
+jobs:
+  discover-sites:
+    name: Discover Sites
+    runs-on: ubuntu-latest
+    outputs:
+      sites: ${{ steps.find-sites.outputs.sites }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Find all sites
+        id: find-sites
+        run: |
+          if [ -n "${{ github.event.inputs.site }}" ]; then
+            # Single site specified
+            SITES='["${{ github.event.inputs.site }}"]'
+          else
+            # Find all sites
+            SITES=$(ls -d sites/*/ 2>/dev/null | sed 's/sites\///' | sed 's/\///' | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          fi
+          echo "sites=$SITES" >> $GITHUB_OUTPUT
+          echo "Found sites: $SITES"
+
+  run-pipeline:
+    name: Run Pipeline for ${{ matrix.site }}
+    needs: discover-sites
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        site: ${{ fromJson(needs.discover-sites.outputs.sites) }}
+      fail-fast: false # Continue with other sites if one fails
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      
+      - name: Install dependencies
+        run: bun install
+      
+      - name: Install site dependencies
+        working-directory: sites/${{ matrix.site }}
+        run: bun install
+      
+      - name: Run pipeline (light mode)
+        id: pipeline
+        run: |
+          MODE="${{ github.event.inputs.mode || 'light' }}"
+          bun run scripts/run-pipeline.mjs --site ${{ matrix.site }} --mode $MODE
+        continue-on-error: true
+      
+      - name: Check pipeline status
+        id: check-status
+        run: |
+          if [ -f "output/${{ matrix.site }}/pipeline-status.json" ]; then
+            SUCCESS=$(jq -r '.success' output/${{ matrix.site }}/pipeline-status.json)
+            FAILED=$(jq -r '.failedSteps' output/${{ matrix.site }}/pipeline-status.json)
+            SKIPPED=$(jq -r '.skippedSteps' output/${{ matrix.site }}/pipeline-status.json)
+            
+            echo "success=$SUCCESS" >> $GITHUB_OUTPUT
+            echo "failed=$FAILED" >> $GITHUB_OUTPUT
+            echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
+            
+            echo "Pipeline Status: Success=$SUCCESS, Failed=$FAILED, Skipped=$SKIPPED"
+          else
+            echo "success=false" >> $GITHUB_OUTPUT
+            echo "failed=unknown" >> $GITHUB_OUTPUT
+            echo "Pipeline status file not found"
+          fi
+      
+      - name: Upload pipeline reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pipeline-reports-${{ matrix.site }}
+          path: |
+            output/${{ matrix.site }}/
+            sites/${{ matrix.site }}/reports/
+          retention-days: 30
+      
+      - name: Comment on commit (if failed)
+        if: steps.check-status.outputs.success == 'false' && github.event_name == 'push'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body: `⚠️ **Pipeline failed for \`${{ matrix.site }}\`**\n\nFailed steps: ${{ steps.check-status.outputs.failed }}\n\nCheck [artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.`
+            })
+
+  generate-summary:
+    name: Generate Summary Report
+    needs: run-pipeline
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+      
+      - name: Generate consolidated summary
+        run: |
+          echo "# Weekly Pipeline Summary" > summary.md
+          echo "" >> summary.md
+          echo "**Run Date:** $(date -u +%Y-%m-%d\ %H:%M\ UTC)" >> summary.md
+          echo "**Workflow:** [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> summary.md
+          echo "" >> summary.md
+          echo "## Results" >> summary.md
+          echo "" >> summary.md
+          
+          # Find all pipeline status files
+          find artifacts/ -name "pipeline-status.json" | while read -r status_file; do
+            SITE=$(echo $status_file | sed 's|artifacts/pipeline-reports-||' | sed 's|/.*||')
+            SUCCESS=$(jq -r '.success' "$status_file")
+            DURATION=$(jq -r '.duration' "$status_file")
+            FAILED=$(jq -r '.failedSteps' "$status_file")
+            COMPLETED=$(jq -r '.completedSteps' "$status_file")
+            
+            ICON="✅"
+            if [ "$SUCCESS" != "true" ]; then
+              ICON="❌"
+            fi
+            
+            echo "### $ICON $SITE" >> summary.md
+            echo "" >> summary.md
+            echo "- **Status:** $([ "$SUCCESS" = "true" ] && echo "Success" || echo "Failed")" >> summary.md
+            echo "- **Duration:** ${DURATION}s" >> summary.md
+            echo "- **Completed Steps:** $COMPLETED" >> summary.md
+            echo "- **Failed Steps:** $FAILED" >> summary.md
+            echo "" >> summary.md
+            
+            # Include summary if available
+            SUMMARY_FILE=$(echo "$status_file" | sed 's/pipeline-status.json/summary.md/')
+            if [ -f "$SUMMARY_FILE" ]; then
+              echo "<details>" >> summary.md
+              echo "<summary>View Details</summary>" >> summary.md
+              echo "" >> summary.md
+              cat "$SUMMARY_FILE" >> summary.md
+              echo "" >> summary.md
+              echo "</details>" >> summary.md
+              echo "" >> summary.md
+            fi
+          done
+          
+          echo "---" >> summary.md
+          echo "" >> summary.md
+          echo "*Generated by Web-Dev-Factory-HQ Weekly Pipeline*" >> summary.md
+      
+      - name: Upload summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-summary
+          path: summary.md
+          retention-days: 90
+      
+      - name: Post summary to job
+        run: |
+          echo "# Weekly Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          cat summary.md >> $GITHUB_STEP_SUMMARY
+      
+      - name: Create issue if failures detected
+        if: needs.run-pipeline.result == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('summary.md', 'utf8');
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `⚠️ Weekly Pipeline Failures - ${new Date().toISOString().split('T')[0]}`,
+              body: summary + '\n\n---\n\n**Action Required:** Review failed pipelines and fix issues.',
+              labels: ['pipeline', 'automated', 'needs-review']
+            });
+
+  notify:
+    name: Send Notifications
+    needs: [run-pipeline, generate-summary]
+    runs-on: ubuntu-latest
+    if: always() && (needs.run-pipeline.result == 'failure' || needs.run-pipeline.result == 'success')
+    steps:
+      - name: Send notification
+        run: |
+          STATUS="${{ needs.run-pipeline.result }}"
+          ICON="✅"
+          if [ "$STATUS" != "success" ]; then
+            ICON="❌"
+          fi
+          
+          echo "$ICON Weekly pipeline completed with status: $STATUS"
+          echo "View results: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          
+          # Add webhook notifications here if needed (Slack, Discord, email, etc.)
+          # Example:
+          # curl -X POST ${{ secrets.SLACK_WEBHOOK }} \
+          #   -H 'Content-Type: application/json' \
+          #   -d '{"text": "'"$ICON Weekly pipeline: $STATUS"'"}'
+

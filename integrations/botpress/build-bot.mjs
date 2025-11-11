@@ -7,7 +7,7 @@
 
 import https from 'https';
 
-const BOTPRESS_TOKEN = process.env.BOTPRESS_PAT || 'bp_pat_ioxVfUcssAidPfLey5FucJXYV5BiOohv71Fs';
+const BOTPRESS_TOKEN = process.env.BOTPRESS_PAT;
 const BOT_ID = 'e1a8e8ce-61e1-4ba5-baa2-782a7ae7e4db';
 const BOTPRESS_API = 'https://api.botpress.cloud/v1';
 

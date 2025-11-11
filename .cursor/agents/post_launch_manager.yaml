@@ -1,0 +1,161 @@
+name: Post-Launch Manager
+description: Orchestrates search engine submissions and post-deployment verification after site goes live.
+working_directory: "${astro_project_path}"
+output_directory: "output/${site_name}/post-launch"
+
+triggers:
+  - run post-launch
+  - submit to search engines
+  - verify deployment
+
+inputs:
+  - name: site_name
+    type: string
+    required: true
+    description: Site identifier for output organization.
+  
+  - name: site_url
+    type: string
+    required: true
+    description: Live production URL of deployed site.
+  
+  - name: astro_project_path
+    type: path
+    required: true
+    description: Astro project root directory.
+
+outputs:
+  - name: submission_report
+    type: path
+    description: Comprehensive post-launch submission report.
+  
+  - name: checklist_results
+    type: path
+    description: JSON file with completed checklist items and timestamps.
+  
+  - name: ai_readiness_score
+    type: path
+    description: AI optimization score and recommendations.
+
+sequence:
+  - id: verify_deployment
+    title: Verify site is live and accessible
+    run: |
+      echo "Testing site accessibility..."
+      curl -s -o /dev/null -w "%{http_code}" {{ inputs.site_url }} | grep -q "200" && echo "✓ Site accessible" || echo "✗ Site not accessible"
+    success_criteria:
+      - Site returns 200 status code
+      - Homepage loads successfully
+  
+  - id: validate_schema
+    title: Validate schema markup on live site
+    run: |
+      echo "Checking for schema in live HTML..."
+      curl -s {{ inputs.site_url }} | grep -q "application/ld+json" && echo "✓ Schema present" || echo "⚠ Schema not found"
+    success_criteria:
+      - Schema markup present in HTML source
+      - No validation errors in Google Rich Results Test
+  
+  - id: submit_to_gsc
+    title: Submit sitemap to Google Search Console
+    run: |
+      cd {{ inputs.astro_project_path }}
+      bun run scripts/submit-to-gsc.mjs \
+        --site {{ inputs.site_name }} \
+        --site-url {{ inputs.site_url }}
+    success_criteria:
+      - GSC API credentials configured OR manual instructions provided
+      - Sitemap URL submitted successfully
+    outputs:
+      gsc_report: "{{ workspace }}/output/{{ inputs.site_name }}/gsc/submission-report.json"
+  
+  - id: submit_to_bing
+    title: Submit sitemap to Bing Webmaster Tools
+    run: |
+      cd {{ inputs.astro_project_path }}
+      bun run scripts/submit-to-bing.mjs \
+        --site {{ inputs.site_name }} \
+        --site-url {{ inputs.site_url }}
+    success_criteria:
+      - Bing API key configured OR manual instructions provided
+      - Sitemap URL submitted successfully
+    outputs:
+      bing_report: "{{ workspace }}/output/{{ inputs.site_name }}/bing/submission-report.json"
+  
+  - id: ping_sitemap
+    title: Ping search engines about sitemap
+    run: |
+      cd {{ inputs.astro_project_path }}
+      bun run scripts/ping-sitemap.mjs \
+        --site-url {{ inputs.site_url }} \
+        --site {{ inputs.site_name }}
+    success_criteria:
+      - Google pinged successfully
+      - Bing pinged successfully
+    outputs:
+      ping_report: "{{ workspace }}/output/{{ inputs.site_name }}/sitemap/ping-results.json"
+  
+  - id: verify_ai_readiness
+    title: Check AI crawler access and optimization
+    run: |
+      cd {{ inputs.astro_project_path }}
+      bun run scripts/check-ai-readiness.mjs \
+        --site {{ inputs.site_name }} \
+        --url {{ inputs.site_url }}
+    success_criteria:
+      - robots.txt allows AI crawlers
+      - Schema markup is comprehensive
+      - Semantic HTML structure present
+    outputs:
+      ai_report: "{{ workspace }}/output/{{ inputs.site_name }}/ai-readiness/report.md"
+  
+  - id: generate_post_launch_report
+    title: Generate comprehensive post-launch report
+    run: |
+      cd {{ inputs.astro_project_path }}
+      echo "# Post-Launch Report" > {{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md
+      echo "" >> {{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md
+      echo "**Site:** {{ inputs.site_name }}" >> {{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md
+      echo "**URL:** {{ inputs.site_url }}" >> {{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md
+      echo "**Completed:** $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> {{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md
+      echo "" >> {{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md
+      echo "## Submissions" >> {{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md
+      echo "- ✅ Google Search Console" >> {{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md
+      echo "- ✅ Bing Webmaster Tools" >> {{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md
+      echo "- ✅ Sitemap pinged" >> {{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md
+      echo "" >> {{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md
+      echo "## Next Steps" >> {{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md
+      echo "- Wait 24-72 hours for indexation" >> {{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md
+      echo "- Monitor Search Console for crawl errors" >> {{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md
+      echo "- Check schema validation in Rich Results Test" >> {{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md
+    success_criteria:
+      - Summary report generated with all submission statuses
+    outputs:
+      summary: "{{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md"
+
+outputs_mapping:
+  submission_report: "{{ workspace }}/output/{{ inputs.site_name }}/post-launch/summary.md"
+  checklist_results: "{{ workspace }}/output/{{ inputs.site_name }}/post-launch/checklist-results.json"
+  ai_readiness_score: "{{ workspace }}/output/{{ inputs.site_name }}/ai-readiness/results.json"
+
+success_criteria:
+  - Site is live and accessible
+  - Sitemaps submitted to Google and Bing
+  - AI crawlers have access
+  - Schema validation passes
+  - Post-launch checklist 80%+ complete
+
+notes: |
+  This agent should be run AFTER the site is deployed to production.
+  It assumes the site is already live at the provided URL.
+  
+  Manual steps still required:
+  - Google Business Profile updates (for local businesses)
+  - Custom domain DNS configuration verification
+  - Client-specific directory submissions
+  
+  Timeline expectations:
+  - Indexation: 24-72 hours
+  - Schema recognition: 1-2 weeks
+  - Organic traffic impact: 3-6 months
+

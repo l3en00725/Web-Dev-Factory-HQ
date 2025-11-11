@@ -1,0 +1,438 @@
+name: Content QA Reviewer
+description: AI-powered agent that reviews site copy, clarity, SEO alignment, and conversion opportunities
+
+working_directory: "${site_path}"
+output_directory: "output/${site_name}/ai-qa"
+
+inputs:
+  - name: site_path
+    type: path
+    required: true
+    description: Root path of the Astro site to review
+  
+  - name: site_name
+    type: string
+    required: true
+    description: Client site identifier (folder name)
+  
+  - name: business_type
+    type: string
+    required: false
+    description: Type of business for context (e.g., "lawn care", "plumbing")
+  
+  - name: target_audience
+    type: string
+    required: false
+    description: Target audience demographic
+  
+  - name: review_depth
+    type: string
+    required: false
+    default: "standard"
+    description: Review depth - "quick", "standard", or "comprehensive"
+
+outputs:
+  - name: qa_report
+    type: path
+    description: Markdown report with findings and recommendations
+  
+  - name: score
+    type: integer
+    description: Overall content quality score (0-100)
+  
+  - name: critical_issues
+    type: integer
+    description: Number of critical issues found
+
+tasks:
+  - id: gather_content
+    name: Extract all site content
+    run: |
+      mkdir -p output/{{ inputs.site_name }}/ai-qa
+      
+      echo "📄 Gathering site content..."
+      
+      # Extract from built HTML files if available
+      if [ -d "{{ inputs.site_path }}/dist" ]; then
+        find "{{ inputs.site_path }}/dist" -name "*.html" -type f \
+          -exec cat {} \; > output/{{ inputs.site_name }}/ai-qa/raw_content.html
+        echo "✅ Extracted from dist/ (built site)"
+      else
+        # Fall back to source files
+        find "{{ inputs.site_path }}/src/pages" -type f \
+          \( -name "*.astro" -o -name "*.md" -o -name "*.mdx" \) \
+          -exec cat {} \; > output/{{ inputs.site_name }}/ai-qa/raw_content.txt
+        echo "✅ Extracted from src/pages/ (source files)"
+      fi
+      
+      # Get metadata
+      cat > output/{{ inputs.site_name }}/ai-qa/metadata.json <<EOF
+      {
+        "site_name": "{{ inputs.site_name }}",
+        "business_type": "{{ inputs.business_type }}",
+        "target_audience": "{{ inputs.target_audience }}",
+        "extracted_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+        "source": "{{ inputs.site_path }}"
+      }
+      EOF
+    success_criteria:
+      - Raw content file created and non-empty
+      - Metadata JSON valid
+
+  - id: create_qa_script
+    name: Generate AI QA analysis script
+    run: |
+      cat > "{{ inputs.site_path }}/scripts/ai-qa-review.mjs" <<'QASCRIPT'
+      #!/usr/bin/env node
+      import { readFile, writeFile } from 'node:fs/promises';
+      import { resolve } from 'node:path';
+      import * as cheerio from 'cheerio';
+      
+      const siteName = process.env.SITE_NAME || 'unknown';
+      const businessType = process.env.BUSINESS_TYPE || 'business';
+      const reviewDepth = process.env.REVIEW_DEPTH || 'standard';
+      const outputDir = `output/${siteName}/ai-qa`;
+      
+      // Read content
+      const rawHtml = await readFile(`${outputDir}/raw_content.html`, 'utf-8').catch(() => '');
+      const rawText = await readFile(`${outputDir}/raw_content.txt`, 'utf-8').catch(() => '');
+      const content = rawHtml || rawText;
+      
+      // Parse HTML if available
+      const $ = cheerio.load(content);
+      
+      // Remove scripts, styles, nav, footer for cleaner analysis
+      $('script, style, nav, footer, header').remove();
+      const bodyText = $('body').text() || content;
+      const cleanText = bodyText.replace(/\s+/g, ' ').trim();
+      
+      // Analysis functions
+      function analyzeReadability(text) {
+        const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+        const words = text.split(/\s+/).filter(w => w.length > 0);
+        const syllables = words.reduce((sum, word) => {
+          // Simple syllable count approximation
+          const vowels = word.match(/[aeiouy]+/gi);
+          return sum + (vowels ? vowels.length : 1);
+        }, 0);
+        
+        const avgWordsPerSentence = words.length / sentences.length;
+        const avgSyllablesPerWord = syllables / words.length;
+        
+        // Flesch-Kincaid Reading Ease
+        const fleschScore = 206.835 - (1.015 * avgWordsPerSentence) - (84.6 * avgSyllablesPerWord);
+        
+        // Flesch-Kincaid Grade Level
+        const gradeLevel = (0.39 * avgWordsPerSentence) + (11.8 * avgSyllablesPerWord) - 15.59;
+        
+        return {
+          fleschScore: Math.max(0, Math.min(100, fleschScore)).toFixed(1),
+          gradeLevel: Math.max(0, gradeLevel).toFixed(1),
+          totalWords: words.length,
+          totalSentences: sentences.length,
+          avgWordsPerSentence: avgWordsPerSentence.toFixed(1)
+        };
+      }
+      
+      function findCallsToAction(html) {
+        const ctas = [];
+        $('a, button').each((i, elem) => {
+          const $elem = $(elem);
+          const text = $elem.text().trim().toLowerCase();
+          const href = $elem.attr('href') || '';
+          
+          const ctaKeywords = [
+            'call', 'contact', 'get started', 'sign up', 'subscribe',
+            'book now', 'schedule', 'request', 'quote', 'free', 'learn more'
+          ];
+          
+          if (ctaKeywords.some(kw => text.includes(kw))) {
+            ctas.push({ text: $elem.text().trim(), href, type: elem.name });
+          }
+        });
+        return ctas;
+      }
+      
+      function analyzeSEOKeywords(text, businessType) {
+        const keywords = businessType.split(/\s+/);
+        const textLower = text.toLowerCase();
+        
+        return keywords.map(kw => {
+          const count = (textLower.match(new RegExp(kw.toLowerCase(), 'g')) || []).length;
+          return { keyword: kw, count, density: ((count / text.split(/\s+/).length) * 100).toFixed(2) + '%' };
+        });
+      }
+      
+      function analyzeTone(text) {
+        const toneIndicators = {
+          professional: ['expertise', 'experience', 'certified', 'licensed', 'professional'],
+          friendly: ['we', 'you', 'your', 'our', 'help', 'support'],
+          urgent: ['now', 'today', 'limited', 'hurry', 'don\'t miss'],
+          trustworthy: ['guarantee', 'trusted', 'proven', 'reliable', 'satisfaction']
+        };
+        
+        const textLower = text.toLowerCase();
+        const scores = {};
+        
+        for (const [tone, indicators] of Object.entries(toneIndicators)) {
+          scores[tone] = indicators.filter(ind => textLower.includes(ind)).length;
+        }
+        
+        const dominantTone = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
+        return { scores, dominant: dominantTone[0] };
+      }
+      
+      function findIssues(html, text) {
+        const issues = {
+          critical: [],
+          warnings: [],
+          suggestions: []
+        };
+        
+        // Critical: No H1
+        if ($('h1').length === 0) {
+          issues.critical.push('Missing H1 heading - critical for SEO');
+        }
+        
+        // Critical: No meta description
+        if ($('meta[name="description"]').length === 0) {
+          issues.critical.push('Missing meta description');
+        }
+        
+        // Warning: Short content
+        if (text.split(/\s+/).length < 300) {
+          issues.warnings.push('Content is very short (<300 words) - may hurt SEO');
+        }
+        
+        // Warning: No clear CTA
+        const ctas = findCallsToAction(html);
+        if (ctas.length === 0) {
+          issues.warnings.push('No clear call-to-action buttons found');
+        }
+        
+        // Suggestion: Improve readability
+        const readability = analyzeReadability(text);
+        if (parseFloat(readability.gradeLevel) > 12) {
+          issues.suggestions.push(`Content is complex (grade ${readability.gradeLevel}) - consider simplifying`);
+        }
+        
+        // Suggestion: Add more keywords
+        const keywords = analyzeSEOKeywords(text, businessType);
+        if (keywords.every(kw => kw.count < 3)) {
+          issues.suggestions.push('Business keywords appear infrequently - consider adding more');
+        }
+        
+        return issues;
+      }
+      
+      // Run analysis
+      console.log('🤖 Running AI Content QA Review...\n');
+      
+      const readability = analyzeReadability(cleanText);
+      const ctas = findCallsToAction(content);
+      const keywords = analyzeSEOKeywords(cleanText, businessType);
+      const tone = analyzeTone(cleanText);
+      const issues = findIssues(content, cleanText);
+      
+      // Calculate overall score
+      let score = 100;
+      score -= issues.critical.length * 20;
+      score -= issues.warnings.length * 10;
+      score -= issues.suggestions.length * 5;
+      score = Math.max(0, Math.min(100, score));
+      
+      // Generate report
+      const report = `# Content QA Report: ${siteName}
+      
+      **Generated:** ${new Date().toISOString()}  
+      **Business Type:** ${businessType}  
+      **Review Depth:** ${reviewDepth}  
+      **Overall Score:** ${score}/100 ${score >= 80 ? '✅' : score >= 60 ? '⚠️' : '❌'}
+      
+      ---
+      
+      ## Summary
+      
+      ${score >= 80 ? '✅ **Excellent!** Content is clear, SEO-optimized, and conversion-focused.' : ''}
+      ${score >= 60 && score < 80 ? '⚠️ **Good, but needs improvement.** Review issues below.' : ''}
+      ${score < 60 ? '❌ **Needs significant work.** Address critical issues immediately.' : ''}
+      
+      ---
+      
+      ## 📊 Readability Analysis
+      
+      | Metric | Value | Target |
+      |--------|-------|--------|
+      | **Flesch Reading Ease** | ${readability.fleschScore} | 60-70 (Standard) |
+      | **Grade Level** | ${readability.gradeLevel} | 8-10 (High School) |
+      | **Total Words** | ${readability.totalWords} | 300+ |
+      | **Avg Words/Sentence** | ${readability.avgWordsPerSentence} | 15-20 |
+      
+      **Interpretation:**
+      - 90-100: Very Easy (5th grade)
+      - 60-70: Standard (8th-9th grade) ✅ **Recommended**
+      - 30-50: Difficult (College level)
+      - 0-30: Very Difficult
+      
+      ${parseFloat(readability.fleschScore) < 60 ? '⚠️ Content may be too complex for general audience. Consider simpler language.' : ''}
+      ${parseFloat(readability.gradeLevel) > 10 ? '⚠️ Grade level is high. Aim for 8th-10th grade for maximum reach.' : ''}
+      
+      ---
+      
+      ## 🎯 Call-to-Action Analysis
+      
+      **Found ${ctas.length} CTA elements**
+      
+      ${ctas.length === 0 ? '❌ **Critical:** No clear calls-to-action found!' : ''}
+      ${ctas.length > 0 ? ctas.map(cta => `- **"${cta.text}"** (${cta.type} → ${cta.href || 'no link'})`).join('\n') : ''}
+      
+      ${ctas.length < 2 ? '\n⚠️ **Recommendation:** Add at least 2-3 CTA buttons per page for better conversion.\n' : ''}
+      
+      ---
+      
+      ## 🔍 SEO Keyword Analysis
+      
+      ${keywords.map(kw => `- **${kw.keyword}**: ${kw.count} occurrences (${kw.density} density)`).join('\n')}
+      
+      **Ideal keyword density:** 1-2% for primary keywords
+      
+      ${keywords.some(kw => parseFloat(kw.density) > 2) ? '⚠️ Possible keyword stuffing detected' : ''}
+      ${keywords.every(kw => kw.count < 3) ? '⚠️ Keywords appear too infrequently' : ''}
+      
+      ---
+      
+      ## 💬 Tone & Voice Analysis
+      
+      **Dominant Tone:** ${tone.dominant}
+      
+      | Tone | Score |
+      |------|-------|
+      | Professional | ${tone.scores.professional} |
+      | Friendly | ${tone.scores.friendly} |
+      | Urgent | ${tone.scores.urgent} |
+      | Trustworthy | ${tone.scores.trustworthy} |
+      
+      ${businessType.includes('service') && tone.scores.trustworthy < 2 ? '⚠️ Service businesses benefit from trust-building language (guarantee, certified, reliable)' : ''}
+      
+      ---
+      
+      ## 🚨 Issues Found
+      
+      ### Critical (Fix Immediately)
+      
+      ${issues.critical.length === 0 ? '✅ No critical issues!' : issues.critical.map(i => `- ❌ ${i}`).join('\n')}
+      
+      ### Warnings (Should Address)
+      
+      ${issues.warnings.length === 0 ? '✅ No warnings!' : issues.warnings.map(i => `- ⚠️ ${i}`).join('\n')}
+      
+      ### Suggestions (Nice to Have)
+      
+      ${issues.suggestions.length === 0 ? '✅ No suggestions!' : issues.suggestions.map(i => `- 💡 ${i}`).join('\n')}
+      
+      ---
+      
+      ## ✅ Recommendations
+      
+      ### Immediate Actions
+      
+      1. **Fix Critical Issues:** ${issues.critical.length === 0 ? 'None!' : issues.critical.join(', ')}
+      2. **Add Clear CTAs:** ${ctas.length < 2 ? 'Include "Call Now", "Get Quote", "Schedule Service" buttons' : 'CTAs present ✅'}
+      3. **Optimize Readability:** ${parseFloat(readability.gradeLevel) > 10 ? 'Simplify language to 8th-10th grade level' : 'Good ✅'}
+      
+      ### Content Improvements
+      
+      - ${readability.totalWords < 300 ? '**Expand content** to at least 300-500 words per page' : '**Content length is good** ✅'}
+      - ${keywords.every(kw => kw.count < 3) ? '**Increase keyword usage** naturally throughout copy' : '**Keyword usage is appropriate** ✅'}
+      - ${ctas.length === 0 ? '**Add conversion opportunities** on every page' : '**CTA placement is good** ✅'}
+      
+      ### SEO Checklist
+      
+      - [${$('h1').length > 0 ? 'x' : ' '}] H1 heading present
+      - [${$('meta[name="description"]').length > 0 ? 'x' : ' '}] Meta description
+      - [${$('title').length > 0 ? 'x' : ' '}] Title tag
+      - [${$('img[alt]').length > 0 ? 'x' : ' '}] Image alt text
+      - [${keywords.some(kw => kw.count > 2) ? 'x' : ' '}] Keywords present
+      - [${readability.totalWords >= 300 ? 'x' : ' '}] Sufficient content length
+      
+      ---
+      
+      ## 📈 Conversion Opportunities
+      
+      ${ctas.length > 0 ? '✅ CTAs present - ensure they link to contact forms or phone numbers' : ''}
+      ${cleanText.toLowerCase().includes('free') ? '✅ Value proposition includes "free" (strong motivator)' : '💡 Consider offering free consultation/estimate'}
+      ${cleanText.toLowerCase().includes('guarantee') ? '✅ Trust-building language present' : '💡 Add guarantees or certifications if applicable'}
+      ${$('img').length > 3 ? '✅ Visual content present' : '💡 Add photos of work, team, or facilities'}
+      
+      ### Suggested Additions:
+      
+      1. **Social Proof:** Customer testimonials or reviews
+      2. **Urgency:** Limited-time offers or seasonal promotions
+      3. **Trust Signals:** Certifications, years in business, guarantee badges
+      4. **Local SEO:** Service area mentions, local landmarks
+      5. **Contact Options:** Phone, form, chat - make it easy!
+      
+      ---
+      
+      *Generated by Web-Dev-Factory-HQ Content QA Reviewer v2*  
+      *This is an automated analysis. Manual review recommended for best results.*
+      `;
+      
+      await writeFile(`${outputDir}/qa-report.md`, report);
+      await writeFile(`${outputDir}/qa-score.json`, JSON.stringify({
+        site: siteName,
+        score,
+        criticalIssues: issues.critical.length,
+        warnings: issues.warnings.length,
+        suggestions: issues.suggestions.length,
+        readability,
+        ctas: ctas.length,
+        keywords,
+        generatedAt: new Date().toISOString()
+      }, null, 2));
+      
+      console.log('═'.repeat(50));
+      console.log(`📊 Content QA Score: ${score}/100`);
+      console.log('═'.repeat(50));
+      console.log(`Critical Issues: ${issues.critical.length}`);
+      console.log(`Warnings: ${issues.warnings.length}`);
+      console.log(`Suggestions: ${issues.suggestions.length}`);
+      console.log(`\n📄 Full report: ${outputDir}/qa-report.md`);
+      
+      if (issues.critical.length > 0) {
+        console.error('\n❌ Critical issues found! Fix before deployment.');
+        process.exit(1);
+      } else if (score < 70) {
+        console.warn('\n⚠️  Content needs improvement. Review report.');
+      } else {
+        console.log('\n✅ Content quality is good!');
+      }
+      QASCRIPT
+      
+      chmod +x "{{ inputs.site_path }}/scripts/ai-qa-review.mjs"
+      echo "✅ Created AI QA review script"
+    success_criteria:
+      - QA script created successfully
+
+  - id: run_qa_analysis
+    name: Execute AI content review
+    run: |
+      cd "{{ inputs.site_path }}"
+      SITE_NAME="{{ inputs.site_name }}" \
+      BUSINESS_TYPE="{{ inputs.business_type }}" \
+      REVIEW_DEPTH="{{ inputs.review_depth }}" \
+      bun run scripts/ai-qa-review.mjs
+    success_criteria:
+      - QA report generated
+      - Score calculated (0-100)
+
+success_criteria:
+  - qa-report.md created with comprehensive analysis
+  - qa-score.json contains numeric metrics
+  - Critical issues identified and documented
+
+outputs_mapping:
+  qa_report: "output/{{ inputs.site_name }}/ai-qa/qa-report.md"
+  score: "output/{{ inputs.site_name }}/ai-qa/qa-score.json:score"
+  critical_issues: "output/{{ inputs.site_name }}/ai-qa/qa-score.json:criticalIssues"
+

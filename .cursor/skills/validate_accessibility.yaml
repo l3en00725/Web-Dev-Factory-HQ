@@ -1,0 +1,337 @@
+name: Validate Accessibility
+description: Runs automated WCAG 2.1 compliance checks using axe-core and generates accessibility report
+
+inputs:
+  - name: site_path
+    type: path
+    required: true
+    description: Root path of the Astro site
+  
+  - name: base_url
+    type: string
+    required: false
+    default: "http://localhost:4321"
+    description: Local or deployed URL to test
+  
+  - name: pages_to_test
+    type: array
+    required: false
+    default: ["/", "/about", "/contact", "/services"]
+    description: Array of paths to test for accessibility
+  
+  - name: output_dir
+    type: path
+    required: false
+    default: "output/accessibility"
+    description: Directory to save accessibility reports
+
+steps:
+  - id: install_dependencies
+    description: Ensure axe-core and playwright are installed
+    run: |
+      cd "{{ inputs.site_path }}"
+      if ! grep -q "@axe-core/playwright" package.json 2>/dev/null; then
+        echo "📦 Installing accessibility testing dependencies..."
+        bun add -D @axe-core/playwright playwright
+      else
+        echo "✅ Dependencies already installed"
+      fi
+  
+  - id: create_test_script
+    description: Generate accessibility test script
+    run: |
+      mkdir -p "{{ inputs.site_path }}/scripts"
+      cat > "{{ inputs.site_path }}/scripts/test-accessibility.mjs" <<'SCRIPT'
+      #!/usr/bin/env node
+      import { chromium } from 'playwright';
+      import { injectAxe, checkA11y, getViolations } from '@axe-core/playwright';
+      import { writeFile, mkdir } from 'node:fs/promises';
+      import { resolve } from 'node:path';
+      
+      const baseUrl = process.env.BASE_URL || 'http://localhost:4321';
+      const pagesToTest = (process.env.PAGES || '/,/about,/contact,/services').split(',');
+      const outputDir = process.env.OUTPUT_DIR || 'output/accessibility';
+      
+      await mkdir(outputDir, { recursive: true });
+      
+      const browser = await chromium.launch({ headless: true });
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      
+      const allViolations = [];
+      const summary = {
+        testedAt: new Date().toISOString(),
+        baseUrl,
+        totalPages: pagesToTest.length,
+        totalViolations: 0,
+        criticalViolations: 0,
+        seriousViolations: 0,
+        moderateViolations: 0,
+        minorViolations: 0,
+        pages: []
+      };
+      
+      console.log(`🔍 Testing ${pagesToTest.length} pages for WCAG 2.1 compliance...\n`);
+      
+      for (const path of pagesToTest) {
+        const url = `${baseUrl}${path}`;
+        console.log(`Testing: ${url}`);
+        
+        try {
+          await page.goto(url, { waitUntil: 'networkidle' });
+          await injectAxe(page);
+          
+          const violations = await getViolations(page, null, {
+            runOnly: {
+              type: 'tag',
+              values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
+            }
+          });
+          
+          const pageResult = {
+            path,
+            url,
+            violations: violations.length,
+            critical: violations.filter(v => v.impact === 'critical').length,
+            serious: violations.filter(v => v.impact === 'serious').length,
+            moderate: violations.filter(v => v.impact === 'moderate').length,
+            minor: violations.filter(v => v.impact === 'minor').length,
+            issues: violations.map(v => ({
+              id: v.id,
+              impact: v.impact,
+              description: v.description,
+              help: v.help,
+              helpUrl: v.helpUrl,
+              nodes: v.nodes.length,
+              tags: v.tags
+            }))
+          };
+          
+          summary.pages.push(pageResult);
+          summary.totalViolations += violations.length;
+          summary.criticalViolations += pageResult.critical;
+          summary.seriousViolations += pageResult.serious;
+          summary.moderateViolations += pageResult.moderate;
+          summary.minorViolations += pageResult.minor;
+          
+          allViolations.push(...violations);
+          
+          const icon = violations.length === 0 ? '✅' : pageResult.critical > 0 ? '❌' : '⚠️';
+          console.log(`${icon} ${path}: ${violations.length} violations (${pageResult.critical} critical)\n`);
+          
+        } catch (error) {
+          console.error(`❌ Failed to test ${url}: ${error.message}\n`);
+          summary.pages.push({
+            path,
+            url,
+            error: error.message,
+            violations: 0
+          });
+        }
+      }
+      
+      await browser.close();
+      
+      // Save JSON report
+      await writeFile(
+        resolve(outputDir, 'accessibility_report.json'),
+        JSON.stringify(summary, null, 2)
+      );
+      
+      // Generate markdown report
+      const markdownReport = `# Accessibility Report
+      
+      **Generated:** ${summary.testedAt}  
+      **Base URL:** ${summary.baseUrl}  
+      **Pages Tested:** ${summary.totalPages}  
+      
+      ## Summary
+      
+      | Metric | Count |
+      |--------|-------|
+      | **Total Violations** | ${summary.totalViolations} |
+      | 🔴 Critical | ${summary.criticalViolations} |
+      | 🟠 Serious | ${summary.seriousViolations} |
+      | 🟡 Moderate | ${summary.moderateViolations} |
+      | 🔵 Minor | ${summary.minorViolations} |
+      
+      ${summary.totalViolations === 0 ? '✅ **All pages pass WCAG 2.1 AA compliance!**' : ''}
+      
+      ## Page Results
+      
+      ${summary.pages.map(p => `
+      ### ${p.path}
+      
+      ${p.error ? `❌ **Error:** ${p.error}` : `
+      - **Total Violations:** ${p.violations}
+      - 🔴 Critical: ${p.critical}
+      - 🟠 Serious: ${p.serious}
+      - 🟡 Moderate: ${p.moderate}
+      - 🔵 Minor: ${p.minor}
+      
+      ${p.issues && p.issues.length > 0 ? `
+      #### Issues
+      
+      ${p.issues.map(issue => `
+      **${issue.impact.toUpperCase()}: ${issue.help}**  
+      - **Rule:** \`${issue.id}\`  
+      - **Description:** ${issue.description}  
+      - **Affected elements:** ${issue.nodes}  
+      - **Learn more:** [${issue.helpUrl}](${issue.helpUrl})  
+      `).join('\n')}
+      ` : '✅ No violations found'}
+      `}
+      `).join('\n---\n')}
+      
+      ## Recommendations
+      
+      ${summary.criticalViolations > 0 ? `
+      ### 🚨 Critical Issues (Must Fix)
+      
+      Critical accessibility issues prevent users from accessing content. These must be fixed before launch.
+      ` : ''}
+      
+      ${summary.seriousViolations > 0 ? `
+      ### ⚠️ Serious Issues (Should Fix)
+      
+      Serious issues significantly impact user experience. Address these as soon as possible.
+      ` : ''}
+      
+      ### Common Fixes
+      
+      1. **Missing alt text:** Add descriptive alt attributes to all images
+      2. **Color contrast:** Ensure text has 4.5:1 contrast ratio (7:1 for AAA)
+      3. **Form labels:** Associate all form inputs with labels
+      4. **Heading hierarchy:** Use proper H1-H6 structure without skipping levels
+      5. **Keyboard navigation:** Ensure all interactive elements are keyboard accessible
+      6. **ARIA attributes:** Use semantic HTML first, ARIA when necessary
+      
+      ---
+      
+      *Generated by Web-Dev-Factory-HQ Accessibility Validator*  
+      *Powered by axe-core and Playwright*
+      `;
+      
+      await writeFile(
+        resolve(outputDir, 'accessibility_report.md'),
+        markdownReport
+      );
+      
+      console.log('═'.repeat(50));
+      console.log('📊 Accessibility Test Summary');
+      console.log('═'.repeat(50));
+      console.log(`Total Violations: ${summary.totalViolations}`);
+      console.log(`  🔴 Critical: ${summary.criticalViolations}`);
+      console.log(`  🟠 Serious: ${summary.seriousViolations}`);
+      console.log(`  🟡 Moderate: ${summary.moderateViolations}`);
+      console.log(`  🔵 Minor: ${summary.minorViolations}`);
+      console.log('');
+      console.log(`📄 Report saved to: ${outputDir}/accessibility_report.{json,md}`);
+      console.log('');
+      
+      if (summary.criticalViolations > 0) {
+        console.error('❌ Critical accessibility issues found. Fix before deployment.');
+        process.exit(1);
+      } else if (summary.seriousViolations > 0) {
+        console.warn('⚠️  Serious accessibility issues found. Review recommended.');
+      } else {
+        console.log('✅ No critical accessibility issues found!');
+      }
+      SCRIPT
+      chmod +x "{{ inputs.site_path }}/scripts/test-accessibility.mjs"
+      echo "✅ Created accessibility test script"
+  
+  - id: start_dev_server
+    description: Start development server if testing localhost
+    run: |
+      if [[ "{{ inputs.base_url }}" == *"localhost"* ]]; then
+        echo "🚀 Starting dev server..."
+        cd "{{ inputs.site_path }}"
+        bun run dev &
+        SERVER_PID=$!
+        echo $SERVER_PID > /tmp/accessibility-server.pid
+        sleep 5 # Wait for server to start
+        echo "✅ Dev server started (PID: $SERVER_PID)"
+      else
+        echo "ℹ️  Testing remote URL: {{ inputs.base_url }}"
+      fi
+  
+  - id: run_accessibility_tests
+    description: Execute accessibility tests with axe-core
+    run: |
+      cd "{{ inputs.site_path }}"
+      BASE_URL="{{ inputs.base_url }}" \
+      PAGES="{{ inputs.pages_to_test | join: ',' }}" \
+      OUTPUT_DIR="{{ inputs.output_dir }}" \
+      bun run scripts/test-accessibility.mjs
+  
+  - id: stop_dev_server
+    description: Stop development server if started
+    run: |
+      if [ -f /tmp/accessibility-server.pid ]; then
+        SERVER_PID=$(cat /tmp/accessibility-server.pid)
+        kill $SERVER_PID 2>/dev/null || true
+        rm /tmp/accessibility-server.pid
+        echo "✅ Dev server stopped"
+      fi
+
+outputs:
+  - name: report_json
+    type: path
+    description: JSON format accessibility report
+  
+  - name: report_md
+    type: path
+    description: Markdown format accessibility report
+  
+  - name: total_violations
+    type: integer
+    description: Total number of violations found
+  
+  - name: critical_violations
+    type: integer
+    description: Number of critical violations (blocks deployment)
+
+validation:
+  - accessibility_report.json created successfully
+  - All tested pages loaded without errors
+  - No critical violations found (for deployment approval)
+  - Report includes detailed fix recommendations
+
+performance_targets:
+  - Test execution: <10 seconds per page
+  - Memory usage: <500MB
+  - Browser startup: <3 seconds
+
+error_handling:
+  - If page fails to load, log error and continue with other pages
+  - If dev server fails to start, provide manual testing instructions
+  - If axe-core fails, output detailed error and suggest fixes
+  - Always stop dev server in cleanup, even on failure
+
+notes: |
+  This skill performs automated WCAG 2.1 Level AA accessibility testing.
+  
+  Tests cover:
+  - Color contrast ratios
+  - Image alt text
+  - Form labels and ARIA
+  - Heading hierarchy
+  - Keyboard navigation
+  - Screen reader compatibility
+  - Semantic HTML
+  
+  Critical violations will block deployment in the pipeline.
+  Serious violations trigger warnings but allow deployment.
+  
+  For best results:
+  - Test representative pages (home, services, contact, forms)
+  - Review violations manually (some may be false positives)
+  - Use browser DevTools for detailed element inspection
+  - Consider hiring accessibility expert for comprehensive audit
+  
+  Related tools:
+  - Lighthouse accessibility score
+  - WAVE browser extension
+  - Screen readers (NVDA, JAWS, VoiceOver)
+

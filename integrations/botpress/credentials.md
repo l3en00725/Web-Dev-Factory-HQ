@@ -12,7 +12,7 @@
   - ✅ `/sites/blue-lawns/.env` (site-specific)
   - ✅ `/.env` (root/project-wide)
 - **Variable Name:** `BOTPRESS_PAT`
-- **Token Value:** `bp_pat_ioxVfUcssAidPfLey5FucJXYV5BiOohv71Fs`
+- **Token Value:** `[STORED IN .ENV - NOT COMMITTED]`
 - **Status:** ✅ Configured in both locations
 - **Security:** ✅ Both files are in `.gitignore` (will NOT be committed)
 
