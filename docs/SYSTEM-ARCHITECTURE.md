@@ -544,6 +544,155 @@ bun run scripts/crawl-site.mjs --use-playwright --out output/client/scrape
 
 **Script:** `scripts/optimize-media.mjs`
 
+---
+
+#### Step 3: Image SEO Renaming
+
+**What it does:**
+- Parses `content_map.json` to match images to page context
+- Renames images using SEO-friendly format: `[brand]-[city]-[keyword]-[section].webp`
+- Preserves alt text from original HTML (validates 10-12 words)
+- Compresses images to WebP (80% quality)
+- Updates all Astro page references automatically
+- Generates verification CSV: `output/[site]/image-seo-map.csv`
+- **Fails build if >20% of images remain unrenamed**
+
+**Script:** `scripts/rename-images.mjs`
+
+**Command executed:**
+```bash
+bun run scripts/rename-images.mjs --site [site-name]
+```
+
+**Inputs:**
+- `--site`: Site name (required)
+- `--contentMap`: Optional. Path to content_map.json (default: `output/[site]/scrape/content_map.json`)
+- `--mediaDir`: Optional. Media directory (default: `sites/[site]/public/media`)
+- `--outputDir`: Optional. Output directory (default: `sites/[site]/public/media/optimized`)
+
+**Files created:**
+```
+sites/[site]/public/media/optimized/
+├── blue-lawns-burlington-lawn-care-hero-1.webp
+├── blue-lawns-cape-may-landscaping-service-2.webp
+└── ...
+
+output/[site]/
+└── image-seo-map.csv    # Rename mapping with alt text
+```
+
+**Naming Algorithm:**
+1. Load `content_map.json` to find page context
+2. Match image filename to nearest page URL/slug
+3. Extract keywords from H1 and H2 headings
+4. Determine section (hero, service, about, gallery, etc.)
+5. Extract city from page URL or heading
+6. Generate: `[brand]-[city]-[primary_keyword]-[section]-[index].webp`
+
+**Alt Text Preservation:**
+- Preserves original alt text if 8-15 words
+- Generates new alt text from context if missing/invalid
+- Format: "Professional [service] services by [brand] in [city]"
+
+**What can go wrong:**
+- ❌ **Content map missing** → Script continues with limited context matching
+- ❌ **>20% unrenamed** → Build fails, review report and fix issues
+- ❌ **Sharp not installed** → Install: `bun add sharp`
+
+**Integration point:** After optimize-images, before import-content
+
+---
+
+#### Step 4: Import Content
+
+**What it does:**
+- Imports scraped content into Astro pages
+- Maps images to optimized versions
+- Updates navigation links
+
+**Script:** `scripts/import-content.mjs`
+
+**Command executed:**
+```bash
+cd sites/[site] && bun run scripts/import-content.mjs
+```
+
+---
+
+#### Step 5: Location Page Generation (Optional)
+
+**What it does:**
+- Generates dynamic location pages from `data/locations.json`
+- Creates 80% unique content per city
+- Injects LocalBusiness schema with geo coordinates
+- Updates navigation with locations dropdown
+
+**Script:** `scripts/create-locations.mjs`
+
+**Command executed:**
+```bash
+bun run scripts/create-locations.mjs
+```
+
+**Prerequisites:**
+- `data/locations.json` file with city data
+
+**Files created:**
+```
+sites/[site]/src/pages/locations/
+├── cape-may/
+│   └── index.astro
+├── stone-harbor/
+│   └── index.astro
+└── ...
+
+output/[site]/
+└── locations-summary.md
+```
+
+**Content Generation Algorithm:**
+- Uses keyword rotation from service arrays
+- Generates unique intro paragraphs per city index
+- Varies service descriptions and coastal challenges
+- Creates city-specific schema with unique coordinates
+
+**Navigation Integration:**
+- Updates `src/components/navbar/navbar.astro`
+- Adds locations dropdown menu
+- Links to all generated location pages
+
+**What can go wrong:**
+- ❌ **locations.json missing** → Create file with city data
+- ❌ **No coordinates** → Use Google Maps to find lat/lng
+- ❌ **Duplicate slugs** → Script handles automatically with index
+
+---
+
+#### Step 6: Generate Schema
+
+**What it does:**
+- Detects business type from content
+- Generates JSON-LD schema markup
+- Validates schema with Google Rich Results
+
+**Script:** `scripts/generate-schema.mjs`
+
+**Command executed:**
+```bash
+cd sites/[site] && bun run scripts/generate-schema.mjs
+```
+
+---
+
+#### Step 7: Optimize Performance
+
+**What it does:**
+- Applies performance optimizations
+- Enables lazy loading
+- Configures asset compression
+
+**Script:** `scripts/enable-performance-defaults.mjs`
+
 **Command executed:**
 ```bash
 bun run scripts/optimize-media.mjs \
@@ -1567,6 +1716,78 @@ bun run choose-form
 - Budget for Zapier ($30/mo)
 - Need for CRM integration
 - Email notification requirements
+
+---
+
+### rename-images.mjs
+
+**Purpose:** SEO-driven image renaming with alt text preservation.
+
+**Usage:**
+```bash
+bun run scripts/rename-images.mjs --site [site-name]
+```
+
+**Inputs:**
+- `--site`: Site name (required)
+- `--contentMap`: Optional. Path to content_map.json
+- `--mediaDir`: Optional. Media directory path
+- `--outputDir`: Optional. Output directory path
+
+**Outputs:**
+- `sites/[site]/public/media/optimized/` - Renamed and optimized images
+- `output/[site]/image-seo-map.csv` - Rename mapping report
+
+**Features:**
+- Context-aware naming from page H1/H2 headings
+- Alt text preservation (validates 10-12 words)
+- WebP compression (80% quality)
+- Build failure if >20% unrenamed
+
+**When to use:**
+- After image optimization
+- Before content import
+- As part of automated pipeline
+
+---
+
+### create-locations.mjs
+
+**Purpose:** Generate dynamic location pages with 80% unique content.
+
+**Usage:**
+```bash
+bun run scripts/create-locations.mjs
+```
+
+**Inputs:**
+- `data/locations.json` - Array of city objects with coordinates
+
+**Outputs:**
+- `sites/[site]/src/pages/locations/[city-slug]/index.astro` - Generated pages
+- `output/[site]/locations-summary.md` - Summary report
+
+**Features:**
+- 80% unique content per city using keyword rotation
+- LocalBusiness schema injection with geo coordinates
+- SEO-optimized meta titles and descriptions
+- City-specific hero image references
+- Dynamic internal linking
+
+**Content Generation:**
+- Unique intro paragraphs per city
+- Varied service descriptions
+- City-specific schema markup
+- Custom meta tags
+
+**Navigation Integration:**
+- Updates navbar with locations dropdown
+- Links to all generated location pages
+
+**When to use:**
+- For multi-location businesses
+- After initial site setup
+- When adding new service cities
 
 ---
 

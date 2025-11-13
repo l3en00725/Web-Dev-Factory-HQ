@@ -70,6 +70,25 @@ sequence:
       - image-map.json created for import step
     dependencies:
       - scrape_existing_site
+  - id: rename_images
+    title: Rename images with SEO-friendly names and preserve alt text
+    run: |
+      bun run scripts/rename-images.mjs \
+        --site {{ inputs.project_slug }} \
+        --contentMap "{{ sequence.scrape_existing_site.outputs.content_map }}" \
+        --mediaDir "{{ sequence.optimize_images.outputs.optimized_media_path }}" \
+        --outputDir "{{ workspace }}/sites/{{ inputs.project_slug }}/public/media/optimized"
+    cwd: "{{ workspace }}"
+    outputs:
+      image_seo_map: "{{ workspace }}/output/{{ inputs.project_slug }}/image-seo-map.csv"
+      optimized_renamed_path: "{{ workspace }}/sites/{{ inputs.project_slug }}/public/media/optimized"
+    success_criteria:
+      - <20% of images remain unrenamed
+      - image-seo-map.csv generated with rename mapping
+      - All images compressed to WebP (80% quality)
+    dependencies:
+      - optimize_images
+      - scrape_existing_site
   - id: clone_reference_repo
     title: Clone reference repository
     skill: clone_repo
@@ -87,7 +106,7 @@ sequence:
     inputs:
       project_slug: "{{ inputs.project_slug }}"
       content_map: "{{ sequence.scrape_existing_site.outputs.content_map }}"
-      media_assets: "{{ sequence.optimize_images.outputs.optimized_media_path }}"
+      media_assets: "{{ sequence.rename_images.outputs.optimized_renamed_path }}"
       image_map: "{{ sequence.optimize_images.outputs.image_map }}"
       reference_repo: "{{ sequence.clone_reference_repo.outputs.local_repo_path }}"
       business_type: "{{ inputs.business_type }}"
@@ -101,6 +120,7 @@ sequence:
     dependencies:
       - scrape_existing_site
       - optimize_images
+      - rename_images
   - id: optimize_page_speed
     title: Achieve ≥95 Lighthouse performance
     skill: optimize_page_speed

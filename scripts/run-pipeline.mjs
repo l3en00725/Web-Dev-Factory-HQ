@@ -62,6 +62,13 @@ const pipeline = [
     heavy: true // Skip in light mode
   },
   {
+    id: 'rename-images',
+    name: '🏷️  Rename Images (SEO)',
+    cmd: `bun run scripts/rename-images.mjs --site ${values.site}`,
+    optional: false,
+    heavy: false
+  },
+  {
     id: 'import',
     name: '📥 Import content',
     cmd: `cd ${sitePath} && bun run scripts/import-content.mjs`,

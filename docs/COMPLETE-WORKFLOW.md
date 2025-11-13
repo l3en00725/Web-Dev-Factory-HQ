@@ -302,7 +302,61 @@ Processing:
    Output: sites/blue-lawns/public/media/
 ```
 
-**Step 3: Import Content**
+**Step 3: Image SEO Renaming**
+
+**Command:**
+```bash
+bun run scripts/rename-images.mjs --site blue-lawns
+```
+
+**What it does:**
+- Parses `output/[site]/scrape/content_map.json` for image context
+- Matches images to nearest page H1 or section heading
+- Renames using format: `[brand]-[city]-[primary_keyword]-[section].webp`
+- Preserves alt text from original HTML (validates 10-12 words)
+- Writes renamed images to `/public/media/optimized/`
+- Compresses images to WebP (80% quality)
+- Generates verification log: `output/[site]/image-seo-map.csv`
+- **Fails build if >20% of images remain unrenamed**
+
+**Expected output:**
+```
+🖼️  Starting SEO Image Renaming & Optimization...
+
+Site: blue-lawns
+Content Map: output/blue-lawns/scrape/content_map.json
+Media Dir: sites/blue-lawns/public/media
+Output Dir: sites/blue-lawns/public/media/optimized
+
+Found 24 images to process
+
+[1/24] Processing: hero-lawn.jpg
+  → blue-lawns-burlington-lawn-care-hero-1.webp
+  Context: burlington | hero | lawn, care, maintenance
+  Alt: "Professional lawn care services by blue lawns in Burlington"
+  ✅ Renamed and optimized (saved 65.2%)
+
+[... 23 more ...]
+
+✅ IMAGE RENAMING COMPLETE
+📊 Total Images: 24
+✅ Renamed: 24
+⚠️  Unrenamed: 0 (0.0%)
+❌ Errors: 0
+📋 Report: output/blue-lawns/image-seo-map.csv
+📁 Optimized images: sites/blue-lawns/public/media/optimized
+```
+
+**Verification:**
+- Review `output/[site]/image-seo-map.csv` for rename mapping
+- Check that alt text is 10-12 words per image
+- Verify <20% unrenamed threshold
+
+**Next step:** Update Astro page references (handled automatically by import step)
+
+---
+
+**Step 4: Import Content**
 ```
 📥 import             running...
 
@@ -317,7 +371,73 @@ Importing content from scrape data...
 ✅ import             success       8.1s
 ```
 
-**Step 4: Generate Schema**
+**Step 5: Location Page Generation** (Optional)
+
+**Command:**
+```bash
+bun run scripts/create-locations.mjs
+```
+
+**Prerequisites:**
+- Create `data/locations.json` with city data:
+```json
+[
+  { "city": "Cape May", "state": "NJ", "lat": 38.9351, "lng": -74.9060 },
+  { "city": "Stone Harbor", "state": "NJ", "lat": 39.0501, "lng": -74.7596 },
+  { "city": "Avalon", "state": "NJ", "lat": 39.1018, "lng": -74.7163 }
+]
+```
+
+**What it does:**
+- Generates dynamic Astro pages at `src/pages/locations/[city-slug]/index.astro`
+- Creates **80% unique content** per city using keyword rotation
+- Injects LocalBusiness schema with geo coordinates
+- Generates SEO-optimized meta titles and descriptions
+- Creates city-specific hero images references
+- Generates summary report: `output/[site]/locations-summary.md`
+
+**Expected output:**
+```
+🚀 Starting location page generation...
+
+✅ Generated: /locations/cape-may/
+✅ Generated: /locations/stone-harbor/
+✅ Generated: /locations/avalon/
+
+📊 Summary report generated: output/blue-lawns/locations-summary.md
+
+✨ Successfully generated 3 location pages!
+```
+
+**Content Uniqueness:**
+- Unique introductory paragraphs per city
+- Varied service descriptions and keyword placement
+- City-specific schema markup with unique coordinates
+- Custom meta titles and descriptions
+- Dynamic internal linking structure
+
+**Navigation Integration:**
+After generation, update `src/components/navbar/navbar.astro` to include locations dropdown:
+```astro
+{
+  title: "Locations",
+  children: [
+    { title: "Cape May", path: "/locations/cape-may/" },
+    { title: "Stone Harbor", path: "/locations/stone-harbor/" },
+    { title: "Avalon", path: "/locations/avalon/" }
+  ]
+}
+```
+
+**Verification:**
+- Check `output/[site]/locations-summary.md` for generated pages
+- Verify schema.org markup on each location page
+- Test navigation dropdown functionality
+- Validate unique content per city (target: 80%+ uniqueness)
+
+---
+
+**Step 6: Generate Schema**
 ```
 🏷️  schema            running...
 
@@ -341,7 +461,7 @@ Generating JSON-LD schema...
    Schemas: LocalBusiness + FAQPage
 ```
 
-**Step 5: Optimize Performance**
+**Step 7: Optimize Performance**
 ```
 ⚡ performance        running...
 
@@ -355,7 +475,7 @@ Applying performance optimizations...
 ✅ performance        success       5.4s
 ```
 
-**Step 6: Generate SEO Report**
+**Step 8: Generate SEO Report**
 ```
 📊 seo                running...
 
@@ -370,7 +490,7 @@ Auditing SEO...
    Report: output/blue-lawns/seo/post_launch.md
 ```
 
-**Step 7: Build Site**
+**Step 9: Build Site**
 ```
 🏗️  build             running...
 
@@ -385,7 +505,7 @@ Building Astro site...
    Size: 2.8 MB (uncompressed), 892 KB (gzipped)
 ```
 
-**Step 8: Quality Assurance (Automatic)**
+**Step 10: Quality Assurance (Automatic)**
 ```
 🤖 ai-qa             running...
 

@@ -404,3 +404,123 @@ The Web-Dev-Factory-HQ system now includes:
 
 **Next Step:** Test with a real client site! 🚀
 
+---
+
+## Part 3: Legacy SEO-Driven Image Renaming & Alt Text Preservation
+
+### 3.1 General Image Renaming Script Created
+
+- **File:** `scripts/rename-images.mjs`
+- **Features:**
+  - Parses `output/[site]/scrape/content_map.json` for image context
+  - Matches images to nearest page H1 or section heading
+  - Renames using format: `[brand]-[city]-[primary_keyword]-[section].webp`
+  - Preserves alt text from original HTML (validates 10-12 words)
+  - Writes renamed images to `/public/media/optimized/`
+  - Updates all Astro page image references automatically
+  - Compresses images to WebP (80% quality)
+  - Generates verification log: `output/[site]/image-seo-map.csv`
+  - **Fails build if >20% of images remain unrenamed or unlinked**
+
+- **Usage:**
+  ```bash
+  bun run scripts/rename-images.mjs --site [site-name]
+  ```
+
+- **Context Matching Algorithm:**
+  1. Load `content_map.json` to find page context
+  2. Match image filename to nearest page URL/slug
+  3. Extract keywords from H1 and H2 headings
+  4. Determine section (hero, service, about, gallery, etc.)
+  5. Extract city from page URL or heading
+  6. Generate SEO-friendly filename
+
+- **Alt Text Preservation:**
+  - Preserves original alt text if 8-15 words (validates length)
+  - Generates new alt text from context if missing/invalid
+  - Format: "Professional [service] services by [brand] in [city]"
+
+- **Build Failure Threshold:**
+  - Script exits with error code 1 if >20% unrenamed
+  - Prevents deployment of sites with poor image SEO
+
+- **Status:** ✅ Created and ready for use
+
+---
+
+## Part 4: Automated Location Page Generator
+
+### 4.1 Location Page Generator Script
+
+- **File:** `scripts/create-locations.mjs` (already exists)
+- **Features:**
+  - Reads `data/locations.json` for city data
+  - Generates dynamic Astro pages at `src/pages/locations/[city-slug]/index.astro`
+  - Creates **80% unique content** per city using keyword rotation
+  - Injects LocalBusiness schema with geo coordinates
+  - Generates SEO-optimized meta titles and descriptions
+  - Creates city-specific hero image references
+  - Generates summary report: `output/[site]/locations-summary.md`
+
+- **Usage:**
+  ```bash
+  bun run scripts/create-locations.mjs
+  ```
+
+- **Content Generation Algorithm:**
+  - Uses keyword arrays for service variations
+  - Rotates through intro paragraph templates based on city index
+  - Varies service descriptions and coastal challenges
+  - Creates unique schema markup per city with coordinates
+  - Generates custom meta tags per location
+
+- **80% Uniqueness Logic:**
+  - Unique intro paragraphs: 5 variations rotated by index
+  - Service keywords: Rotated from `lawnCareServices` array
+  - Coastal challenges: Rotated from `coastalChallenges` array
+  - Schema coordinates: Unique per city
+  - Meta descriptions: City-specific
+
+- **Navigation Integration:**
+  - Script generates pages but doesn't auto-update navbar
+  - Manual step: Update `src/components/navbar/navbar.astro` with locations dropdown
+  - Example structure:
+    ```astro
+    {
+      title: "Locations",
+      children: [
+        { title: "Cape May", path: "/locations/cape-may/" },
+        { title: "Stone Harbor", path: "/locations/stone-harbor/" }
+      ]
+    }
+    ```
+
+- **Input Format (`data/locations.json`):**
+  ```json
+  [
+    { "city": "Cape May", "state": "NJ", "lat": 38.9351, "lng": -74.9060 },
+    { "city": "Stone Harbor", "state": "NJ", "lat": 39.0501, "lng": -74.7596 }
+  ]
+  ```
+
+- **Output Files:**
+  - `sites/[site]/src/pages/locations/[city-slug]/index.astro` - Generated pages
+  - `output/[site]/locations-summary.md` - Summary report with SEO analysis
+
+- **Status:** ✅ Script exists, documentation added
+
+---
+
+## Summary
+
+**Completed:**
+- ✅ General `rename-images.mjs` script created
+- ✅ Location generator documented
+- ✅ Both integrated into documentation
+- ✅ Pipeline integration points defined
+
+**Next Steps:**
+- Integrate `rename-images` into pipeline orchestrator
+- Add to agent YAML specifications
+- Test with real site data
+
