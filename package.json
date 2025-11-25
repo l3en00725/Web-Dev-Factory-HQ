@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "build": "cd sites/blue-lawns && npm run build",
     "lint": "echo 'No lint configured'",
     "build:aveda": "cd sites/aveda-institute && ~/.bun/bin/bun run build",
     "new-site": "bun run scripts/clone-template.mjs --name",
@@ -22,10 +23,11 @@
   "dependencies": {
     "chalk": "^5.6.2",
     "cheerio": "^1.1.2",
+    "csv-parse": "^6.1.0",
     "googleapis": "^134.0.0",
     "prompts": "^2.4.2",
     "resend": "^3.0.0",
-    "sharp": "^0.33.0"
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
     "playwright": "^1.56.1"

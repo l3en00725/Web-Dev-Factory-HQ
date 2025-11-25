@@ -1,0 +1,62 @@
+name: Sanity Content Seeder Agent
+model: Claude Opus
+description: >
+  Generate initial Sanity documents for a new factory site (homepage, settings,
+  navigation, services, locations) using brand information and the active
+  dataset from environment configuration.
+inputs:
+  - name: siteName
+    type: string
+    required: true
+    description: Short slug or human-readable name for the site being provisioned.
+  - name: brand_info
+    type: object
+    required: true
+    description: >
+      Structured brand data (name, tagline, value props, locations, services,
+      contact info, tone/voice) used to craft initial content.
+outputs:
+  - name: seed_documents
+    type: json
+    description: >
+      Array of Sanity document payloads (homepage, settings, nav, services[],
+      locations[]) ready to be ingested by a push-to-sanity script.
+  - name: seeding_plan
+    type: markdown
+    description: >
+      Human-readable description of which documents will be created, IDs,
+      references between them, and any follow-up manual edits recommended.
+steps:
+  - id: resolve_dataset
+    name: Resolve target dataset
+    description: >
+      Determine the effective dataset by prioritizing the SANITY_DATASET env
+      var documented in env-docs; fall back to a provided dataset key in
+      brand_info if necessary, with clear notes.
+  - id: map_brand_to_schema
+    name: Map brand info into schema shapes
+    description: >
+      Align brand_info fields (services, locations, contact, social, tone) with
+      the schema shapes defined by the Sanity Schema Agent, including
+      references to settings, nav, and global SEO.
+  - id: craft_initial_documents
+    name: Craft initial Sanity documents
+    description: >
+      Generate structured JSON documents for homepage, settings, nav, services
+      array, and locations array, including IDs, slugs, references, and
+      initial SEO metadata consistent with factory conventions.
+  - id: validate_references
+    name: Validate references and relationships
+    description: >
+      Ensure that document references (e.g., homepage → settings, nav →
+      referenced routes, services → locations where applicable) are internally
+      consistent and compatible with the template rendering engine.
+  - id: document_seeding_flow
+    name: Document seeding flow and CLI usage
+    description: >
+      Produce seeding_plan instructions describing how a future push-to-sanity
+      script should authenticate (using SANITY_WRITE_TOKEN), target the
+      dataset, and apply the seed_documents safely (idempotent upserts where
+      possible).
+
+

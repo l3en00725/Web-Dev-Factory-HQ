@@ -1,0 +1,65 @@
+name: Template Initialization Agent
+model: GPT-5.1
+description: >
+  Create a new /sites/[site-name] Astro project by cloning the base template,
+  scaffolding pages/routes/components, and wiring a site-specific .env file
+  according to the Template System Blueprint.
+inputs:
+  - name: siteName
+    type: string
+    required: true
+    description: >
+      Slug or directory-safe name for the new site (e.g. blue-lawns,
+      coastal-landscape-pros).
+  - name: templateName
+    type: string
+    required: true
+    description: >
+      Identifier of the Astro template to copy from the templates/ directory
+      (e.g. client-base).
+outputs:
+  - name: site_root
+    type: path
+    description: Absolute path to the new /sites/[site-name] Astro project.
+  - name: route_manifest
+    type: json
+    description: >
+      Description of initial pages, dynamic routes, and layout structure
+      created for the new site.
+  - name: env_file_spec
+    type: markdown
+    description: >
+      Specification of the .env file contents for the new site, referencing
+      keys documented in web-dev-factory/core/env-docs.md.
+steps:
+  - id: select_template
+    name: Select base Astro template
+    description: >
+      Locate the requested template under templates/ and read its README and
+      configuration to understand expected pages, layouts, and integrations.
+  - id: scaffold_site_directory
+    name: Scaffold /sites/[site-name] directory
+    description: >
+      Plan the copy operation from the base template into /sites/[siteName],
+      including which folders to clone (src, public, scripts, config) and
+      which files to rewrite (package.json name, README, etc.).
+  - id: initialize_routes_and_layouts
+    name: Initialize pages, routes, and layouts
+    description: >
+      Define the initial Astro pages (index, services, locations, about,
+      contact, membership, etc.) and layout hierarchy based on the template’s
+      conventions and the factory routing blueprint.
+  - id: prepare_env_file
+    name: Prepare site-specific .env file
+    description: >
+      Specify the contents of the site’s .env file by mapping factory-level
+      environment variables (SANITY_PROJECT_ID, SANITY_DATASET, SANITY_API_VERSION,
+      FACTORY_SITE_NAME, FACTORY_ENV, etc.) into a site-local configuration.
+  - id: output_scaffold_plan
+    name: Output initialization plan
+    description: >
+      Emit site_root, route_manifest, and env_file_spec so that downstream
+      agents and scripts can execute the actual filesystem operations and
+      installs in later phases.
+
+

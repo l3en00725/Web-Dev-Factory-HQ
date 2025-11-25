@@ -1,0 +1,235 @@
+name: Web-Dev-Factory Orchestrator
+
+model: GPT-5.1
+
+description: >
+
+  Master coordinator for the entire multi-agent build pipeline.
+
+  This agent never writes code. It defines sequencing, dependencies,
+
+  metadata hand-off, and MCP interactions across all agents for every site build.
+
+
+
+inputs:
+
+  - name: siteName
+
+    type: string
+
+    required: true
+
+    description: Name of the website being created or migrated
+
+
+
+  - name: sourceUrl
+
+    type: string
+
+    required: false
+
+    description: URL to scrape an existing site for content
+
+
+
+  - name: domain
+
+    type: string
+
+    required: false
+
+    description: Target production or staging domain
+
+
+
+  - name: repoPath
+
+    type: string
+
+    required: false
+
+    description: Workspace folder for the generated Astro site
+
+
+
+  - name: brand_info
+
+    type: object
+
+    required: false
+
+    description: Logo, colors, tagline, business details
+
+
+
+outputs:
+
+  - name: orchestrationPlan
+
+    type: object
+
+    description: >
+
+      A phase-by-phase execution map listing which agent performs which action,
+
+      expected artifacts, required environment variables, and MCP interactions.
+
+
+
+steps:
+
+  - id: phase0
+
+    name: Intake and Validation
+
+    description: >
+
+      Validate inputs, confirm Sanity MCP connection, confirm environment variables
+
+      (`SANITY_PROJECT_ID`, `SANITY_DATASET`, `SANITY_TOKEN`, `SANITY_API_VERSION`).
+
+      Determine if build is new or migration.
+
+
+
+  - id: phase1
+
+    name: Scrape Old Site (Optional)
+
+    description: >
+
+      If sourceUrl is present, coordinate the Old Site Scraper Agent
+      (`.cursor/agents/factory/old_site_scraper_agent.yaml`) to generate:
+
+      - content inventory
+
+      - media list
+
+      - markdown/HTML content blocks
+
+      - SEO hints
+
+
+
+  - id: phase2
+
+    name: Template Initialization
+
+    description: >
+
+      Trigger Template Initialization Agent
+      (`.cursor/agents/factory/template_initialization_agent.yaml`) to clone a base Astro template into
+
+      `/sites/[siteName]`, configure environment files, and prepare folders.
+
+
+
+  - id: phase3
+
+    name: Sanity Schema Creation
+
+    description: >
+
+      Trigger Sanity Schema Agent (Claude Opus)
+      (`.cursor/agents/factory/sanity_schema_agent.yaml`) to generate the complete schema:
+
+      objects, sections, documents, index.ts. Ensure MCP push succeeds.
+
+
+
+  - id: phase4
+
+    name: Content Seeding
+
+    description: >
+
+      Trigger Sanity Content Seeder Agent
+      (`.cursor/agents/factory/sanity_content_seeder_agent.yaml`) to auto-create:
+
+      homepage, settings, services, locations, navigation, global SEO.
+
+      If scraped content exists, map fields to schema.
+
+
+
+  - id: phase5
+
+    name: Template Rendering Layer
+
+    description: >
+
+      Trigger Template Rendering Agent
+      (`.cursor/agents/factory/template_rendering_agent.yaml`) to map Sanity schema to Astro components,
+
+      prepare template.config.json, and define dynamic rendering blueprint.
+
+
+
+  - id: phase6
+
+    name: Astro Site Builder
+
+    description: >
+
+      Trigger Astro Site Builder Agent
+      (`.cursor/agents/factory/astro_site_builder_agent.yaml`) to assemble routes, pages, layouts,
+
+      SEO structure, dynamic pageBuilder rendering, and sanity client integration.
+
+      Optionally coordinate Builder Orchestrator Agent
+      (`.cursor/agents/factory/builder_orchestrator_agent.yaml`) if a nested build pipeline is needed.
+
+
+
+  - id: phase7
+
+    name: Design Enhancement
+
+    description: >
+
+      Trigger Design Enhancement Agent (Gemini)
+      (`.cursor/agents/factory/design_enhancement_agent.yaml`) to refine UI/UX:
+
+      spacing, colors, responsive layout, bento sections, card polish.
+
+
+
+  - id: phase8
+
+    name: SEO Copy Enhancement
+
+    description: >
+
+      Trigger SEO Copy Agent (Gemini)
+      (`.cursor/agents/factory/seo_copy_agent.yaml`) to generate optimized text,
+
+      hero copy, metadata, FAQ content, and location SEO.
+
+
+
+  - id: phase9
+
+    name: Deployment Preparation
+
+    description: >
+
+      Verify OG images, favicon, sitemap, robots.txt, redirects,
+
+      Sanity environment overrides, and Vercel readiness.
+
+
+
+  - id: phase10
+
+    name: Final Blueprint
+
+    description: >
+
+      Output the orchestrationPlan listing inputs, outputs, dependencies,
+
+      artifacts per phase, and next steps for automation.
+
+
+

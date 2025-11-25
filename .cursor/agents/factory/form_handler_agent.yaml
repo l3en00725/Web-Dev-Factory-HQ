@@ -1,0 +1,108 @@
+name: Universal Form Handler Agent
+model: GPT-5.1
+description: >
+  A factory-level handler for all website form submissions.
+  - Normalizes inbound form data from any site.
+  - Attaches attribution fields (leadSource, pagePath, UTM parameters, referer, siteName).
+  - Creates a lead document in Sanity via MCP.
+  - Forwards the lead to the client’s CRM (Jobber, ServiceTitan, HubSpot, Zapier Webhook)
+    depending on the client’s intake configuration.
+  - Returns structured JSON indicating success or failure of both Sanity write and CRM
+    forwarding.
+  - Fully neutral — no client-specific labels or copy.
+inputs:
+  - name: formPayload
+    type: object
+    required: true
+    description: >
+      Raw submitted form data from the website (fields, hidden inputs,
+      honeypots, consent flags).
+  - name: requestMeta
+    type: object
+    required: false
+    description: >
+      HTTP request metadata including URL, referer, headers, UTM parameters,
+      client IP, and siteName if available.
+  - name: clientConfig
+    type: object
+    required: true
+    description: >
+      Client-specific integration configuration including CRM webhook URLs
+      and/or API credentials for Jobber, ServiceTitan, HubSpot, or generic
+      Zapier-style webhooks.
+  - name: dataset
+    type: string
+    required: false
+    description: >
+      Target Sanity dataset for lead documents. Defaults to SANITY_DATASET
+      (or "production") when not provided.
+outputs:
+  - name: leadDocument
+    type: json
+    description: >
+      Metadata for the created Sanity lead document (ID, _type, key fields,
+      attribution, timestamps). Null if the Sanity write failed.
+  - name: crmForwardResult
+    type: json
+    description: >
+      Structured result of CRM forwarding including target system, HTTP status,
+      response body (sanitized), and any retry hints.
+  - name: attribution
+    type: json
+    description: >
+      Derived attribution object including pagePath, referer, utm_source,
+      utm_medium, utm_campaign, utm_term, utm_content, leadSource heuristic,
+      and siteName if available.
+  - name: errors
+    type: json
+    description: >
+      Any errors encountered during Sanity write or CRM forwarding, grouped by
+      subsystem. Empty object when both operations succeed.
+steps:
+  - id: derive_attribution
+    name: Derive attribution from requestMeta
+    description: >
+      Normalize attribution fields from requestMeta: extract pagePath, referer,
+      and any utm_* parameters; infer leadSource using a simple heuristic
+      (e.g., direct, organic, paid, referral, social) based on referer and
+      UTM data; attach siteName when available. Produce a canonical attribution
+      object for downstream steps.
+  - id: normalize_form_payload
+    name: Normalize form payload
+    description: >
+      Map arbitrary form field names into a standard schema including: name,
+      email, phone, message, serviceInterest, pagePath, preferredDate,
+      preferredTime, and any additional metadata or custom fields. Strip
+      honeypot fields, normalize phone/email formats, and preserve raw payload
+      for auditing when needed.
+  - id: write_to_sanity
+    name: Write lead document to Sanity
+    description: >
+      Construct a Sanity lead document that combines normalized form data and
+      attribution, plus an intakeMeta object (source site, timestamp, and
+      requestMeta summary). Use the Sanity MCP connection to create the lead
+      document in the target dataset, capturing the resulting document ID and
+      key fields into leadDocument. Do not write any client-specific copy
+      beyond what is present in formPayload and requestMeta.
+  - id: forward_to_crm
+    name: Forward lead to CRM
+    description: >
+      Based on clientConfig, forward the normalized lead payload (plus
+      attribution) to the appropriate CRM:
+      - If clientConfig.webhookURL exists, POST JSON to that URL.
+      - If Jobber credentials exist, follow the Jobber API schema for creating
+        leads or work requests.
+      - If ServiceTitan credentials exist, follow its lead or job intake API.
+      - If HubSpot credentials exist, use appropriate contacts/engagements
+        endpoints.
+      Capture HTTP status, response, and any obvious error conditions into
+      crmForwardResult without leaking sensitive tokens.
+  - id: compile_results
+    name: Compile final results
+    description: >
+      Aggregate leadDocument, crmForwardResult, and attribution into a single
+      structured response along with any errors encountered. Ensure the final
+      output remains neutral and suitable for logging, monitoring, or
+      downstream automations in the Web-Dev-Factory pipeline.
+
+

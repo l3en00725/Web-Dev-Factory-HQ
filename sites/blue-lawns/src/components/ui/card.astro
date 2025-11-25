@@ -9,14 +9,14 @@ const { title, description, class: className } = Astro.props;
 ---
 
 <div class:list={[
-  'p-6 bg-white border border-gray-200 rounded-lg shadow-sm',
+  'p-6 bg-white border border-[#E0F0FF] rounded-lg shadow-sm hover:shadow-md transition-shadow',
   className
 ]}>
   {title && (
-    <h3 class="text-xl font-bold text-gray-900 mb-3">{title}</h3>
+    <h3 class="text-xl font-bold text-[#0B203D] mb-3">{title}</h3>
   )}
   {description && (
-    <p class="text-gray-700">{description}</p>
+    <p class="text-[#333]">{description}</p>
   )}
   <slot />
 </div>

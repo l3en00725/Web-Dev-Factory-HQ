@@ -16,18 +16,18 @@ const {
 } = Astro.props;
 
 const variantClasses = {
-  default: 'bg-green-700 text-white hover:bg-green-800',
-  outline: 'bg-white text-green-700 border-2 border-green-700 hover:bg-green-50',
-  ghost: 'bg-transparent text-green-700 hover:bg-green-50'
+  default: 'bg-[#0074D9] text-white hover:bg-[#005BBB] border-2 border-transparent',
+  outline: 'bg-white text-[#0074D9] border-2 border-[#0074D9] hover:bg-[#E0F0FF]',
+  ghost: 'bg-transparent text-[#0074D9] hover:bg-[#E0F0FF] border-2 border-transparent'
 };
 
 const sizeClasses = {
   sm: 'px-4 py-2 text-sm',
-  md: 'px-6 py-3 text-base',
-  lg: 'px-8 py-4 text-lg'
+  md: 'px-5 py-2.5 text-base',
+  lg: 'px-6 py-3 text-lg'
 };
 
-const baseClasses = 'inline-block rounded-lg font-semibold transition-colors duration-200';
+const baseClasses = 'rounded-md text-center transition focus-visible:ring-2 ring-offset-2 ring-[#1E90FF]';
 
 const Component = href ? 'a' : 'button';
 ---

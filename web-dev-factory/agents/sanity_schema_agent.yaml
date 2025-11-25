@@ -1,0 +1,72 @@
+name: Sanity Schema Agent
+model: Claude Opus
+description: >
+  Generate the complete Sanity schema system for a new factory site, including
+  core document types, reusable objects, a flexible sections-array system, and
+  the exported index.ts + sanity.config.ts structure defined by the Template
+  System Blueprint.
+inputs:
+  - name: siteName
+    type: string
+    required: true
+    description: Human-readable site name used for titles, descriptions, and schema naming context.
+  - name: dataset
+    type: string
+    required: true
+    description: Target Sanity dataset (e.g. production) where the schemas will be registered.
+outputs:
+  - name: schema_source
+    type: code
+    description: >
+      TypeScript/JavaScript schema definitions for homepage, service, location,
+      testimonial, settings, navItem, globalSEO, and all sections-array blocks.
+  - name: file_structure
+    type: structure
+    description: >
+      Proposed Sanity folder and file layout, including schema/ files, index.ts
+      exports, and sanity.config.ts wiring.
+  - name: implementation_notes
+    type: markdown
+    description: >
+      Detailed notes and TODOs for GPT-based implementation inside the repo,
+      including any assumptions or Blueprint-specific constraints.
+steps:
+  - id: review_blueprint
+    name: Review Template System Blueprint and env docs
+    description: >
+      Parse the Template System Blueprint and factory env docs to understand
+      required document types, sections-array behavior, SEO fields, and
+      multi-site considerations.
+  - id: design_content_model
+    name: Design Sanity content model
+    description: >
+      Define document and object schemas for homepage, service, location,
+      testimonial, settings, navItem, and globalSEO, ensuring consistent
+      naming, field reuse, and localization readiness.
+  - id: define_sections_array
+    name: Define sections-array system
+    description: >
+      Specify a reusable sections array pattern (e.g. pageBuilder) with a
+      curated set of section blocks (hero, services, grid/bento, FAQ, CTA,
+      testimonials, location highlights, etc.) tailored to the factory’s
+      templates.
+  - id: compose_schema_exports
+    name: Compose index.ts and sanity.config.ts structure
+    description: >
+      Describe how all schema modules are imported and exported from schema/index.ts
+      and how sanity.config.ts should register them, including projectId,
+      dataset, and API version usage from environment variables.
+  - id: align_with_factory_env
+    name: Align schema with factory environment variables
+    description: >
+      Document how SANITY_PROJECT_ID, SANITY_DATASET, and SANITY_API_VERSION
+      will be consumed by the eventual code so the schema system is compatible
+      with the Web-Dev-Factory environment model.
+  - id: output_spec
+    name: Produce final schema specification
+    description: >
+      Output well-structured schema_source, file_structure, and
+      implementation_notes artifacts that another GPT agent can translate into
+      actual files without further design decisions.
+
+

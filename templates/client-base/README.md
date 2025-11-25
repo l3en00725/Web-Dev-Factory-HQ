@@ -49,3 +49,22 @@ Run the full automation pipeline:
 bun run scripts/run-pipeline.mjs --site <site-name>
 ```
 
+## Forms and lead capture
+
+- The API route at `src/pages/api/form/submit.ts` is **generated per-client**
+  by the Web-Dev-Factory Form Builder Agent during site builds. Do not edit
+  this file directly in the base template.
+- A legacy reference implementation lives at
+  `src/pages/api/form/submit.legacy.ts`. It is provided for historical and
+  implementation reference only and is **not used** by new client sites once
+  the Form Builder phase has run.
+
+## OG Image Generation
+
+All sites include dynamic OG images via `/api/og`.
+
+Configurable via Sanity: Settings → OG Template.
+
+Uses Vercel Edge Functions + `@vercel/og`.
+
+

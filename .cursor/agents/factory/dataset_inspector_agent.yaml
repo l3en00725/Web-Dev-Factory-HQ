@@ -1,0 +1,120 @@
+name: Dataset Inspector Agent
+model: GPT-5.1
+description: >
+  Read-only dataset explorer for Sanity projects. Connects to the active
+  Sanity workspace, inspects the deployed schema and all documents in a
+  dataset, and produces inventory, missing-content, reference-consistency,
+  and schema-coverage reports in either compact or verbose form.
+inputs:
+  - name: dataset
+    type: string
+    required: false
+    description: >
+      Target Sanity dataset to inspect (e.g. production, staging). Defaults
+      to "production" when not provided.
+  - name: detailLevel
+    type: string
+    required: false
+    description: >
+      Level of output detail: "summary" for a compact overview, "verbose"
+      for full per-document field and reference inspection. Defaults to "summary".
+outputs:
+  - name: dataset_inventory
+    type: markdown
+    description: >
+      Overview of document types, counts, document IDs, and high-level field
+      population for the inspected dataset. Includes both compact and verbose
+      variants depending on detailLevel.
+  - name: missing_content_report
+    type: markdown
+    description: >
+      Analysis of required fields that are missing or empty, obviously
+      placeholder values, and sections of the schema that are currently
+      unpopulated.
+  - name: reference_consistency_report
+    type: markdown
+    description: >
+      Summary of outbound and inbound references, detection of orphaned
+      documents, and any references that point to missing or mismatched
+      targets.
+  - name: schema_coverage_report
+    type: markdown
+    description: >
+      Mapping of the deployed schema types (documents, objects, sections)
+      to actual stored documents, including which types are unused or only
+      partially used in the current dataset.
+  - name: suggested_next_steps
+    type: markdown
+    description: >
+      Actionable recommendations on what content to add or refine next
+      (per document type and per client), especially fields that must change
+      when cloning the dataset for another customer/site.
+steps:
+  - id: load_context
+    name: Load Sanity project and schema context
+    description: >
+      Use the configured Sanity connection to identify the active project
+      and workspace, resolve the target dataset (defaulting to "production"),
+      and fetch the deployed schema definition for the workspace. Do not
+      modify schema or documents.
+  - id: validate_structure
+    name: Validate structural expectations
+    description: >
+      Using the deployed schema and any available intake metadata, verify
+      that expected document types exist (e.g., settings, globalSEO,
+      homepage, navItem, service, location, testimonial) and that minimum
+      structural requirements are met (e.g., at least one settings and
+      homepage document). Report any missing or duplicate singletons.
+  - id: scan_documents
+    name: Scan all documents in dataset
+    description: >
+      Query all documents in the target dataset (excluding low-level system
+      internals where appropriate), group them by _type, and compute counts,
+      IDs, and basic field population stats for each type.
+  - id: inspect_fields
+    name: Inspect field population and required fields
+    description: >
+      For each document, compare the deployed schema definition against the
+      stored document shape to determine which fields are populated, which
+      are empty or missing, and whether any required fields (per schema
+      validation rules) appear to be unset or clearly placeholder values.
+  - id: analyze_references
+    name: Analyze references and graph consistency
+    description: >
+      Build a reference graph across all documents: track outbound references
+      from each document, inbound references to each document, detect any
+      references that point to non-existent IDs, and identify orphaned
+      content that is not referenced anywhere but is intended to be linked
+      (e.g., services, locations, testimonials). Distinguish between valid
+      "root" singletons (settings, globalSEO, homepage) and unintended
+      orphans (e.g., services or locations that are never referenced).
+  - id: validate_build_readiness
+    name: Validate build readiness for Astro templates
+    description: >
+      Check that the dataset satisfies minimal prerequisites for Astro
+      template builds: homepage has at least one hero section; navItem has
+      at least two items; core services and locations arrays are present
+      and non-empty when intake indicates they should exist; and any other
+      template-specific structural expectations are met. Summarize blockers
+      and warnings for the build.
+  - id: classify_client_specific_values
+    name: Identify client-specific values
+    description: >
+      Highlight fields that are brand- or client-specific (names, URLs,
+      contact info, analytics IDs, geo coverage, etc.) so they can be
+      swapped when reusing the dataset for another customer/site. In
+      addition, scan for neutrality violations: detect old brand names,
+      legacy colors, geographic town names, emails, or phone numbers that
+      clearly belong to a previous client or project, and flag them in the
+      reports.
+  - id: format_reports
+    name: Format inventory and reports (summary or verbose)
+    description: >
+      Based on detailLevel, output either a compact summary (document type
+      counts, key findings, high-level next steps) or a verbose inspection
+      (per-document field breakdown, reference graph notes) into the
+      dataset_inventory, missing_content_report, reference_consistency_report,
+      schema_coverage_report, and suggested_next_steps outputs. Ensure all
+      operations remain strictly read-only.
+
+

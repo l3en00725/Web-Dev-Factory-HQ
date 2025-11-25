@@ -1,0 +1,102 @@
+name: Universal Sanity Content Seeder
+model: GPT-5.1
+description: >
+  Creates fully client-agnostic initial Sanity documents using only intake
+  data and universal scaffolding. No hardcoded brand values, no Blue-Lawns
+  defaults, no fake geographic data. All content is derived from the intake
+  object or generic, clearly-marked placeholders, and every document is
+  written via the Sanity MCP connection with an attached intakeMeta field.
+inputs:
+  - name: intake
+    type: object
+    required: true
+    description: >
+      Parsed intake data from the Universal Intake Agent, including brand,
+      services, locations, navigation intent, and content priorities for the
+      new client.
+  - name: dataset
+    type: string
+    required: false
+    description: >
+      Target Sanity dataset to seed (e.g. production, staging). Defaults to
+      "production" when not provided.
+outputs:
+  - name: seededDocuments
+    type: json
+    description: >
+      Array of created document metadata (IDs, _type, slug, and key fields)
+      for settings, globalSEO, homepage, nav, services, locations, and
+      testimonials.
+  - name: missingFieldsReport
+    type: markdown
+    description: >
+      Report of schema fields that could not be populated from intake and
+      were left empty or filled with generic placeholders, grouped by
+      document type.
+  - name: recommendations
+    type: markdown
+    description: >
+      Guidance on which fields the implementer should review and refine
+      manually after seeding, including brand-specific copy, imagery, and
+      geo coverage that require human confirmation.
+steps:
+  - id: resolve_dataset
+    name: Resolve target dataset
+    description: >
+      Determine the effective dataset by prioritizing the dataset input and
+      SANITY_DATASET environment variable, defaulting to "production" when
+      unspecified. Do not create or alter datasets; only choose which one to
+      seed.
+  - id: derive_universal_scaffolding
+    name: Derive universal scaffolding from intake
+    description: >
+      From the intake object, derive a neutral content model: site naming,
+      generic navigation labels, service and location lists, and high-level
+      messaging without embedding any previous-client-specific names, towns,
+      or contact details. Where intake is missing data, prepare clearly
+      marked placeholders (e.g., "Set homepage headline", "Add hero subcopy").
+  - id: seed_core_singletons
+    name: Seed core singleton documents
+    description: >
+      Using only intake and universal scaffolding, create settings and
+      globalSEO documents via Sanity MCP. Attach an intakeMeta object to
+      each document (containing at least source dataset, intake version, and
+      timestamps). Avoid hardcoded brand strings; rely on intake brand info
+      or generic labels like "Your Company".
+  - id: seed_primary_pages
+    name: Seed homepage and primary navigation
+    description: >
+      Create a homepage document with a minimal but valid pageBuilder
+      (including a hero section) and seed a set of navItem documents that
+      reflect the intake navigation intent. All labels and URLs must be
+      derived from intake or neutral defaults (e.g., "Home", "Services",
+      "Contact"), with no previous-client-specific paths. Attach intakeMeta
+      to each document.
+  - id: seed_services_locations_testimonials
+    name: Seed services, locations, and testimonials
+    description: >
+      For each service and location described in intake, create corresponding
+      service and location documents with neutral, non-geographic-generic
+      copy that mirrors the intake wording. If testimonials are present in
+      intake, create testimonial documents as well. Where intake omits a
+      field, leave it empty or use a clear "TODO" style placeholder rather
+      than inventing data. Attach intakeMeta to every document and ensure
+      all writes go through the Sanity MCP connection.
+  - id: wire_references
+    name: Wire references between seeded documents
+    description: >
+      Establish references between homepage, nav, services, locations, and
+      testimonials based on the schema: connect location.services to service
+      docs, associate testimonials to services or locations when indicated
+      by intake, and ensure slugs and references are internally consistent.
+      Do not create any references to undeclared or non-existent IDs.
+  - id: compile_reports
+    name: Compile seededDocuments and reports
+    description: >
+      Summarize all created document IDs and key fields into seededDocuments.
+      Build missingFieldsReport enumerating which schema fields were left
+      empty or populated with placeholders due to gaps in intake. Provide
+      recommendations for humans to refine the seeded content before the
+      first build. All operations must remain client-agnostic and avoid
+      leaking data from other sites.
+

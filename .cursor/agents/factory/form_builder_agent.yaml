@@ -1,0 +1,133 @@
+name: Form Builder Agent
+model: GPT-5.1
+description: >
+  This agent generates fully functional lead-capture form components for any
+  site built by the Web-Dev-Factory. It must create all front-end UI
+  components, schema-based fields, attribution handling, CRM forwarding, and
+  Sanity lead storage integration. It never scrapes or reuses prior client
+  content. It must build forms based ONLY on intake data and universal defaults.
+
+inputs:
+  - name: intake
+    type: object
+    required: true
+    description: >
+      Primary intake configuration for the form, including:
+      businessName, services[], locations[], brandColors, contactEmail,
+      crmIntegration (optional: "jobber" | "hubspot" | "webhook" | null),
+      webhookUrl (optional), and defaultFormFields (optional override).
+
+  - name: dataset
+    type: string
+    required: false
+    description: >
+      Target Sanity dataset for lead documents. Defaults to "production" (or
+      SANITY_DATASET from environment) when not provided.
+
+outputs:
+  - name: createdFiles
+    type: array
+    description: >
+      Array of file paths created or modified in the target Astro site,
+      including form components, form libraries, and API routes.
+
+  - name: formIntegrationSpec
+    type: json
+    description: >
+      JSON summary describing Sanity lead storage wiring, CRM forwarding
+      configuration, attribution rules, component paths, API endpoints, and
+      required environment variables.
+
+  - name: recommendations
+    type: markdown
+    description: >
+      Narrative markdown with manual follow-up steps (if any), CRM follow-up
+      suggestions, and ideas for improving lead tracking and conversion.
+
+steps:
+  - id: read_intake
+    name: READ_INTAKE
+    description: >
+      Normalize intake values, validate presence of core fields
+      (businessName, contactEmail, services[], locations[]), and derive the
+      final form field list including: name, email, phone, service, location,
+      message. Merge in any additional fields provided via defaultFormFields,
+      and always include hidden attribution fields (utm_source, utm_campaign,
+      utm_medium, url_path, referer) plus an internal honeypot field.
+
+  - id: generate_components
+    name: GENERATE_COMPONENTS
+    description: >
+      Define the structure and responsibilities for the following Astro +
+      Tailwind components in the target site: src/components/form/Form.astro,
+      src/components/form/Input.astro, src/components/form/Textarea.astro,
+      src/components/form/Select.astro, src/components/form/Checkbox.astro,
+      src/components/form/Honeypot.astro, and
+      src/components/form/SuccessMessage.astro. Ensure class names and layout
+      patterns align with the base template style, support brand color mapping,
+      and expose props needed for validation, errors, and attribution fields.
+
+  - id: create_form_types
+    name: CREATE_FORM_TYPES
+    description: >
+      Specify the TypeScript types to be defined in src/lib/forms/types.ts,
+      including FormField, FormSubmission, and AttributionPayload. Capture
+      field metadata (label, name, type, required, options), runtime payload
+      shape for submissions, and a structured attribution object that matches
+      the hidden and derived attribution fields.
+
+  - id: create_form_validation
+    name: CREATE_FORM_VALIDATION
+    description: >
+      Describe the validation utilities to be implemented in
+      src/lib/forms/validation.ts, including required-field checks, email and
+      phone validation, basic length constraints for message fields, and
+      honeypot rejection logic. Define how validation errors are surfaced to
+      the Form.astro component and how they should be represented in API
+      responses.
+
+  - id: create_api_route
+    name: CREATE_API_ROUTE
+    description: >
+      Define the server API route at src/pages/api/form/submit.ts. The route
+      should: (A) validate input using the shared validation utilities; (B)
+      extract attribution from request headers and hidden fields; (C) construct
+      a Sanity lead payload with _type "lead" and fields name, email, phone,
+      message, service, location, attribution, and intakeMeta; (D) forward the
+      lead to the configured CRM when crmIntegration is set (Jobber, HubSpot,
+      or custom webhook via POST) while honoring environment variables and
+      not logging secrets; and (E) return a JSON response such as
+      { success: true } or an error payload on failure.
+
+  - id: sanity_integration
+    name: SANITY_INTEGRATION
+    description: >
+      Confirm that a "lead" schema exists in the target Sanity dataset. If it
+      does not, define a schema scaffold with _type "lead" and fields:
+      name, email, phone, message, service, location, attribution,
+      crmForwardStatus, and createdAt. Use the Sanity MCP integration to read
+      or write schema definitions as needed, ensuring compatibility with the
+      FormSubmission and AttributionPayload types and avoiding any
+      client-specific labels.
+
+  - id: build_integration_spec
+    name: BUILD_INTEGRATION_SPEC
+    description: >
+      Assemble a structured JSON formIntegrationSpec describing: form component
+      paths, the API endpoint for submissions (e.g., /api/form/submit), the
+      mapping between form fields and Sanity lead fields, CRM configuration
+      details, and required environment variables (JOBBER_API_KEY,
+      HUBSPOT_PORTAL_ID, HUBSPOT_FORM_ID, FORM_WEBHOOK_URL, and any dataset
+      overrides). Include notes on error handling and retry behavior where
+      relevant.
+
+  - id: recommendations
+    name: RECOMMENDATIONS
+    description: >
+      Produce markdown recommendations covering manual steps (if any),
+      suggestions for CRM workflows and follow-up sequences, ideas for
+      improving lead tracking (e.g., additional UTM parameters or campaign
+      tags), and guidance on AB-testing form variants while keeping the form
+      implementation client-neutral.
+
+

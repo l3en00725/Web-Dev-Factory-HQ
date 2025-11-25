@@ -1,0 +1,55 @@
+name: Old Site Scraper Agent
+model: GPT-5.1
+description: >
+  Scrape an existing website to collect HTML, text content, headings, images,
+  CTAs, FAQs, and forms into a structured migration-ready dataset under
+  output/<site>.
+inputs:
+  - name: sourceUrl
+    type: string
+    required: true
+    description: Root URL of the legacy site to be scraped.
+outputs:
+  - name: scrape_output_dir
+    type: path
+    description: Path to the generated output/<site> folder for this scrape.
+  - name: content_inventory
+    type: json
+    description: >
+      Structured map of pages, URLs, headings, body copy, CTAs, and on-page
+      sections suitable for import and analysis.
+  - name: migration_dataset
+    type: json
+    description: >
+      Normalized dataset summarizing branding elements, forms, FAQs, and copy
+      that downstream agents can use during migration.
+steps:
+  - id: derive_site_slug
+    name: Derive site slug from source URL
+    description: >
+      Convert sourceUrl into a stable slug (e.g. host without protocol) to use
+      when naming the output/<site> directory.
+  - id: plan_crawl_scope
+    name: Plan crawl scope and rules
+    description: >
+      Determine which paths to include/exclude (e.g. avoid admin/login), crawl
+      depth, and rate limits, following any robots.txt constraints and the
+      factory’s scraping ethics.
+  - id: extract_page_content
+    name: Extract page-level content
+    description: >
+      For each crawled URL, capture HTML snapshots, headings (H1–H3), body
+      text, CTAs, meta tags, and image references into a structured inventory.
+  - id: collect_media_assets
+    name: Collect and map media assets
+    description: >
+      Identify and catalog images and other media (with alt text and
+      filenames) into a media listing suitable for later optimization scripts.
+  - id: synthesize_migration_dataset
+    name: Synthesize migration-ready dataset
+    description: >
+      Aggregate content_inventory into a migration_dataset that highlights
+      branding cues, repeated CTAs, common questions (for FAQs), and form
+      structures for use by schema, copy, and builder agents.
+
+

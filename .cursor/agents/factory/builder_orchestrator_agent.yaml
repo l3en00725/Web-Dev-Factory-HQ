@@ -1,0 +1,305 @@
+name: Builder Orchestrator Agent
+model: GPT-5.1
+description: >
+  Central multi-model orchestrator for the Web-Dev-Factory that coordinates
+  scrape, template selection, schema generation, design enhancement, template
+  rendering, Astro build, and deployment phases across GPT, Claude, and
+  Gemini agents.
+inputs:
+  - name: siteName
+    type: string
+    required: true
+    description: Directory-safe name for the site under /sites and /output.
+  - name: templateName
+    type: string
+    required: true
+    description: Name/identifier of the selected template to initialize and render.
+  - name: businessName
+    type: string
+    required: true
+    description: Human-readable business name used for intake and branding.
+  - name: services
+    type: array
+    required: true
+    description: List of primary services offered by the business.
+  - name: locations
+    type: array
+    required: true
+    description: List of primary service locations or offices.
+  - name: brandColors
+    type: object
+    required: false
+    description: Brand color palette (primary/secondary/accent) for design and forms.
+  - name: contactEmail
+    type: string
+    required: false
+    description: Primary contact email for inquiries and form submissions.
+  - name: contactPhone
+    type: string
+    required: false
+    description: Primary contact phone number.
+  - name: crmIntegration
+    type: object
+    required: false
+    description: CRM integration preferences (provider, config, webhookUrl).
+  - name: analytics
+    type: object
+    required: false
+    description: Analytics configuration (e.g., googleAnalyticsId).
+  - name: websiteUrl
+    type: string
+    required: false
+    description: Public website URL if already known.
+  - name: sourceUrl
+    type: string
+    required: false
+    description: Optional legacy site URL to scrape during Phase 0.
+outputs:
+  - name: orchestration_plan
+    type: markdown
+    description: >
+      High-level runbook describing how each phase executes and which agents
+      are called with which inputs/outputs, including intakeObject,
+      seededDocs, datasetInspectorReport, neutralityFlags, and requiredFixes,
+      as well as the dedicated Form Builder phase details: createdFormFiles,
+      formIntegrationSpec, formEnvRequirements, and how forms are wired into
+      Sanity and downstream CRM/webhook targets.
+  - name: phase_artifacts
+    type: json
+    description: >
+      Structured references to the key artifacts from each phase (scrape,
+      schema, content seed, dataset inspection, design, rendering config,
+      built site, form components and API routes, form integration specs,
+      form environment requirements, and deployment).
+  - name: formHandlingSetup
+    type: json
+    description: >
+      Status flags for form submission handling setup, including:
+      - leadSchemaDetected
+      - formHandlerAgentDetected
+      - formConfigGenerated
+      - apiRouteReady
+      It should align with the Form Builder phase outputs (createdFormFiles,
+      formIntegrationSpec, formEnvRequirements) so that form handling status
+      and generated artifacts stay in sync.
+  - name: createdFormFiles
+    type: array
+    description: >
+      Flat list of file paths created or modified by the Form Builder phase,
+      including form UI components, form libraries, and API routes.
+  - name: formIntegrationSpec
+    type: json
+    description: >
+      Structured JSON object mirroring the Form Builder Agent output describing
+      Sanity lead storage, CRM forwarding configuration, attribution rules,
+      component wiring, and API endpoints.
+  - name: formEnvRequirements
+    type: json
+    description: >
+      Environment variable requirements derived from the Form Builder Agent,
+      including JOBBER_API_KEY, HUBSPOT_PORTAL_ID, HUBSPOT_FORM_ID,
+      FORM_WEBHOOK_URL, and any dataset or Sanity-related overrides.
+  - name: designSpecs
+    type: json
+    description: >
+      Aggregated design system spec from the Design Enhancement phase, including
+      updated_component_specs, interactive_patterns, and tailwind_specs for use
+      by template rendering and Astro build phases.
+  - name: designRecommendations
+    type: markdown
+    description: >
+      Human-readable design recommendations from the Design Enhancement phase,
+      suitable for designers and stakeholders to review proposed UI/UX changes.
+  - name: seoMeta
+    type: json
+    description: >
+      Optimized page-level meta (titles and descriptions) produced by the SEO
+      Copy phase, including legacy vs proposed values and SEO risk annotations.
+  - name: keywordStrategy
+    type: json
+    description: >
+      Clustered keyword strategy describing themes, intent, difficulty/volume
+      tiers, local modifiers, and mapping to page types.
+  - name: seoContentBlocks
+    type: markdown
+    description: >
+      Long-form SEO content blocks (H1–H3 structure, body, CTAs) aligned to
+      keywordStrategy and seoMeta for use in template rendering and content
+      seeding.
+  - name: redirectMap
+    type: json
+    description: >
+      Proposed redirect mapping for legacy → new URLs generated during SEO Copy
+      phase, to be consumed by deployment and redirect systems.
+  - name: finalRedirects
+    type: json
+    description: >
+      Finalized redirect configuration derived from redirectMap and deployment
+      decisions (wiring only; no execution).
+  - name: seoSafetyReport
+    type: markdown
+    description: >
+      Summary of preserved slugs, preserved metadata, and identified SEO risks
+      validating that migrations do not break existing SEO.
+steps:
+  - id: phase_0_intake
+    name: Phase 0 – Universal Intake
+    description: >
+      Run the Universal Intake Agent to produce intakeObject that flows into
+      schema, seeding, design, template rendering, the Form Builder phase,
+      and deployment planning. If sourceUrl is provided, optionally run the
+      Old Site Scraper Agent afterward for supplemental data, but the primary
+      source of truth for downstream agents remains intakeObject.
+    run:
+      call: .cursor/agents/factory/intake_agent.yaml
+      args:
+        siteName: $inputs.siteName
+        businessName: $inputs.businessName
+        services: $inputs.services
+        locations: $inputs.locations
+        brandColors: $inputs.brandColors
+        contactEmail: $inputs.contactEmail
+        contactPhone: $inputs.contactPhone
+        crmIntegration: $inputs.crmIntegration
+        analytics: $inputs.analytics
+        websiteUrl: $inputs.websiteUrl
+        sourceUrl: $inputs.sourceUrl
+      set: intakeObject
+  - id: phase_1_template_select
+    name: Phase 1 – Template selection
+    description: >
+      Confirm or suggest templateName based on business_type, migration_dataset
+      (if available), and Template System Blueprint rules; finalize template
+      choice for downstream agents.
+  - id: phase_2_schema
+    name: Phase 2 – Sanity schema and seeding
+    description: >
+      Call the Sanity Schema Agent with siteName and SANITY_DATASET to deploy
+      or update the schema, then call the Universal Sanity Content Seeder
+      (`.cursor/agents/factory/sanity_content_seeder_agent.yaml`) with the
+      normalized intake object from Phase 0
+      ($steps.phase_0_intake.intakeObject) and resolved dataset to create
+      initial documents. Capture seededDocs and missingFieldsReport for later
+      validation.
+  - id: phase_3_dataset_inspection
+    name: Phase 3 – Dataset inspection and validation
+    description: >
+      After schema deployment and content seeding, invoke the Dataset
+      Inspector Agent (`.cursor/agents/factory/dataset_inspector_agent.yaml`)
+      in verbose mode for the target dataset. Record its dataset_inventory,
+      missing_content_report, reference_consistency_report,
+      schema_coverage_report, and suggested_next_steps, and derive
+      neutralityFlags and requiredFixes. Design and build phases must wait
+      for this step to complete.
+  - id: phase_4_design_enhancement
+    name: Phase 4 – Design enhancement
+    description: >
+      Invoke the Design Enhancement Agent (Gemini)
+      (`.cursor/agents/factory/design_enhancement_agent.yaml`) with the
+      component_list, template_rules for templateName, the canonical
+      intakeObject from Phase 0, and any relevant signals from requiredFixes
+      to produce updated_component_specs, design_recommendations, explicit
+      interactive_patterns, and tailwind_specs. Persist these as designSpecs
+      (machine-usable Tailwind and component specs, including interactive
+      patterns) and designRecommendations (human-readable guidance) for use in
+      template rendering and Astro build phases.
+  - id: phase_4b_seo_copy_generation
+    name: Phase 4b – SEO copy and strategy generation
+    description: >
+      Before template rendering, call the SEO Copy Agent
+      (`.cursor/agents/factory/seo_copy_agent.yaml`) using the canonical
+      intakeObject from Phase 0 ($steps.phase_0_intake.intakeObject), the
+      current siteName, and any existing scrape artifacts (if Phase 0 or later
+      steps produced them). Capture optimized_meta, recommended_keywords,
+      content_blocks, and redirect_map, then expose them from the orchestrator
+      as seoMeta, keywordStrategy, seoContentBlocks, and redirectMap. These
+      outputs must be deterministic and are consumed by template rendering,
+      optional form builder logic, deployment/redirect systems, and OG/meta
+      verification phases.
+    run:
+      call: .cursor/agents/factory/seo_copy_agent.yaml
+      args:
+        business_type: $steps.phase_0_intake.intakeObject.businessType
+        site_goals: $steps.phase_0_intake.intakeObject.siteGoals
+        siteName: $inputs.siteName
+        intakeObject: $steps.phase_0_intake.intakeObject
+        scrapeArtifacts: $steps.phase_0_intake.scrapeArtifacts
+      set: seoCopyResult
+  - id: phase_5_render_template
+    name: Phase 5 – Template rendering config
+    description: >
+      Use the Template Rendering Agent to map schema_structure to Astro
+      components, incorporating designSpecs (component-level Tailwind and
+      interactive patterns) and SEO outputs (seoMeta, keywordStrategy,
+      seoContentBlocks) to generate template_config and rendering_engine_spec
+      for the selected template.
+  - id: phase_6_build_astro_site
+    name: Phase 6 – Build Astro site
+    description: >
+      Call the Template Initialization Agent to scaffold /sites/[siteName],
+      then call the Astro Site Builder Agent with siteName, sanity dataset,
+      template_config, designSpecs, and seoMeta to wire routes, layouts, SEO,
+      navigation, and footers in a way that respects the design and keyword
+      strategy produced in earlier phases.
+  - id: phase_6b_form_builder
+    name: Phase 6b – Form Builder integration
+    description: >
+      After schema deployment, universal content seeding, dataset inspection,
+      template initialization, and the Astro Site Builder phase, invoke the
+      Form Builder Agent (`.cursor/agents/factory/form_builder_agent.yaml`).
+      Provide the canonical intakeObject from Phase 0
+      ($steps.phase_0_intake.intakeObject), siteName, repoPath, and dataset,
+      along with any crmIntegration, webhookUrl, brand colors, and contact
+      email derived from intakeObject so the agent can generate a fully wired
+      form system. The Form Builder Agent should:
+        - generate reusable form components:
+          - src/components/form/Form.astro
+          - src/components/form/Input.astro
+          - src/components/form/Textarea.astro
+          - src/components/form/Select.astro
+          - src/components/form/Checkbox.astro
+          - src/components/form/Honeypot.astro
+          - src/components/form/SuccessMessage.astro
+        - create form types and validation utilities:
+          - src/lib/forms/types.ts
+          - src/lib/forms/validation.ts
+        - create the API route for submissions:
+          - src/pages/api/form/submit.ts
+        - ensure hidden attribution fields (utm_source, utm_medium, utm_campaign,
+          url_path, referer) are captured and persisted with each lead
+        - write leads into the Sanity "lead" document type with fields:
+          name, email, phone, message, service, location, attribution,
+          crmForwardStatus, createdAt
+        - forward leads to configured CRM or webhook:
+          - jobber via JOBBER_API_KEY
+          - hubspot via HUBSPOT_PORTAL_ID and HUBSPOT_FORM_ID
+          - webhook via FORM_WEBHOOK_URL
+      Capture the generated file paths in createdFormFiles, the wiring details
+      in formIntegrationSpec, and environment expectations in formEnvRequirements
+      so later deployment and verification phases can validate form behavior.
+  - id: phase_7_deploy
+    name: Phase 7 – Deploy
+    description: >
+      Describe how a future deploy skill will build the Astro site and trigger
+      deployment (e.g. via VERCEL_DEPLOY_HOOK_URL), capturing deployment URLs
+      and status as part of phase_artifacts, while deriving finalRedirects from
+      redirectMap and producing an seoSafetyReport that summarizes preserved
+      slugs, preserved metadata, and any remaining SEO risks.
+  - id: phase_9_og_image_generation
+    name: Phase 9 – OG image generation and verification
+    description: >
+      Verify that the initialized site includes a dynamic OG image module:
+      confirm that /api/og (templates/client-base/api/og/route.ts) exists and
+      uses the Edge runtime, ensure Sanity settings.ogTemplate is wired to the
+      OG template object for per-site defaults, map those fields into the OG
+      helper utilities for generating API payloads, and test sample output
+      (e.g. /api/og?title=Test) using the Vercel OG Playground to confirm the
+      1200x630 render matches the brand style.
+  - id: summarize_orchestration
+    name: Summarize multi-model workflow
+    description: >
+      Produce orchestration_plan and phase_artifacts documenting which agent
+      handled which responsibilities, how data flowed between them, and which
+      environment variables and external services are required per phase.
+
+

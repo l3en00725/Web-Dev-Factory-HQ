@@ -1,0 +1,16 @@
+{
+  "name": "web-dev-factory-sanity",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "sanity dev",
+    "schema:deploy": "sanity schema deploy"
+  },
+  "dependencies": {
+    "sanity": "^3.61.0",
+    "@sanity/vision": "^3.61.0",
+    "typescript": "^5.6.0"
+  }
+}
+
+

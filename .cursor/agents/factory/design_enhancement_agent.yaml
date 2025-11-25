@@ -1,0 +1,87 @@
+name: Design Enhancement Agent
+model: Gemini
+description: >
+  Analyze and aggressively enhance the visual design and UX of template components,
+  focusing on modern interactive patterns (parallax, micro-interactions, magnetic
+  hover, subtle 3D transforms, glass morph, gradients, Bento grids), responsive
+  container logic, and motion-safe fallbacks, all aligned with brand colors and
+  template rules.
+inputs:
+  - name: component_list
+    type: object
+    required: true
+    description: >
+      Structured inventory of key UI components/sections (names, roles, props,
+      current layout notes) within the selected template.
+  - name: template_rules
+    type: object
+    required: true
+    description: >
+      Constraints and guidelines from the Template System Blueprint (grid
+      system, typography scales, spacing tokens, breakpoints, brand colors).
+outputs:
+  - name: design_recommendations
+    type: markdown
+    description: >
+      Detailed UI/UX improvement plan for each component and section, including
+      layout, spacing, motion, and responsive behavior recommendations.
+  - name: updated_component_specs
+    type: json
+    description: >
+      Structured spec of updated component APIs, layout variants, and CSS/utility
+      patterns to be implemented by code agents.
+steps:
+  - id: audit_current_ui
+    name: Audit current UI and layout
+    description: >
+      Review component_list and template_rules.json to understand existing hierarchy,
+      spacing, responsiveness, and motion usage, noting specific issues (crowding,
+      unclear CTAs, weak contrast, awkward stacking, dated interactions) with
+      deterministic, per-component findings.
+  - id: apply_brand_system
+    name: Apply brand colors and typography
+    description: >
+      Propose precise applications of brand colors, typography scales, spacing
+      tokens, and elevation layers from template_rules for heroes, CTAs, cards,
+      navigation, and footer, ensuring all recommendations remain consistent and
+      machine-readable for updated_component_specs.
+  - id: design_bento_sections
+    name: Design bento-style sections
+    description: >
+      Define concrete Bento/grid variations for key sections (services, value
+      props, process, testimonials), including column counts, breakpoint behavior,
+      gap sizes, and layering rules for desktop, tablet, and mobile.
+  - id: define_interactive_patterns
+    name: Define interactive motion patterns
+    description: >
+      For each interactive component, specify modern motion patterns (mouse
+      parallax, pointer tracking, magnetic hover, subtle 3D transforms, variable
+      blur/glass morph, gradient depth layers) with deterministic trigger
+      conditions, durations, and easing, informed by 2024–2026 UI motion trends.
+  - id: improve_responsiveness
+    name: Improve responsive behavior
+    description: >
+      Specify exact responsive container logic (max-widths, padding, gap scales)
+      and breakpoint-specific adjustments (stacking order, alignment, visibility)
+      so the layout remains coherent from small mobile to large desktop.
+  - id: generate_tailwind_specs
+    name: Generate Tailwind and design specs
+    description: >
+      Produce updated_component_specs with concrete Tailwind class strings and
+      variant definitions per component (including dark mode and brand-color
+      modes), and parallel design_recommendations that explain the rationale in
+      human-readable form.
+  - id: enforce_motion_safety
+    name: Enforce motion-safe fallbacks
+    description: >
+      Ensure all interactive and motion recommendations include reduced-motion
+      fallbacks and accessibility-safe alternatives, with explicit notes about
+      when to disable or soften animations.
+  - id: output_design_system_specs
+    name: Output updated component specs
+    description: >
+      Emit deterministic design_recommendations and updated_component_specs that
+      can be consumed directly by implementation agents without additional design
+      interpretation.
+
+

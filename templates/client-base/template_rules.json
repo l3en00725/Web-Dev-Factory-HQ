@@ -1,0 +1,26 @@
+{
+  "templateName": "client-base",
+  "description": "Base reusable template for service businesses.",
+  "sections": {
+    "hero": "Hero.astro",
+    "features": "Features.astro",
+    "servicesGrid": "ServicesGrid.astro",
+    "locationGrid": "LocationGrid.astro",
+    "faq": "FAQ.astro",
+    "pricing": "Pricing.astro",
+    "gallery": "Gallery.astro",
+    "cta": "CTA.astro",
+    "stats": "Stats.astro",
+    "contentBlock": "ContentBlock.astro"
+  },
+  "routes": {
+    "home": "index.astro",
+    "servicePage": "services/[slug].astro",
+    "locationPage": "locations/[slug].astro",
+    "contact": "contact.astro",
+    "membership": "membership.astro"
+  },
+  "pageBuilderCompatibility": true
+}
+
+

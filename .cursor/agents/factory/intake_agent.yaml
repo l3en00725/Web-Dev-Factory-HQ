@@ -1,0 +1,111 @@
+name: Universal Intake Agent
+model: GPT-5.1
+description: >
+  A client-agnostic intake normalizer that produces a fully structured
+  intakeObject used by the schema agent, content seeder, form builder,
+  and design/rendering phases.
+inputs:
+  - name: siteName
+    type: string
+    required: true
+  - name: businessName
+    type: string
+    required: true
+  - name: services
+    type: array
+    required: true
+  - name: locations
+    type: array
+    required: true
+  - name: brandColors
+    type: object
+    required: true
+  - name: contactEmail
+    type: string
+    required: true
+  - name: contactPhone
+    type: string
+    required: true
+  - name: crmIntegration
+    type: object
+    required: true
+  - name: analytics
+    type: object
+    required: true
+  - name: websiteUrl
+    type: string
+    required: true
+  - name: sourceUrl
+    type: string
+    required: false
+  - name: additionalNotes
+    type: string
+    required: false
+  - name: businessType
+    type: string
+    required: false
+  - name: siteGoals
+    type: any
+    required: false
+  - name: scrapeArtifacts
+    type: any
+    required: false
+outputs:
+  - name: intakeObject
+    type: json
+    description: >
+      Normalized canonical object consumed by:
+      - Universal Sanity Content Seeder
+      - Form Builder Agent
+      - Design Enhancement Agent
+      - Template Rendering Agent
+      - Astro Site Builder Agent.
+steps:
+  - id: normalize_core
+    name: Normalize core fields
+    run: |
+      Normalize all string fields, ensure arrays are present, derive
+      safe slugs for services/locations, and enforce color hex format.
+  - id: infer_missing_values
+    name: Infer missing values
+    run: |
+      If websiteUrl is missing, derive from siteName.
+      If brandColors are incomplete, fill with neutral placeholders.
+      If crmIntegration unspecified, set default = { provider: "none" }.
+      If analytics unspecified, set default structure { googleAnalyticsId: "" }.
+  - id: build_intake_object
+    name: Construct intakeObject
+    run: |
+      Build canonical structure:
+        Derive effectiveBusinessType:
+          - If businessType provided, use it.
+          - Else, infer from services array (service keywords) or fallback to siteName.
+        Derive effectiveSiteGoals:
+          - If siteGoals provided as string, wrap as [siteGoals].
+          - If siteGoals provided as array, use as-is.
+          - Else, default to ["improve conversions", "rank locally"].
+        {
+          siteName,
+          businessName,
+        businessType: effectiveBusinessType,
+          brandColors,
+          contact: { email, phone },
+          crmIntegration,
+          analytics,
+          sourceUrl,
+          websiteUrl,
+          services: [
+            { title, slug, description: "", enabled: true }
+          ],
+          locations: [
+            { title, slug, city: "", state: "", region: "", zip: "" }
+          ],
+        additionalNotes,
+        siteGoals: effectiveSiteGoals,
+        scrapeArtifacts: scrapeArtifacts || null
+        }
+  - id: emit_intake
+    name: Emit intake object
+    run: return { intakeObject }
+
+

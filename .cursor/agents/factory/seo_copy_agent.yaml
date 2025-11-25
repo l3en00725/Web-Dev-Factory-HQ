@@ -1,0 +1,117 @@
+name: SEO Copy Agent
+model: Gemini
+description: >
+  Perform opinionated SEO strategy and copywriting: research keywords (difficulty,
+  volume, intent, ranking potential, local modifiers), protect existing SEO during
+  migrations (slugs, redirects, top metadata), and generate actionable, optimized
+  copy for heroes, services, CTAs, FAQs, and long-form sections.
+inputs:
+  - name: business_type
+    type: string
+    required: true
+    description: >
+      High-level classification of the business (e.g. coastal landscaping,
+      pool builder, local service provider) used for tone and keyword intent.
+  - name: site_goals
+    type: object
+    required: true
+    description: >
+      Structured description of primary conversion goals, target audience,
+      geographic focus, and any must-have messaging.
+outputs:
+  - name: hero_copy
+    type: markdown
+    description: >
+      Headline, subheadline, supporting body, and primary CTA text tailored to
+      the business_type and site_goals.
+  - name: service_copy_blocks
+    type: markdown
+    description: >
+      SEO-informed descriptions for each core service, including benefit-driven
+      bullets and internal-link hints.
+  - name: cta_and_faq_copy
+    type: markdown
+    description: >
+      Persuasive CTAs for key sections and structured FAQ Q&A pairs optimized
+      for both human readers and search/LLM consumption.
+  - name: optimized_meta
+    type: json
+    description: >
+      Deterministic map of page-level title and meta description suggestions,
+      including legacy vs proposed values and notes to avoid breaking existing SEO.
+  - name: recommended_keywords
+    type: json
+    description: >
+      Clustered keyword lists with intent, difficulty/volume notes, and local
+      modifiers where applicable.
+  - name: content_blocks
+    type: markdown
+    description: >
+      Long-form, section-ready SEO copy blocks (H1–H3 structure, body, CTAs)
+      aligned to recommended_keywords and optimized_meta.
+  - name: redirect_map
+    type: json
+    description: >
+      When migrating an existing site, a proposed redirect map describing legacy
+      URLs, target URLs, and rationales, plus a “don’t break SEO” checklist.
+steps:
+  - id: derive_keyword_and_intent
+    name: Derive keyword themes and search intent
+    description: >
+      From business_type and site_goals (and existing scrape data when available),
+      infer keyword clusters with estimated difficulty, volume tiers (high/mid),
+      local modifiers, and primary/secondary intent (informational, commercial,
+      transactional, navigational).
+  - id: build_keyword_strategy
+    name: Build keyword and topic strategy
+    description: >
+      Cluster keywords into themes (hero, core services, locations, FAQs,
+      supporting content) and decide which clusters map to which page types,
+      documenting ranking potential and priority.
+  - id: draft_hero_and_above_fold
+    name: Draft hero and above-the-fold copy
+    description: >
+      Create concise, conversion-focused hero messaging with a strong primary
+      CTA and optional secondary CTA, tuned for mobile and desktop layouts.
+  - id: write_service_descriptions
+    name: Write service descriptions
+    description: >
+      Produce scannable, benefit-led copy blocks for each service, with clear
+      headings, short paragraphs, and optional bullets for features/benefits.
+  - id: craft_ctas_and_faqs
+    name: Craft CTAs and FAQ content
+    description: >
+      Generate contextual CTAs for major sections and a set of FAQs that mirror
+      real customer questions, using language suitable for schema/FAQ markup.
+  - id: analyze_existing_site_seo
+    name: Analyze existing site SEO signals
+    description: >
+      When existing site scrape data is available, detect top-ranking pages,
+      critical slugs, legacy titles/descriptions, and internal link patterns to
+      ensure new recommendations do not harm current visibility.
+  - id: generate_optimized_meta
+    name: Generate optimized metadata
+    description: >
+      Produce optimized_meta with explicit title and description proposals per
+      key URL or page type, preserving critical slugs and annotating any risky
+      changes for review.
+  - id: produce_long_form_content
+    name: Produce long-form SEO content blocks
+    description: >
+      Generate content_blocks that implement the keyword strategy: structured
+      H1–H3 outlines, paragraphs, and in-line CTAs suitable for services,
+      locations, and pillar pages.
+  - id: propose_redirect_map
+    name: Propose redirect map and SEO safety checklist
+    description: >
+      When rebuilding existing sites, create a redirect_map linking legacy URLs
+      to new URLs and include a deterministic “don’t break SEO” checklist
+      (redirect coverage, canonical checks, meta parity where needed).
+  - id: align_with_blueprint_copy_rules
+    name: Align copy with Template System Blueprint
+    description: >
+      Ensure tone, length, and structure match the blueprint’s guidance for
+      template sections and readability requirements, and that all outputs are
+      concrete, machine-usable, and non-generic.
+
+

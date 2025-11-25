@@ -1,9 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Container from '../components/container.astro';
-import Badge from '../components/ui/badge.astro';
-import Card from '../components/ui/card.astro';
 import Button from '../components/ui/button.astro';
+import Chat from '../components/Chat';
 
 const meta = {
   title: 'Professional Lawn Care & Landscaping | Blue Lawns Cape May County NJ',
@@ -12,74 +10,190 @@ const meta = {
 ---
 
 <Layout title={meta.title}>
-  <Container>
-    <section class="hero">
-      <div class="hero__content space-y-4">
-        <Badge>Professional Lawn Care & Landscaping in Cape May County</Badge>
-        <h1 class="hero__title">Expert Lawn Care & Landscaping Services in Cape May County, NJ</h1>
-        <p class="hero__lead">Blue Lawns provides professional lawn care, landscaping, hardscaping, and pool services throughout Cape May County. From Ocean View to Cape May, we deliver exceptional outdoor property care for residential and commercial clients. Weekly maintenance, custom designs, seasonal cleanup, and year-round service.</p>
-        <div class="hero__actions flex gap-4">
+  <div class="max-w-(--breakpoint-xl) mx-auto px-5">
+    <main class="grid lg:grid-cols-2 place-items-center pt-16 pb-8 md:pt-12 md:pb-24">
+      <div class="py-6 md:order-1 w-full h-full">
+        <!-- AI Chat Assistant - Replaces logo image -->
+        <div class="h-full min-h-[600px]">
+          <Chat client:load />
+        </div>
+      </div>
+      <div>
+        <h1 class="text-5xl lg:text-6xl xl:text-7xl font-bold lg:tracking-tight xl:tracking-tighter text-[#0B203D]">
+          Expert Lawn Care & Landscaping Services in Cape May County, NJ
+        </h1>
+        <p class="text-lg mt-4 text-[#333] max-w-xl">
+          Blue Lawns provides professional lawn care, landscaping, hardscaping, and pool services throughout Cape May County. From Ocean View to Cape May, we deliver exceptional outdoor property care for residential and commercial clients.
+        </p>
+        <div class="mt-6 flex flex-col sm:flex-row gap-3">
           <Button href="/contact">Request a Quote</Button>
           <Button href="/services" variant="outline">Our Services</Button>
         </div>
       </div>
-    </section>
-  </Container>
+    </main>
+  </div>
 
-  <!-- Botpress Chat Container - Full Width Below Hero -->
-  <section id="botpress-chat" class="w-full bg-white py-8 border-t border-gray-100">
-    <div class="container mx-auto px-4">
-      <div id="bp-webchat"></div>
+  <div class="max-w-(--breakpoint-xl) mx-auto px-5 bg-[#F9FAFB] py-16">
+    <div class="mt-16 md:mt-0">
+      <h2 class="text-4xl lg:text-5xl font-bold lg:tracking-tight text-[#0B203D]">
+        Serving Cape May County, New Jersey
+      </h2>
+      <p class="text-lg mt-4 text-[#333]">
+        Blue Lawns provides expert lawn care and landscaping services throughout Cape May County. Our professional team serves homeowners and businesses across the region with reliable, high-quality outdoor property care.
+      </p>
     </div>
-  </section>
 
-  <Container>
-
-  <!-- Service Area Section -->
-  <section class="section bg-gray-50">
-    <div class="section__inner max-w-4xl mx-auto">
-      <h2 class="section__heading text-center mb-8">Serving Cape May County, New Jersey</h2>
-      <p class="text-lg text-center mb-8">Blue Lawns provides expert lawn care and landscaping services throughout Cape May County. Our professional team serves homeowners and businesses across the region with reliable, high-quality outdoor property care.</p>
-      
-      <div class="grid md:grid-cols-2 gap-6 mt-8">
-        <div>
-          <h3 class="text-xl font-bold text-green-800 mb-3">🏡 Residential Areas</h3>
-          <ul class="space-y-2">
-            <li><strong>Ocean View, NJ</strong> - Our home base at 57 W Katherine Ave</li>
-            <li><strong>Avalon & Stone Harbor</strong> - Premium coastal property care</li>
-            <li><strong>Cape May</strong> - Historic home landscaping specialists</li>
-            <li><strong>Sea Isle City</strong> - Year-round maintenance programs</li>
-          </ul>
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 mt-16 gap-16">
+      <div class="flex gap-4 items-start">
+        <div class="mt-1 bg-[#0074D9] rounded-full p-2 w-8 h-8 shrink-0 flex items-center justify-center">
+          <svg width="1em" height="1em" class="text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
         </div>
         <div>
-          <h3 class="text-xl font-bold text-green-800 mb-3">🏢 Commercial & Vacation Properties</h3>
-          <ul class="space-y-2">
-            <li><strong>Wildwood, Wildwood Crest & North Wildwood</strong> - Vacation home maintenance</li>
-            <li><strong>Cape May Court House</strong> - Commercial landscaping</li>
-            <li><strong>Rio Grande</strong> - Custom landscape design</li>
-            <li><strong>7 Mile Island</strong> - Coastal erosion control</li>
-          </ul>
+          <h3 class="font-semibold text-lg text-[#0B203D]">Residential Areas</h3>
+          <p class="text-[#333] mt-2 leading-relaxed">Ocean View, Avalon, Stone Harbor, Cape May, Sea Isle City - Premium coastal property care for year-round residents.</p>
         </div>
       </div>
-
-      <div class="mt-8 p-6 bg-green-50 rounded-lg border border-green-200 text-center">
-        <p class="text-lg font-semibold text-green-900 mb-2">📍 Visit Us</p>
-        <p class="text-gray-700">57 W. Katherine Ave Unit B, Ocean View, NJ 08230</p>
-        <p class="text-gray-700 mt-2">📞 Call: <a href="tel:609-425-2954" class="text-green-700 font-bold hover:underline">609-425-2954</a></p>
+      <div class="flex gap-4 items-start">
+        <div class="mt-1 bg-[#0074D9] rounded-full p-2 w-8 h-8 shrink-0 flex items-center justify-center">
+          <svg width="1em" height="1em" class="text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-semibold text-lg text-[#0B203D]">Commercial Properties</h3>
+          <p class="text-[#333] mt-2 leading-relaxed">Cape May Court House, Rio Grande - Professional commercial landscaping and maintenance services.</p>
+        </div>
+      </div>
+      <div class="flex gap-4 items-start">
+        <div class="mt-1 bg-[#0074D9] rounded-full p-2 w-8 h-8 shrink-0 flex items-center justify-center">
+          <svg width="1em" height="1em" class="text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-semibold text-lg text-[#0B203D]">Vacation Homes</h3>
+          <p class="text-[#333] mt-2 leading-relaxed">Wildwood, Wildwood Crest, North Wildwood - Specialized maintenance for vacation properties.</p>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- Services Overview -->
-  <section class="section">
-    <div class="section__inner">
-      <h2 class="section__heading text-center mb-8">Our Cape May County Services</h2>
-      <div class="grid gap-8 md:grid-cols-3">
-        <Card title="Lawn Care & Maintenance" description="Weekly mowing, edging, trimming, and fertilization services for residential and commercial properties throughout Cape May County." />
-        <Card title="Landscaping & Design" description="Custom landscape design, installation, hardscaping, and coastal erosion control for Ocean View, Avalon, Stone Harbor properties." />
-        <Card title="Pool Service" description="Professional pool maintenance and cleaning via our Ecoast Pool Service partnership. Serving vacation homes and year-round residents." />
+  <div class="max-w-(--breakpoint-xl) mx-auto px-5 py-16">
+    <div class="mt-24">
+      <h2 class="text-4xl lg:text-5xl font-bold lg:tracking-tight text-[#0B203D]">
+        Our Cape May County Services
+      </h2>
+      <p class="text-lg mt-4 text-[#333]">
+        Professional lawn care, landscaping, and pool services tailored for coastal properties.
+      </p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 mt-16 gap-16">
+      <div class="flex gap-4 items-start p-6 rounded-lg bg-white border border-[#E0F0FF] shadow-sm hover:shadow-md transition-shadow">
+        <div class="mt-1 bg-[#0074D9] rounded-full p-2 w-8 h-8 shrink-0 flex items-center justify-center">
+          <svg width="1em" height="1em" class="text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-semibold text-lg text-[#0B203D]">Lawn Care & Maintenance</h3>
+          <p class="text-[#333] mt-2 leading-relaxed">Weekly mowing, edging, trimming, and fertilization services for residential and commercial properties throughout Cape May County.</p>
+        </div>
+      </div>
+      <div class="flex gap-4 items-start p-6 rounded-lg bg-white border border-[#E0F0FF] shadow-sm hover:shadow-md transition-shadow">
+        <div class="mt-1 bg-[#0074D9] rounded-full p-2 w-8 h-8 shrink-0 flex items-center justify-center">
+          <svg width="1em" height="1em" class="text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-semibold text-lg text-[#0B203D]">Landscaping & Design</h3>
+          <p class="text-[#333] mt-2 leading-relaxed">Custom landscape design, installation, hardscaping, and coastal erosion control for Ocean View, Avalon, Stone Harbor properties.</p>
+        </div>
+      </div>
+      <div class="flex gap-4 items-start p-6 rounded-lg bg-white border border-[#E0F0FF] shadow-sm hover:shadow-md transition-shadow">
+        <div class="mt-1 bg-[#0074D9] rounded-full p-2 w-8 h-8 shrink-0 flex items-center justify-center">
+          <svg width="1em" height="1em" class="text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-semibold text-lg text-[#0B203D]">Pool Service</h3>
+          <p class="text-[#333] mt-2 leading-relaxed">Professional pool maintenance and cleaning via our Ecoast Pool Service partnership. Serving vacation homes and year-round residents.</p>
+        </div>
       </div>
     </div>
-  </section>
-  </Container>
+  </div>
+
+  <div class="max-w-(--breakpoint-xl) mx-auto px-5 bg-[#F9FAFB] py-16">
+    <div class="mt-24">
+      <h2 class="text-center text-[#0B203D] text-2xl font-semibold">Our Work in Cape May County</h2>
+      <div class="grid sm:grid-cols-2 md:grid-cols-3 mt-10 gap-6">
+        <div class="overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow border border-[#E0F0FF]">
+          <img 
+            src="/images/optimized/blue-lawns-cape-may-lawn-care-service-2.webp" 
+            alt="Professional lawn care and maintenance services by Blue Lawns in Cape May, Cape May County"
+            class="w-full h-64 object-cover"
+            loading="lazy"
+          />
+        </div>
+        <div class="overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow border border-[#E0F0FF]">
+          <img 
+            src="/images/optimized/blue-lawns-avalon-generic-service-3.webp" 
+            alt="Blue Lawns outdoor property care and landscaping services in Avalon, Cape May County"
+            class="w-full h-64 object-cover"
+            loading="lazy"
+          />
+        </div>
+        <div class="overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow border border-[#E0F0FF]">
+          <img 
+            src="/images/optimized/blue-lawns-stone-harbor-generic-service-4.webp" 
+            alt="Blue Lawns outdoor property care and landscaping services in Stone Harbor, Cape May County"
+            class="w-full h-64 object-cover"
+            loading="lazy"
+          />
+        </div>
+        <div class="overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow border border-[#E0F0FF]">
+          <img 
+            src="/images/optimized/blue-lawns-sea-isle-city-generic-service-5.webp" 
+            alt="Blue Lawns outdoor property care and landscaping services in Sea Isle City, Cape May County"
+            class="w-full h-64 object-cover"
+            loading="lazy"
+          />
+        </div>
+        <div class="overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow border border-[#E0F0FF]">
+          <img 
+            src="/images/optimized/blue-lawns-wildwood-generic-service-6.webp" 
+            alt="Blue Lawns outdoor property care and landscaping services in Wildwood, Cape May County"
+            class="w-full h-64 object-cover"
+            loading="lazy"
+          />
+        </div>
+        <div class="overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow border border-[#E0F0FF]">
+          <img 
+            src="/images/optimized/blue-lawns-wildwood-crest-generic-service-7.webp" 
+            alt="Blue Lawns outdoor property care and landscaping services in Wildwood Crest, Cape May County"
+            class="w-full h-64 object-cover"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-(--breakpoint-xl) mx-auto px-5 py-16">
+    <div class="bg-gradient-to-br from-[#0074D9] to-[#005BBB] p-8 md:px-20 md:py-20 mt-20 mx-auto max-w-5xl rounded-lg flex flex-col items-center text-center shadow-lg">
+      <h2 class="text-white text-4xl md:text-6xl tracking-tight">
+        Ready to transform your outdoor space?
+      </h2>
+      <p class="text-white/90 mt-4 text-lg md:text-xl">
+        Get a free quote for professional lawn care and landscaping services in Cape May County.
+      </p>
+      <div class="flex mt-5">
+        <Button href="/contact" class="bg-white text-[#0074D9] hover:bg-[#E0F0FF]">Get Started</Button>
+      </div>
+    </div>
+  </div>
 </Layout>

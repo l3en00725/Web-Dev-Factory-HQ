@@ -9,6 +9,8 @@ import "../styles/global.css";
 
 export interface Props {
   title: string;
+  description?: string;
+  structuredData?: Record<string, unknown>;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
@@ -18,11 +20,13 @@ const resolvedImageWithDomain = new URL(
   Astro.site
 ).toString();
 
-const { title } = Astro.props;
+const { title, description, structuredData } = Astro.props;
 
 const makeTitle = title
   ? title + " | " + "Blue Lawns"
   : "Blue Lawns - Professional Lawn Care, Landscaping & Pool Maintenance";
+
+const metaDescription = description || "Blue Lawns provides expert lawn care, landscaping, and pool maintenance services. Professional, reliable, and affordable outdoor property care.";
 ---
 
 <!doctype html>
@@ -31,12 +35,16 @@ const makeTitle = title
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
+    <title>{makeTitle}</title>
+    <meta name="description" content={metaDescription} />
+    <link rel="canonical" href={canonicalURL} />
+    <meta name="robots" content="index, follow" />
 
-    <!-- <link rel="preload" as="image" href={src} alt="Hero" /> -->
     <SEO
       title={makeTitle}
-      description="Blue Lawns provides expert lawn care, landscaping, and pool maintenance services. Professional, reliable, and affordable outdoor property care."
+      description={metaDescription}
       canonical={canonicalURL}
       twitter={{
         creator: "@bluelawns",
@@ -51,15 +59,22 @@ const makeTitle = title
           image: resolvedImageWithDomain,
         },
         image: {
-          alt: "Astroship Homepage Screenshot",
+          alt: "Blue Lawns Professional Lawn Care & Landscaping Services",
         },
       }}
     />
-    <script type="application/ld+json" set:html={JSON.stringify(siteSchema)} />
+    
+    {(structuredData || siteSchema) && (
+      <script type="application/ld+json" set:html={JSON.stringify(structuredData || siteSchema)} />
+    )}
   </head>
   <body>
-    <Navbar />
-    <slot />
+    <div class="max-w-(--breakpoint-xl) mx-auto px-5">
+      <Navbar />
+    </div>
+    <main>
+      <slot />
+    </main>
     <Footer />
     <style is:global>
       /* Improve Page speed */
@@ -68,8 +83,5 @@ const makeTitle = title
         content-visibility: auto;
       }
     </style>
-    
-    <!-- Botpress Webchat Initialization -->
-    <script is:inline src="/js/botpress-init.js"></script>
   </body>
 </html>
