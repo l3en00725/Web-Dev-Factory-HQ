@@ -1,6 +1,48 @@
 ---
-/* Placeholder component - will be filled by Design Agent */
+import Container from '../layout/Container.astro';
+import Image from '../sanity/Image.astro';
+import PortableText from '../sanity/PortableText.astro';
+
+interface Props {
+  heading?: string;
+  body?: any;
+  image?: any;
+  layout?: 'left' | 'right' | 'center';
+}
+
+const { heading, body, image, layout = 'left' } = Astro.props;
+const isReversed = layout === 'right';
+const isCenter = layout === 'center';
 ---
-<div></div>
 
+<section class="py-20 bg-background">
+  <Container class:list={[
+    "grid gap-12 items-center",
+    isCenter ? "max-w-3xl text-center" : "lg:grid-cols-2"
+  ]}>
+    {/* Content Column */}
+    <div class:list={[isReversed && "lg:order-2"]}>
+      {heading && <h2 class="mb-6 font-display text-3xl font-bold lg:text-4xl">{heading}</h2>}
+      {body && (
+        <div class="prose prose-lg text-muted-foreground">
+          <PortableText value={body} />
+        </div>
+      )}
+    </div>
 
+    {/* Image Column */}
+    {image && (
+      <div class:list={[
+        "relative overflow-hidden rounded-2xl shadow-lg",
+        isReversed && "lg:order-1",
+        isCenter && "mx-auto w-full max-w-2xl mt-8"
+      ]}>
+        <Image 
+          asset={image} 
+          alt="" 
+          class="h-full w-full object-cover" 
+        />
+      </div>
+    )}
+  </Container>
+</section>

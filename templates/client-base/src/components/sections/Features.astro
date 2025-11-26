@@ -1,6 +1,42 @@
 ---
-/* Placeholder component - will be filled by Design Agent */
+import Container from '../layout/Container.astro';
+import Card from '../ui/Card.astro';
+import Image from '../sanity/Image.astro';
+
+interface Feature {
+  title: string;
+  description: string;
+  icon?: any; // Sanity Image acting as icon
+}
+
+interface Props {
+  heading?: string;
+  features?: Feature[];
+}
+
+const { heading, features = [] } = Astro.props;
 ---
-<div></div>
 
+<section class="py-20 bg-background">
+  <Container>
+    {heading && (
+      <div class="mb-12 text-center">
+        <h2 class="font-display text-3xl font-bold text-foreground lg:text-4xl">{heading}</h2>
+      </div>
+    )}
 
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      {features.map((feature) => (
+        <Card variant="default" class="flex flex-col gap-4 p-6 transition-all hover:-translate-y-1 hover:shadow-lg">
+          {feature.icon && (
+            <div class="mb-2 h-12 w-12 rounded-lg bg-primary-100 p-2 text-primary-600">
+              <Image asset={feature.icon} alt="" class="h-full w-full object-contain" />
+            </div>
+          )}
+          <h3 class="text-xl font-semibold text-foreground">{feature.title}</h3>
+          <p class="text-muted-foreground">{feature.description}</p>
+        </Card>
+      ))}
+    </div>
+  </Container>
+</section>

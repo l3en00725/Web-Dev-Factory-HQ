@@ -142,6 +142,33 @@ outputs:
       Summary of preserved slugs, preserved metadata, and identified SEO risks
       validating that migrations do not break existing SEO.
 steps:
+  - name: Read Project Checkpoint
+    description: Always read the PHASE-CHECKPOINT.md file before doing anything else. Use it as the authoritative source of truth for current phase, step, and next tasks.
+    action:
+      run: |
+        CHECKPOINT_PATH="./PHASE-CHECKPOINT.md"
+        if [ -f "$CHECKPOINT_PATH" ]; then
+          echo "### PHASE CHECKPOINT CONTENTS ###"
+          cat "$CHECKPOINT_PATH"
+          echo "### END CHECKPOINT ###"
+        else
+          echo "No checkpoint file found. Do NOT proceed until one is created."
+        fi
+  - name: Interpret Checkpoint
+    description: Parse the checkpoint and determine the current phase, current step, what has been completed, and what comes next.
+    action:
+      run: |
+        echo "Using PHASE-CHECKPOINT.md to align the agent's next actions."
+  - name: Enforce Phase Boundaries
+    description: The agent must NEVER jump ahead of the phase and step listed in PHASE-CHECKPOINT.md unless the user gives explicit approval. This prevents accidental future-step execution.
+    action:
+      run: |
+        echo "Phase boundaries enforced. Awaiting user direction."
+  - name: Continue Work
+    description: After reading the checkpoint, continue ONLY with the next required step noted in the checkpoint. Reference the checkpoint when generating code, modifying files, or planning next actions.
+    action:
+      run: |
+        echo "Ready to continue with the next step indicated by PHASE-CHECKPOINT.md."
   - id: phase_0_intake
     name: Phase 0 – Universal Intake
     description: >

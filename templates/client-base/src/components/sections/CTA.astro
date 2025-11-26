@@ -1,6 +1,31 @@
 ---
-/* Placeholder component - will be filled by Design Agent */
+import Container from '../layout/Container.astro';
+import Button from '../ui/Button.astro';
+import PortableText from '../sanity/PortableText.astro';
+
+interface Props {
+  heading?: string;
+  text?: any;
+  cta?: { title: string; link: string };
+}
+
+const { heading, text, cta } = Astro.props;
 ---
-<div></div>
 
+<section class="bg-primary-50 py-20 text-center">
+  <Container size="md" class="flex flex-col items-center gap-6">
+    {heading && <h2 class="font-display text-3xl font-bold text-foreground lg:text-4xl">{heading}</h2>}
+    
+    {text && (
+      <div class="prose prose-lg text-muted-foreground mx-auto">
+        <PortableText value={text} />
+      </div>
+    )}
 
+    {cta && (
+      <Button href={cta.link} size="lg" variant="primary" class="mt-4">
+        {cta.title}
+      </Button>
+    )}
+  </Container>
+</section>

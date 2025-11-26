@@ -1,22 +1,60 @@
 ---
+import Container from '../layout/Container.astro';
+import PortableText from '../sanity/PortableText.astro';
+// Will import Form component in Phase 6b when it's built
+
 interface Props {
   heading?: string;
-  text?: any; // PortableText
+  text?: any;
   formTitle?: string;
 }
 
 const { heading, text, formTitle } = Astro.props;
 ---
 
-<section class="py-16 bg-surface">
-  <div class="container mx-auto px-6">
-    <div class="max-w-4xl mx-auto text-center">
-      {heading && <h2 class="text-3xl font-bold mb-6">{heading}</h2>}
-      {/* Placeholder for content - will integrate PortableText component later */}
-      <div class="prose mx-auto mb-12">
-        <p>Contact form placeholder for {formTitle}</p>
+<section class="py-20 bg-surface">
+  <Container class="grid gap-12 lg:grid-cols-2">
+    <div>
+      {heading && <h2 class="mb-6 font-display text-3xl font-bold lg:text-4xl">{heading}</h2>}
+      {text && (
+        <div class="prose prose-lg text-muted-foreground mb-8">
+          <PortableText value={text} />
+        </div>
+      )}
+      
+      <div class="mt-8 space-y-4">
+        <div class="flex items-center gap-3 text-muted-foreground">
+          <span class="font-semibold text-foreground">Email:</span> contact@example.com
+        </div>
+        <div class="flex items-center gap-3 text-muted-foreground">
+          <span class="font-semibold text-foreground">Phone:</span> (555) 123-4567
+        </div>
       </div>
     </div>
-  </div>
-</section>
 
+    <div class="rounded-2xl border border-border bg-background p-8 shadow-sm">
+      <div class="mb-6">
+        <h3 class="text-xl font-semibold">{formTitle || "Send us a message"}</h3>
+      </div>
+      {/* Placeholder for actual Form component */}
+      <form class="space-y-4 opacity-50 pointer-events-none">
+        <div class="space-y-2">
+          <label class="text-sm font-medium">Name</label>
+          <input type="text" class="w-full rounded-md border border-border p-2" disabled />
+        </div>
+        <div class="space-y-2">
+          <label class="text-sm font-medium">Email</label>
+          <input type="email" class="w-full rounded-md border border-border p-2" disabled />
+        </div>
+        <div class="space-y-2">
+          <label class="text-sm font-medium">Message</label>
+          <textarea class="w-full rounded-md border border-border p-2 h-32" disabled></textarea>
+        </div>
+        <button class="w-full rounded-md bg-primary py-2 text-white font-medium">Send Message</button>
+      </form>
+      <p class="mt-4 text-center text-xs text-muted-foreground">
+        (Form system will be injected in Phase 6b)
+      </p>
+    </div>
+  </Container>
+</section>

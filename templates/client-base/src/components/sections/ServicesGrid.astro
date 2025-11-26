@@ -1,6 +1,58 @@
 ---
-/* Placeholder component - will be filled by Design Agent */
+import Container from '../layout/Container.astro';
+import Card from '../ui/Card.astro';
+import Button from '../ui/Button.astro';
+import Image from '../sanity/Image.astro';
+
+interface Service {
+  title: string;
+  slug: { current: string };
+  description?: string; // Short summary
+  image?: any; // Main image
+}
+
+interface Props {
+  heading?: string;
+  subtitle?: string;
+  services?: Service[];
+}
+
+const { heading, subtitle, services = [] } = Astro.props;
 ---
-<div></div>
 
+<section class="py-20 bg-surface">
+  <Container>
+    <div class="mb-16 text-center">
+      {heading && <h2 class="font-display text-3xl font-bold lg:text-4xl">{heading}</h2>}
+      {subtitle && <p class="mt-4 text-lg text-muted-foreground">{subtitle}</p>}
+    </div>
 
+    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      {services.map((service) => (
+        <Card variant="elevated" padding="none" class="h-full flex flex-col">
+          <div slot="media" class="aspect-video w-full overflow-hidden bg-gray-100">
+            {service.image && (
+              <Image 
+                asset={service.image} 
+                alt={service.title} 
+                class="h-full w-full object-cover transition-transform duration-500 hover:scale-110" 
+              />
+            )}
+          </div>
+          
+          <div class="flex flex-1 flex-col p-6">
+            <h3 class="mb-2 text-2xl font-bold">{service.title}</h3>
+            {service.description && (
+              <p class="mb-6 flex-1 text-muted-foreground line-clamp-3">
+                {service.description}
+              </p>
+            )}
+            <Button href={`/services/${service.slug?.current}`} variant="outline" size="sm" class="w-full sm:w-auto">
+              Learn More
+            </Button>
+          </div>
+        </Card>
+      ))}
+    </div>
+  </Container>
+</section>

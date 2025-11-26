@@ -1,6 +1,67 @@
 ---
-/* Placeholder component - will be filled by Design Agent */
+import Container from '../layout/Container.astro';
+import Card from '../ui/Card.astro';
+import Button from '../ui/Button.astro';
+import PortableText from '../sanity/PortableText.astro';
+
+interface Plan {
+  title: string;
+  price: string;
+  features?: string[]; // Simple strings for now, could be objects
+  cta?: { title: string; link: string };
+  highlighted?: boolean;
+}
+
+interface Props {
+  heading?: string;
+  plans?: Plan[];
+}
+
+const { heading, plans = [] } = Astro.props;
 ---
-<div></div>
 
+<section class="py-20 bg-background-subtle">
+  <Container>
+    {heading && (
+      <h2 class="mb-12 text-center font-display text-3xl font-bold lg:text-4xl">{heading}</h2>
+    )}
 
+    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3 lg:items-start">
+      {plans.map((plan) => (
+        <Card 
+          variant={plan.highlighted ? 'elevated' : 'default'} 
+          class:list={["flex flex-col p-8", plan.highlighted && "ring-2 ring-primary relative scale-105 z-10"]}
+        >
+          {plan.highlighted && (
+            <span class="absolute top-0 right-0 -mt-3 -mr-3 rounded-full bg-primary px-3 py-1 text-xs font-bold text-white shadow-sm">
+              Popular
+            </span>
+          )}
+          <h3 class="text-xl font-semibold">{plan.title}</h3>
+          <div class="my-4">
+            <span class="text-4xl font-bold">{plan.price}</span>
+          </div>
+          
+          <ul class="mb-8 flex-1 space-y-3">
+            {plan.features?.map((feature) => (
+              <li class="flex items-start gap-2 text-muted-foreground">
+                <svg class="mt-1 h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span class="text-sm">{feature}</span>
+              </li>
+            ))}
+          </ul>
+
+          {plan.cta && (
+            <Button 
+              href={plan.cta.link} 
+              variant={plan.highlighted ? 'primary' : 'outline'} 
+              block
+            >
+              {plan.cta.title}
+            </Button>
+          )}
+        </Card>
+      ))}
+    </div>
+  </Container>
+</section>

@@ -1,6 +1,31 @@
 ---
-/* Placeholder component - will be filled by Design Agent */
+import Container from '../layout/Container.astro';
+import Image from '../sanity/Image.astro';
+
+interface Props {
+  heading?: string;
+  images?: any[];
+}
+
+const { heading, images = [] } = Astro.props;
 ---
-<div></div>
 
+<section class="py-20 bg-background">
+  <Container>
+    {heading && (
+      <h2 class="mb-12 text-center font-display text-3xl font-bold lg:text-4xl">{heading}</h2>
+    )}
 
+    <div class="columns-1 gap-6 sm:columns-2 lg:columns-3 space-y-6">
+      {images.map((img) => (
+        <div class="break-inside-avoid overflow-hidden rounded-xl shadow-md transition-transform hover:scale-[1.02]">
+          <Image 
+            asset={img} 
+            alt="" 
+            class="h-auto w-full object-cover" 
+          />
+        </div>
+      ))}
+    </div>
+  </Container>
+</section>
