@@ -1,0 +1,63 @@
+---
+import Container from './Container.astro';
+import Logo from '../ui/Logo.astro';
+import Button from '../ui/Button.astro';
+import MobileMenu from './MobileMenu.astro';
+
+// In Phase 4/5, these props will be populated from Sanity settings/navItem queries
+interface Props {
+  logoSrc?: string;
+  siteTitle?: string;
+  navItems?: { title: string; href: string; active?: boolean }[];
+}
+
+const { 
+  logoSrc, 
+  siteTitle = 'Site Name', 
+  navItems = [
+    { title: 'Home', href: '/' },
+    { title: 'Services', href: '/services' },
+    { title: 'About', href: '/about' },
+    { title: 'Contact', href: '/contact' },
+  ]
+} = Astro.props;
+---
+
+<header class="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-md transition-all duration-normal">
+  <Container class="flex h-16 items-center justify-between">
+    <Logo src={logoSrc} text={siteTitle} />
+
+    {/* Desktop Nav */}
+    <nav class="hidden gap-6 lg:flex">
+      {navItems.map((item) => (
+        <a 
+          href={item.href} 
+          class:list={[
+            "text-sm font-medium transition-colors hover:text-primary",
+            item.active ? "text-primary" : "text-muted-foreground"
+          ]}
+        >
+          {item.title}
+        </a>
+      ))}
+      <Button href="/contact" size="sm">Get a Quote</Button>
+    </nav>
+
+    {/* Mobile Toggle */}
+    <div class="lg:hidden">
+      <Button variant="ghost" size="sm" id="open-menu" aria-label="Open Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+      </Button>
+    </div>
+  </Container>
+
+  <MobileMenu items={navItems} />
+</header>
+
+<script>
+  const openBtn = document.getElementById('open-menu');
+  openBtn?.addEventListener('click', () => {
+    document.dispatchEvent(new CustomEvent('toggle-menu'));
+  });
+</script>
+

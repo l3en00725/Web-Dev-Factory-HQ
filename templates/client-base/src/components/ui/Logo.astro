@@ -1,0 +1,24 @@
+---
+interface Props {
+  src?: string;
+  alt?: string;
+  text?: string;
+  class?: string;
+}
+
+const { src, alt = 'Site Logo', text = 'Site Name', class: className } = Astro.props;
+---
+
+<a href="/" class:list={["flex items-center gap-2 font-display font-bold text-xl", className]}>
+  {src ? (
+    <img 
+      src={src} 
+      alt={alt} 
+      class="h-10 w-auto object-contain"
+      loading="eager"
+    />
+  ) : (
+    <span>{text}</span>
+  )}
+</a>
+

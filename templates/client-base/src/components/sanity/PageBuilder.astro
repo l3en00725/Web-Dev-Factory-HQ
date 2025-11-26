@@ -1,0 +1,43 @@
+---
+import Hero from '../sections/Hero.astro';
+import Features from '../sections/Features.astro';
+import ServicesGrid from '../sections/ServicesGrid.astro';
+import Gallery from '../sections/Gallery.astro';
+import Pricing from '../sections/Pricing.astro';
+import FAQ from '../sections/FAQ.astro';
+import ContactSection from '../sections/ContactSection.astro';
+import ContentBlock from '../sections/ContentBlock.astro';
+import Stats from '../sections/Stats.astro';
+import CTA from '../sections/CTA.astro';
+
+interface Props {
+  sections: any[];
+}
+
+const { sections } = Astro.props;
+
+const components = {
+  hero: Hero,
+  features: Features,
+  servicesGrid: ServicesGrid,
+  gallery: Gallery,
+  pricing: Pricing,
+  faq: FAQ,
+  contactSection: ContactSection,
+  contentBlock: ContentBlock,
+  stats: Stats,
+  callToAction: CTA,
+};
+---
+
+{
+  sections?.map((section) => {
+    const Component = components[section._type];
+    if (!Component) {
+      console.warn(`No component found for section type: ${section._type}`);
+      return null;
+    }
+    return <Component {...section} />;
+  })
+}
+

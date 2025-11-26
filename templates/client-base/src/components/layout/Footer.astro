@@ -1,0 +1,48 @@
+---
+import Container from './Container.astro';
+import Logo from '../ui/Logo.astro';
+
+interface Props {
+  logoSrc?: string;
+  siteTitle?: string;
+}
+
+const { logoSrc, siteTitle = 'Site Name' } = Astro.props;
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="border-t border-border bg-surface py-12 text-sm">
+  <Container>
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="flex flex-col gap-4">
+        <Logo src={logoSrc} text={siteTitle} />
+        <p class="text-muted-foreground">
+          Professional services tailored to your needs.
+        </p>
+      </div>
+      
+      <div class="flex flex-col gap-2">
+        <h3 class="font-semibold">Services</h3>
+        <a href="/services" class="text-muted-foreground hover:text-primary">All Services</a>
+        {/* Additional links from Sanity would render here */}
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <h3 class="font-semibold">Company</h3>
+        <a href="/about" class="text-muted-foreground hover:text-primary">About Us</a>
+        <a href="/contact" class="text-muted-foreground hover:text-primary">Contact</a>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <h3 class="font-semibold">Legal</h3>
+        <a href="/privacy" class="text-muted-foreground hover:text-primary">Privacy Policy</a>
+        <a href="/terms" class="text-muted-foreground hover:text-primary">Terms of Service</a>
+      </div>
+    </div>
+    
+    <div class="mt-12 border-t border-border pt-8 text-center text-muted-foreground">
+      &copy; {currentYear} {siteTitle}. All rights reserved.
+    </div>
+  </Container>
+</footer>
+

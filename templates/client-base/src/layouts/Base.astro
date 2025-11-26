@@ -1,4 +1,8 @@
 ---
+import '../styles/design-system.css';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+
 interface Props {
   title: string;
   description?: string;
@@ -21,10 +25,13 @@ const { title, description, structuredData } = Astro.props;
       <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
     )}
   </head>
-  <body>
-    <main>
+  <body class="flex min-h-screen flex-col bg-background text-foreground">
+    <Header />
+    
+    <main class="flex-1">
       <slot />
     </main>
+
+    <Footer />
   </body>
 </html>
-

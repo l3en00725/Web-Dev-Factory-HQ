@@ -1,0 +1,15 @@
+---
+import { PortableText as PortableTextInternal } from "astro-portabletext";
+
+interface Props {
+  value: any[];
+  class?: string;
+}
+
+const { value, class: className } = Astro.props;
+---
+
+<div class:list={["prose prose-lg max-w-none text-muted-foreground", className]}>
+  <PortableTextInternal value={value} />
+</div>
+

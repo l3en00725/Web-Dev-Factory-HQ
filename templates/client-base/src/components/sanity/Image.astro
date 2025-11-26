@@ -1,0 +1,35 @@
+---
+import { client } from "../../lib/sanity/client";
+import imageUrlBuilder from "@sanity/image-url";
+
+interface Props {
+  asset: any;
+  alt?: string;
+  width?: number;
+  height?: number;
+  class?: string;
+  loading?: "eager" | "lazy";
+}
+
+const { asset, alt = "", width, height, class: className, loading = "lazy" } = Astro.props;
+
+const builder = imageUrlBuilder(client);
+
+function urlFor(source) {
+  return builder.image(source);
+}
+
+// Protect against missing asset
+if (!asset) {
+  return null;
+}
+
+let imgUrl = urlFor(asset).auto('format');
+if (width) imgUrl = imgUrl.width(width);
+if (height) imgUrl = imgUrl.height(height);
+
+const src = imgUrl.url();
+---
+
+<img src={src} alt={alt} class={className} loading={loading} width={width} height={height} />
+

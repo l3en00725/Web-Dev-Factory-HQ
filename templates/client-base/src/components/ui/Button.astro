@@ -1,0 +1,56 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'button'> {
+  href?: string;
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  block?: boolean;
+  iconLeft?: string;
+  iconRight?: string;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  block = false,
+  iconLeft,
+  iconRight,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const Element = href ? 'a' : 'button';
+
+// Variant styles mapped to CSS variable tokens
+const variants = {
+  primary: 'bg-primary text-primary-foreground hover:bg-primary-700 hover:shadow-float focus-visible:ring-primary',
+  secondary: 'bg-primary-100 text-primary-900 hover:bg-primary-200 focus-visible:ring-primary-500',
+  outline: 'border border-border bg-transparent text-foreground hover:bg-background-subtle focus-visible:ring-primary-500',
+  ghost: 'bg-transparent text-foreground hover:bg-background-subtle focus-visible:ring-primary-500',
+};
+
+const sizes = {
+  sm: 'h-8 px-3 text-sm gap-1.5',
+  md: 'h-10 px-4 text-base gap-2',
+  lg: 'h-12 px-6 text-lg gap-3',
+};
+
+const baseClasses = [
+  'inline-flex items-center justify-center whitespace-nowrap font-sans font-medium rounded-md transition-all duration-normal',
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+  'disabled:pointer-events-none disabled:opacity-50',
+  variants[variant],
+  sizes[size],
+  block ? 'w-full' : '',
+  className,
+].filter(Boolean).join(' ');
+---
+
+<Element href={href} class={baseClasses} {...rest as any}>
+  {iconLeft && <span class="icon shrink-0" set:html={iconLeft} />}
+  <slot />
+  {iconRight && <span class="icon shrink-0" set:html={iconRight} />}
+</Element>
+
