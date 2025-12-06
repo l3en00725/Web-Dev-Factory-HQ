@@ -10,6 +10,9 @@
     "build:site": "bun run scripts/build-site.mjs --site",
     "deploy:site": "bun run scripts/deploy.mjs --site",
     "pipeline:full": "bun run scripts/run-pipeline.mjs --site",
+    "scrape": "bun run scripts/scrape-old-site.mjs --site --url",
+    "seed": "bun run scripts/seed-sanity-content.mjs --site",
+    "register-dashboard": "bun run scripts/register-dashboard.mjs --site",
     "install-form": "bun run scripts/install-form.mjs",
     "choose-form": "bun run scripts/choose-form.mjs",
     "optimize:images": "bun run scripts/optimize-media.mjs",
@@ -18,12 +21,15 @@
     "submit:gsc": "bun run scripts/submit-to-gsc.mjs",
     "submit:bing": "bun run scripts/submit-to-bing.mjs",
     "ping:sitemap": "bun run scripts/ping-sitemap.mjs",
-    "check:ai": "bun run scripts/check-ai-readiness.mjs"
+    "check:ai": "bun run scripts/check-ai-readiness.mjs",
+    "create-site": "bun run scripts/create-site.mjs --name"
   },
   "dependencies": {
+    "@sanity/client": "^7.13.1",
     "chalk": "^5.6.2",
     "cheerio": "^1.1.2",
     "csv-parse": "^6.1.0",
+    "dotenv": "^17.2.3",
     "googleapis": "^134.0.0",
     "prompts": "^2.4.2",
     "resend": "^3.0.0",

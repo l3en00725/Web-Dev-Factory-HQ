@@ -1,6 +1,125 @@
 ---
-/* Placeholder page - will be rendered by Template Rendering Agent */
+import Base from '../../layouts/Base.astro';
+import PageBuilder from '../../components/sanity/PageBuilder.astro';
+import Container from '../../components/layout/Container.astro';
+import { getLocations, getSettings, getNavItems } from '../../lib/sanity/queries';
+import { generateLocalBusinessSchema } from '../../lib/structured-data/LocalBusiness';
+import { generateBreadcrumbSchema } from '../../lib/structured-data/Breadcrumbs';
+
+interface Location {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  headline?: string;
+  description?: string;
+  image?: any;
+  geo?: {
+    city: string;
+    state: string;
+    zip?: string;
+    county?: string;
+    region?: string;
+    lat?: number;
+    lng?: number;
+  };
+  pageBuilder?: any[];
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    canonicalUrl?: string;
+    noIndex?: boolean;
+    noFollow?: boolean;
+    ogImage?: any;
+  };
+  services?: any[];
+}
+
+export async function getStaticPaths() {
+  const locations = await getLocations();
+  return locations.map((location: any) => ({
+    params: { slug: location.slug.current },
+    props: { location: location as Location },
+  }));
+}
+
+const { location: locationData } = Astro.props;
+const location = locationData as Location;
+const [settings, navItems] = await Promise.all([
+  getSettings(),
+  getNavItems()
+]);
+
+const seo = location?.seo || {};
+const title = seo.metaTitle || location?.headline || `${location?.title} Services`;
+const description = seo.metaDescription || location?.description || `Professional services in ${location?.title}`;
+
+const siteUrl = settings?.siteUrl || Astro.url.origin;
+const canonicalUrl = seo.canonicalUrl || `${siteUrl}/locations/${location.slug.current}`;
+
+// Generate Structured Data
+const localBusinessSchema = generateLocalBusinessSchema(settings, location, canonicalUrl);
+const breadcrumbSchema = generateBreadcrumbSchema([
+  { name: 'Home', url: '/' },
+  { name: 'Locations', url: '/locations' },
+  { name: location.title, url: `/locations/${location.slug.current}` }
+], siteUrl);
+
+const structuredData = {
+  "@graph": [
+    localBusinessSchema,
+    breadcrumbSchema
+  ]
+};
+
+// Define variation context
+const variationContext = {
+  location: {
+    city: location.geo?.city || location.title,
+    state: location.geo?.state || '',
+  },
+  keywords: {
+    primary: `${settings?.title || 'Services'} in ${location.title}`,
+    secondary: []
+  }
+};
 ---
-<div>Placeholder</div>
 
+<Base 
+  title={title} 
+  description={description}
+  settings={settings}
+  navItems={navItems}
+  structuredData={structuredData}
+  canonicalUrl={canonicalUrl}
+  noIndex={seo.noIndex}
+  noFollow={seo.noFollow}
+  ogImage={seo.ogImage}
+>
+  {/* Optional: Manual Hero if not in pageBuilder */}
+  {!location?.pageBuilder && (
+    <section class="bg-primary-900 text-white py-20">
+      <Container>
+        <h1 class="text-4xl lg:text-5xl font-bold mb-4">
+          {location.headline || `Services in ${location.title}`}
+        </h1>
+        {location.description && (
+          <p class="text-lg text-white/90 max-w-2xl">{location.description}</p>
+        )}
+        {location.geo && (
+          <p class="text-sm text-white/80 mt-4">
+            {location.geo.city}{location.geo.state ? `, ${location.geo.state}` : ''}
+            {location.geo.zip && ` ${location.geo.zip}`}
+          </p>
+        )}
+      </Container>
+    </section>
+  )}
 
+  {location?.pageBuilder && (
+    <PageBuilder 
+      sections={location.pageBuilder} 
+      templateId={settings?.selectedTemplate} 
+      variationContext={variationContext}
+    />
+  )}
+</Base>

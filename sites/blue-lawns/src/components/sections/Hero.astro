@@ -1,0 +1,131 @@
+---
+import Container from '../layout/Container.astro';
+import Button from '../ui/Button.astro';
+import Image from '../base/Image.astro';
+
+interface Props {
+  headline?: string;
+  subheadline?: string;
+  image?: string;
+  ctaLabel?: string;
+  ctaLink?: string;
+  secondaryCtaLabel?: string;
+  secondaryCtaLink?: string;
+  alignment?: 'left' | 'center' | 'right';
+}
+
+const {
+  headline,
+  subheadline,
+  image,
+  ctaLabel,
+  ctaLink,
+  secondaryCtaLabel,
+  secondaryCtaLink,
+  alignment = 'left'
+} = Astro.props;
+
+const alignClass = {
+  left: 'items-start text-left',
+  center: 'items-center text-center',
+  right: 'items-end text-right',
+};
+---
+
+<section class="relative flex min-h-[90vh] w-full items-center justify-center overflow-hidden bg-primary-950">
+  {/* Background Image Layer */}
+  <div class="absolute inset-0 z-0 select-none">
+    {image ? (
+      <div class="relative h-full w-full">
+        <Image
+          src={image}
+          alt={headline || "Hero Background"}
+          class="h-full w-full object-cover object-center opacity-90"
+          priority={true}
+        />
+      </div>
+    ) : (
+      <div class="h-full w-full bg-gradient-to-br from-primary-900 to-slate-900"></div>
+    )}
+
+    {/* Coastal Premium Overlays */}
+    {/* 1. Darken bottom for text readability */}
+    <div class="absolute inset-0 bg-gradient-to-t from-primary-950/95 via-primary-950/50 to-primary-950/20"></div>
+    
+    {/* 2. Blue/Teal tint overlay for brand consistency */}
+    <div class="absolute inset-0 bg-primary-900/20 mix-blend-overlay"></div>
+    
+    {/* 3. Radial sheen top-right */}
+    <div class="absolute -top-1/4 -right-1/4 h-[800px] w-[800px] rounded-full bg-secondary-400/20 blur-[120px]"></div>
+  </div>
+
+  <Container class={`relative z-10 mt-20 flex flex-col gap-8 ${alignClass[alignment]}`}>
+    {/* Premium Trust Badge */}
+    <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md transition-colors hover:bg-white/20">
+      <span class="relative flex h-2 w-2">
+        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-secondary-400 opacity-75"></span>
+        <span class="relative inline-flex h-2 w-2 rounded-full bg-secondary-500"></span>
+      </span>
+      <span class="tracking-wide">The #1 Choice in Cape May County</span>
+    </div>
+
+    <div class="max-w-4xl">
+      {headline && (
+        <h1 class="font-display text-5xl font-bold leading-[1.1] tracking-tight text-white drop-shadow-lg lg:text-7xl xl:text-8xl">
+          {headline.split('<br/>').map((line) => (
+             <span class="block">{line}</span>
+          ))}
+        </h1>
+      )}
+      {subheadline && (
+        <p class="mt-6 max-w-2xl text-xl leading-relaxed text-primary-50 drop-shadow-md lg:text-2xl font-light opacity-90">
+          {subheadline}
+        </p>
+      )}
+    </div>
+
+    <div class="mt-4 flex flex-col gap-4 sm:flex-row">
+      {ctaLabel && ctaLink && (
+        <Button 
+          href={ctaLink} 
+          size="lg" 
+          variant="primary" 
+          class="min-w-[180px] border-transparent bg-secondary-500 text-white shadow-xl shadow-secondary-900/20 hover:bg-secondary-600 hover:-translate-y-1 transition-all duration-300"
+        >
+          {ctaLabel}
+        </Button>
+      )}
+      {secondaryCtaLabel && secondaryCtaLink && (
+        <Button
+          href={secondaryCtaLink}
+          size="lg"
+          variant="outline"
+          class="min-w-[180px] border-white/30 bg-white/5 text-white backdrop-blur-md hover:bg-white/15 hover:border-white/50 hover:-translate-y-1 transition-all duration-300"
+        >
+          {secondaryCtaLabel}
+        </Button>
+      )}
+    </div>
+
+    {/* Social Proof */}
+    <div class="mt-10 flex items-center gap-4 rounded-2xl border border-white/10 bg-primary-950/30 px-6 py-3 backdrop-blur-sm">
+       <div class="flex -space-x-3">
+        {[1, 2, 3, 4].map((i) => (
+          <div class="h-10 w-10 rounded-full border-2 border-primary-900 bg-slate-200 overflow-hidden">
+             {/* Fallback avatars if no images available */}
+             <div class="h-full w-full bg-gradient-to-br from-slate-300 to-slate-400"></div>
+          </div>
+        ))}
+      </div>
+      <div class="flex flex-col">
+        <div class="flex text-secondary-400 text-sm">
+          {'★★★★★'.split('').map(star => <span>{star}</span>)}
+        </div>
+        <span class="text-sm font-medium text-white/90">Trusted by 500+ Neighbors</span>
+      </div>
+    </div>
+  </Container>
+
+  {/* Smooth Transition to Content */}
+  <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent"></div>
+</section>

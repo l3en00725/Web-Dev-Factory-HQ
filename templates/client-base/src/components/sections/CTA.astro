@@ -1,31 +1,68 @@
 ---
 import Container from '../layout/Container.astro';
 import Button from '../ui/Button.astro';
-import PortableText from '../sanity/PortableText.astro';
+import Image from '../sanity/Image.astro';
 
 interface Props {
   heading?: string;
-  text?: any;
-  cta?: { title: string; link: string };
+  body?: string;
+  buttonLabel?: string;
+  buttonLink?: string;
+  secondaryButtonLabel?: string;
+  secondaryButtonLink?: string;
+  backgroundColor?: string;
+  textColor?: 'light' | 'dark';
+  backgroundImage?: any;
 }
 
-const { heading, text, cta } = Astro.props;
+const { 
+  heading, 
+  body, 
+  buttonLabel, 
+  buttonLink,
+  secondaryButtonLabel,
+  secondaryButtonLink,
+  backgroundColor,
+  textColor = 'light',
+  backgroundImage 
+} = Astro.props;
+
+const isDark = textColor === 'light'; // If text is light, bg is presumably dark
 ---
 
-<section class="bg-primary-50 py-20 text-center">
-  <Container size="md" class="flex flex-col items-center gap-6">
-    {heading && <h2 class="font-display text-3xl font-bold text-foreground lg:text-4xl">{heading}</h2>}
-    
-    {text && (
-      <div class="prose prose-lg text-muted-foreground mx-auto">
-        <PortableText value={text} />
+<section class={`relative py-section-mobile lg:py-section-desktop text-center overflow-hidden ${backgroundColor || 'bg-primary-900'}`}>
+  {/* Background Image Overlay */}
+  {backgroundImage && (
+      <div class="absolute inset-0 z-0">
+         <Image asset={backgroundImage} class="w-full h-full object-cover opacity-20" />
+         <div class="absolute inset-0 bg-black/40"></div>
       </div>
+  )}
+
+  <Container size="md" class="relative z-10 flex flex-col items-center gap-6">
+    {heading && (
+        <h2 class={`font-display text-3xl font-bold lg:text-4xl ${isDark ? 'text-foreground-inverse' : 'text-foreground'}`}>
+            {heading}
+        </h2>
+    )}
+    
+    {body && (
+      <p class={`text-lg max-w-prose mx-auto ${isDark ? 'text-primary-100' : 'text-foreground-secondary'}`}>
+        {body}
+      </p>
     )}
 
-    {cta && (
-      <Button href={cta.link} size="lg" variant="primary" class="mt-4">
-        {cta.title}
-      </Button>
-    )}
+    <div class="flex flex-wrap gap-4 justify-center mt-4">
+        {buttonLabel && buttonLink && (
+        <Button href={buttonLink} size="lg" variant="primary">
+            {buttonLabel}
+        </Button>
+        )}
+        {secondaryButtonLabel && secondaryButtonLink && (
+            <Button href={secondaryButtonLink} size="lg" variant={isDark ? 'outline' : 'secondary'}>
+                {secondaryButtonLabel}
+            </Button>
+        )}
+    </div>
   </Container>
 </section>

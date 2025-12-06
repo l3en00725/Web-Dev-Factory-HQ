@@ -1,4 +1,12 @@
+# robots.txt for Blue Lawns
+# https://www.bluelawns.com
+
 User-agent: *
 Allow: /
 
-Sitemap: http://astroship.web3templates.com/sitemap-index.xml
+# Sitemaps
+Sitemap: https://www.bluelawns.com/sitemap.xml
+
+# Disallow admin/api routes
+Disallow: /api/
+Disallow: /dashboard/

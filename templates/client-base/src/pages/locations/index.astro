@@ -1,0 +1,58 @@
+---
+import Base from '../../layouts/Base.astro';
+import Container from '../../components/layout/Container.astro';
+import { getLocations, getSettings, getNavItems } from '../../lib/sanity/queries';
+
+const [locations, settings, navItems] = await Promise.all([
+  getLocations(),
+  getSettings(),
+  getNavItems()
+]);
+
+const title = "Service Areas";
+const description = `We proudly serve ${locations.length} locations${settings?.title ? ` in the ${settings.title} area` : ''}.`;
+---
+
+<Base 
+  title={title} 
+  description={description}
+  settings={settings}
+  navItems={navItems}
+>
+  <section class="bg-background py-20">
+    <Container>
+      <div class="mb-12 text-center">
+        <h1 class="font-display text-4xl font-bold lg:text-5xl mb-4">{title}</h1>
+        <p class="text-xl text-muted-foreground max-w-2xl mx-auto">{description}</p>
+      </div>
+      
+      {locations.length > 0 ? (
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {locations.map((location: any) => (
+            <a 
+              href={`/locations/${location.slug.current}`}
+              class="group block rounded-lg border border-border bg-surface p-6 shadow-sm transition-all duration-normal hover:shadow-md hover:border-primary"
+            >
+              <h2 class="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+                {location.title}
+              </h2>
+              {location.headline && (
+                <p class="text-muted-foreground text-sm mb-3">{location.headline}</p>
+              )}
+              {location.geo && (
+                <p class="text-sm text-muted-foreground">
+                  {location.geo.city}{location.geo.state ? `, ${location.geo.state}` : ''}
+                </p>
+              )}
+            </a>
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-12">
+          <p class="text-muted-foreground">No locations available yet. Add locations in Sanity Studio.</p>
+        </div>
+      )}
+    </Container>
+  </section>
+</Base>
+

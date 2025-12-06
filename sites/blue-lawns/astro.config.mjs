@@ -1,22 +1,30 @@
-import { defineConfig } from "astro/config";
-import tailwindcss from "@tailwindcss/vite";
 import mdx from "@astrojs/mdx";
-import sitemap from "@astrojs/sitemap";
-import icon from "astro-icon";
-import vercel from "@astrojs/vercel/serverless";
 import react from "@astrojs/react";
+import sitemap from "@astrojs/sitemap";
+import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from "astro/config";
+import rehypeExternalLinks from "rehype-external-links";
 
-// https://astro.build/config
 export default defineConfig({
-  site: "https://bluelawns.com",
-  output: "server", // Enable server-side rendering for API routes
-  adapter: vercel(),
-  integrations: [
-    react(), // Enable React for AI chat component
-    mdx(), 
-    sitemap(), 
-    icon()
-  ],
+  site: "https://www.bluelawns.com",
+  trailingSlash: "never",
+  output: "static",
+  integrations: [react(), sitemap(), mdx()],
+  markdown: {
+    rehypePlugins: [
+      [
+        rehypeExternalLinks,
+        {
+          rel: "noopener noreferrer nofollow",
+          target: "_blank",
+        },
+      ],
+    ],
+    shikiConfig: {
+      theme: "light-plus",
+      wrap: false,
+    },
+  },
   vite: {
     plugins: [tailwindcss()],
   },

@@ -1,0 +1,77 @@
+---
+import Container from '../layout/Container.astro';
+
+type GridColumnCount = 1 | 2 | 3 | 4 | 6;
+
+interface FeatureItem {
+  title: string;
+  description?: string;
+  icon?: string;
+  link?: string;
+}
+
+interface Props {
+  heading?: string;
+  subheading?: string;
+  items?: FeatureItem[];
+  columns?: GridColumnCount;
+}
+
+const { heading, subheading, items = [], columns = 3 } = Astro.props;
+
+const gridCols: Record<GridColumnCount, string> = {
+  1: 'grid-cols-1',
+  2: 'lg:grid-cols-2',
+  3: 'lg:grid-cols-3',
+  4: 'lg:grid-cols-4',
+  6: 'lg:grid-cols-6',
+};
+---
+
+<section class="py-24 bg-white">
+  <Container>
+    <div class="grid lg:grid-cols-12 gap-16">
+      {/* Header Left (Desktop) or Top (Mobile) */}
+      <div class="lg:col-span-4">
+        {(heading || subheading) && (
+          <div class="sticky top-32">
+            <span class="inline-block py-1 px-3 rounded-full bg-primary-50 text-primary-700 text-sm font-semibold tracking-wide mb-6">
+              Why Choose Us
+            </span>
+            {heading && (
+              <h2 class="font-display text-4xl font-bold tracking-tight text-slate-900 lg:text-5xl mb-6">
+                {heading}
+              </h2>
+            )}
+            {subheading && (
+              <p class="text-xl text-slate-500 leading-relaxed font-light">
+                {subheading}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Features Grid Right */}
+      <div class={`lg:col-span-8 grid gap-8 sm:grid-cols-2`}>
+        {items.map((item) => (
+          <div class="group flex flex-col gap-6 rounded-3xl bg-neutral-50 p-8 transition-all duration-300 hover:bg-white hover:shadow-xl hover:shadow-primary-900/5 hover:-translate-y-1 border border-neutral-100 hover:border-primary-100/50">
+            {item.icon && (
+              <div class="h-14 w-14 flex items-center justify-center rounded-2xl bg-primary-100/50 text-primary-600 text-3xl transition-transform duration-300 group-hover:scale-110 group-hover:bg-primary-600 group-hover:text-white">
+                {item.icon}
+              </div>
+            )}
+            <div>
+              <h3 class="text-xl font-bold text-slate-900 mb-3 font-display">{item.title}</h3>
+              {item.description && (
+                <p class="text-slate-500 leading-relaxed">
+                  {item.description}
+                </p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </Container>
+</section>

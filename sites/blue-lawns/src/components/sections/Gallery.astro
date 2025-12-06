@@ -1,0 +1,85 @@
+---
+import Container from '../layout/Container.astro';
+import Image from '../base/Image.astro';
+
+type GridColumnCount = 1 | 2 | 3 | 4 | 6;
+
+interface GalleryImage {
+  src: string;
+  alt?: string;
+  caption?: string;
+  title?: string;
+}
+
+interface Props {
+  heading?: string;
+  subheading?: string;
+  images?: GalleryImage[];
+  layout?: 'grid' | 'masonry';
+  columns?: GridColumnCount;
+}
+
+const { 
+  heading, 
+  subheading, 
+  images = [], 
+  layout = 'grid', 
+  columns = 3 
+} = Astro.props;
+
+const gridCols: Record<GridColumnCount, string> = {
+  1: 'columns-1',
+  2: 'sm:columns-2',
+  3: 'sm:columns-2 lg:columns-3',
+  4: 'sm:columns-2 lg:columns-4',
+  6: 'sm:columns-3 lg:columns-6'
+};
+---
+
+<section class="py-24 bg-white">
+  <Container>
+    {(heading || subheading) && (
+      <div class="mb-16 text-center max-w-3xl mx-auto">
+        {heading && (
+          <h2 class="font-display text-4xl font-bold tracking-tight text-slate-900 lg:text-5xl mb-6">
+            {heading}
+          </h2>
+        )}
+        {subheading && (
+          <p class="text-xl text-slate-500 leading-relaxed font-light">
+            {subheading}
+          </p>
+        )}
+      </div>
+    )}
+
+    {/* Masonry-style CSS Grid */}
+    <div class={`space-y-6 ${gridCols[columns] || 'lg:columns-3'} gap-6`}>
+      {images.map((img) => (
+        <div class="group relative break-inside-avoid overflow-hidden rounded-2xl bg-neutral-100 shadow-md transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
+          <Image 
+            src={img.src}
+            alt={img.alt || img.title || "Gallery image"} 
+            class="h-auto w-full object-cover transition-transform duration-700 group-hover:scale-110" 
+          />
+          
+          {/* Overlay Caption */}
+          {(img.title || img.caption) && (
+            <div class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 p-6">
+              {img.title && (
+                <h3 class="text-lg font-bold text-white font-display mb-1 translate-y-4 transition-transform duration-300 group-hover:translate-y-0">
+                  {img.title}
+                </h3>
+              )}
+              {img.caption && (
+                <p class="text-sm text-white/90 translate-y-4 transition-transform duration-300 group-hover:translate-y-0 delay-75">
+                  {img.caption}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </Container>
+</section>

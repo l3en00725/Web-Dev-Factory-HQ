@@ -1,0 +1,126 @@
+---
+import Container from './Container.astro';
+import Logo from '../ui/Logo.astro';
+import Button from '../ui/Button.astro';
+import MobileMenu from './MobileMenu.astro';
+
+interface Props {
+  logoSrc?: string;
+  siteTitle?: string;
+  navItems?: { title: string; href: string; active?: boolean }[];
+  variant?: 'transparent' | 'solid';
+}
+
+const { 
+  logoSrc, 
+  siteTitle = 'Blue Lawns', 
+  navItems = [],
+  variant = 'transparent'
+} = Astro.props;
+---
+
+<header 
+  id="site-header"
+  class:list={[
+    "group fixed top-0 z-50 w-full transition-all duration-300 border-b",
+    variant === 'transparent' 
+      ? "bg-transparent border-transparent text-white" 
+      : "bg-white/90 backdrop-blur-md border-slate-200/50 text-slate-900 shadow-sm"
+  ]}
+  data-variant={variant}
+  data-scrolled="false"
+>
+  <Container class="flex h-20 items-center justify-between">
+    <Logo src={logoSrc} text={siteTitle} class="scale-95 transform transition-transform hover:scale-100 text-inherit" />
+
+    {/* Desktop Nav */}
+    <nav class="hidden items-center gap-1 md:flex">
+      {navItems.map((item) => (
+        <a 
+          href={item.href} 
+          class:list={[
+            "relative px-4 py-2 text-sm font-medium transition-all duration-300 rounded-full",
+            // Base state (Transparent Header)
+            variant === 'transparent' 
+              ? (item.active 
+                  ? "text-white bg-white/20 font-semibold shadow-sm ring-1 ring-white/30" 
+                  : "text-white/90 hover:text-white hover:bg-white/10")
+              : (item.active 
+                  ? "text-primary-700 bg-primary-50 font-semibold" 
+                  : "text-slate-600 hover:text-primary-600 hover:bg-slate-50"),
+            
+            // Scrolled State Overrides (using group-data attribute from header)
+            // If active:
+            item.active && "group-data-[scrolled=true]:bg-primary-50 group-data-[scrolled=true]:text-primary-700 group-data-[scrolled=true]:ring-primary-100 group-data-[scrolled=true]:shadow-none",
+            // If inactive:
+            !item.active && "group-data-[scrolled=true]:text-slate-600 group-data-[scrolled=true]:hover:text-primary-600 group-data-[scrolled=true]:hover:bg-slate-100"
+          ]}
+        >
+          {item.title}
+        </a>
+      ))}
+      <div 
+        class:list={[
+          "ml-4 pl-4 border-l transition-colors duration-300",
+          variant === 'transparent' ? "border-white/20 group-data-[scrolled=true]:border-slate-200" : "border-slate-200"
+        ]}
+      >
+        <Button 
+          href="/contact" 
+          size="md" 
+          variant="primary" 
+          class="shadow-lg shadow-primary-900/20 border-none bg-secondary-500 hover:bg-secondary-600 text-white"
+        >
+          Get a Free Quote
+        </Button>
+      </div>
+    </nav>
+
+    {/* Mobile Toggle */}
+    <div class="md:hidden">
+      <Button variant="ghost" size="sm" id="open-menu" aria-label="Open Menu" class="text-inherit hover:bg-white/10 group-data-[scrolled=true]:hover:bg-slate-100 group-data-[scrolled=true]:text-slate-700">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+      </Button>
+    </div>
+  </Container>
+
+  <MobileMenu items={navItems} />
+</header>
+
+<script>
+  const header = document.getElementById('site-header');
+  const openBtn = document.getElementById('open-menu');
+  
+  // Get initial variant
+  const initialVariant = header?.getAttribute('data-variant') || 'transparent';
+
+  // Handle Scroll State
+  function updateHeaderState() {
+    if (!header || initialVariant === 'solid') return; // Don't change state if forced solid
+    
+    const isScrolled = window.scrollY > 20;
+    
+    if (isScrolled) {
+      // Scrolled State (Solid/Glass)
+      header.classList.remove('bg-transparent', 'border-transparent', 'text-white');
+      header.classList.add('bg-white/90', 'backdrop-blur-md', 'border-slate-200/50', 'text-slate-900', 'shadow-sm');
+    } else {
+      // Top State (Transparent)
+      header.classList.add('bg-transparent', 'border-transparent', 'text-white');
+      header.classList.remove('bg-white/90', 'backdrop-blur-md', 'border-slate-200/50', 'text-slate-900', 'shadow-sm');
+    }
+    
+    header.setAttribute('data-scrolled', isScrolled.toString());
+  }
+
+  if (initialVariant === 'transparent') {
+    window.addEventListener('scroll', updateHeaderState, { passive: true });
+    // Initial check
+    updateHeaderState();
+  }
+
+  // Mobile Menu Toggle
+  openBtn?.addEventListener('click', () => {
+    document.dispatchEvent(new CustomEvent('toggle-menu'));
+  });
+</script>

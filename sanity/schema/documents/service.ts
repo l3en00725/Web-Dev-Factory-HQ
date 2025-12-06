@@ -44,6 +44,14 @@ export default defineType({
       validation: (Rule) => Rule.max(200),
     }),
     defineField({
+      name: 'isPrimaryService',
+      title: 'Is Primary Service',
+      type: 'boolean',
+      group: 'content',
+      description: 'Mark as true for main services that should be prominently featured',
+      initialValue: false,
+    }),
+    defineField({
       name: 'description',
       title: 'Full Description',
       type: 'array',

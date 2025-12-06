@@ -1,0 +1,68 @@
+---
+import Container from '../layout/Container.astro';
+
+interface FAQItem {
+  question: string;
+  answer: string; 
+}
+
+interface Props {
+  heading?: string;
+  subheading?: string;
+  items?: FAQItem[];
+  enableSchema?: boolean;
+}
+
+const { heading, subheading, items = [], enableSchema = true } = Astro.props;
+
+// Schema.org JSON-LD generation
+const schema = enableSchema ? {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": items.map(item => ({
+    "@type": "Question",
+    "name": item.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": item.answer
+    }
+  }))
+} : null;
+---
+
+<section class="py-24 bg-white">
+  {schema && <script type="application/ld+json" is:inline set:html={JSON.stringify(schema)} />}
+  
+  <Container size="md">
+    {(heading || subheading) && (
+      <div class="mb-16 text-center">
+        {heading && (
+          <h2 class="font-display text-3xl font-bold tracking-tight text-slate-900 lg:text-4xl mb-4">
+            {heading}
+          </h2>
+        )}
+        {subheading && (
+          <p class="text-lg text-slate-500">
+            {subheading}
+          </p>
+        )}
+      </div>
+    )}
+
+    <div class="space-y-4">
+      {items.map((item) => (
+        <details class="group rounded-2xl border border-neutral-200 bg-neutral-50 open:bg-white open:ring-1 open:ring-primary-100 open:shadow-md transition-all duration-300">
+          <summary class="flex cursor-pointer list-none items-center justify-between p-6 font-medium text-slate-900 hover:text-primary-600 transition-colors [&::-webkit-details-marker]:hidden">
+            <span class="text-lg">{item.question}</span>
+            <span class="ml-4 flex h-8 w-8 items-center justify-center rounded-full bg-white border border-neutral-200 text-slate-400 transition-transform duration-300 group-open:rotate-180 group-open:bg-primary-50 group-open:text-primary-600">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
+          </summary>
+          <div class="border-t border-neutral-100 px-6 pb-6 pt-2 text-slate-600 leading-relaxed">
+            {item.answer}
+          </div>
+        </details>
+      ))}
+    </div>
+  </Container>
+</section>

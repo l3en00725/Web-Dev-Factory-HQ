@@ -1,0 +1,88 @@
+---
+import Button from '../ui/Button.astro';
+
+interface Props {
+  items: { title: string; href: string; active?: boolean }[];
+}
+
+const { items } = Astro.props;
+---
+
+<div 
+  id="mobile-menu" 
+  class="fixed inset-0 z-50 translate-x-full transition-transform duration-300 ease-in-out lg:hidden"
+  aria-hidden="true"
+>
+  {/* Backdrop */}
+  <div class="absolute inset-0 bg-slate-900/20 backdrop-blur-sm" id="menu-backdrop"></div>
+
+  {/* Drawer */}
+  <div class="absolute right-0 top-0 h-full w-[85%] max-w-sm bg-white shadow-2xl flex flex-col">
+    <div class="flex items-center justify-between p-6 border-b border-slate-100">
+      <span class="text-lg font-display font-bold text-primary-900">Menu</span>
+      <Button variant="ghost" size="sm" id="close-menu" aria-label="Close Menu" class="text-slate-500 hover:bg-slate-100">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </Button>
+    </div>
+    
+    <nav class="flex-1 overflow-y-auto px-6 py-8">
+      <ul class="flex flex-col gap-2">
+        {items.map((item) => (
+          <li>
+            <a 
+              href={item.href} 
+              class:list={[
+                "block py-3 text-xl font-medium transition-colors rounded-lg px-4",
+                item.active 
+                  ? "text-primary-700 bg-primary-50" 
+                  : "text-slate-600 hover:text-primary-600 hover:bg-slate-50"
+              ]}
+            >
+              {item.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="p-6 border-t border-slate-100 bg-slate-50">
+      <Button href="/contact" size="lg" variant="primary" class="w-full justify-center shadow-md">
+        Get a Free Quote
+      </Button>
+      <p class="mt-4 text-center text-xs text-slate-500">
+        Licensed & Insured • Cape May County
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const menu = document.getElementById('mobile-menu');
+  const closeBtn = document.getElementById('close-menu');
+  const backdrop = document.getElementById('menu-backdrop');
+  
+  function closeMenu() {
+    if (menu) {
+      menu.setAttribute('aria-hidden', 'true');
+      menu.classList.add('translate-x-full');
+      document.body.style.overflow = '';
+    }
+  }
+
+  // Toggle logic is driven by custom event 'toggle-menu' dispatched from Header
+  document.addEventListener('toggle-menu', () => {
+    const isOpen = menu?.getAttribute('aria-hidden') === 'false';
+    if (menu) {
+      menu.setAttribute('aria-hidden', (!isOpen).toString());
+      if (!isOpen) {
+        menu.classList.remove('translate-x-full');
+        document.body.style.overflow = 'hidden'; // Prevent scroll
+      } else {
+        closeMenu();
+      }
+    }
+  });
+
+  closeBtn?.addEventListener('click', closeMenu);
+  backdrop?.addEventListener('click', closeMenu);
+</script>

@@ -37,6 +37,9 @@ Thumbs.db
 coverage/
 .nyc_output/
 
+# Legacy archive (not used in active code)
+legacy-archive/
+
 # Environment files
 .env
 .env.*

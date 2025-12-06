@@ -1,32 +1,41 @@
 ---
 import Container from '../layout/Container.astro';
 
-interface Stat {
+interface StatItem {
   value: string;
   label: string;
+  prefix?: string;
+  suffix?: string;
+  icon?: string;
 }
 
 interface Props {
   heading?: string;
-  stats?: Stat[];
+  subheading?: string;
+  items?: StatItem[];
+  enableAnimation?: boolean;
+  backgroundColor?: string;
 }
 
-const { heading, stats = [] } = Astro.props;
+const { heading, subheading, items = [] } = Astro.props;
 ---
 
-<section class="bg-primary-900 py-20 text-white">
+<section class="bg-primary-900 py-section-mobile lg:py-section-desktop text-foreground-inverse">
   <Container>
-    {heading && (
-      <h2 class="mb-12 text-center font-display text-3xl font-bold opacity-90 lg:text-4xl">
-        {heading}
-      </h2>
+    {(heading || subheading) && (
+      <div class="mb-section-gap-mobile lg:mb-section-gap text-center opacity-90">
+        {heading && <h2 class="font-display text-3xl font-bold lg:text-4xl text-foreground-inverse">{heading}</h2>}
+        {subheading && <p class="mt-4 text-primary-100">{subheading}</p>}
+      </div>
     )}
 
     <div class="grid gap-8 text-center sm:grid-cols-2 lg:grid-cols-4">
-      {stats.map((stat) => (
-        <div class="flex flex-col gap-2 rounded-2xl bg-white/5 p-6 backdrop-blur-sm">
-          <span class="font-display text-5xl font-bold text-primary-300">{stat.value}</span>
-          <span class="text-lg font-medium text-primary-100">{stat.label}</span>
+      {items.map((item) => (
+        <div class="flex flex-col gap-2 rounded-2xl bg-white/5 p-6 backdrop-blur-sm transition-all duration-normal hover:bg-white/10 hover:scale-105">
+          <span class="font-display text-5xl font-bold text-primary-300">
+            {item.prefix}{item.value}{item.suffix}
+          </span>
+          <span class="text-lg font-medium text-primary-100">{item.label}</span>
         </div>
       ))}
     </div>

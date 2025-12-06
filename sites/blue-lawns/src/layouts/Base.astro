@@ -1,0 +1,108 @@
+---
+import '../styles/tokens.css';
+import '../styles/design-system.css';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import { buildCanonicalUrl } from '../lib/seo-utils';
+import { validateSchemaObject } from '../lib/schema-validator';
+import settings from '../content/settings.json';
+import navigation from '../content/navigation.json';
+
+interface Props {
+  title: string;
+  description?: string;
+  structuredData?: Record<string, unknown>;
+  canonicalUrl?: string;
+  noIndex?: boolean;
+  noFollow?: boolean;
+  ogImage?: string;
+  headerVariant?: 'transparent' | 'solid';
+}
+
+const { 
+  title, 
+  description, 
+  structuredData, 
+  canonicalUrl, 
+  noIndex, 
+  noFollow, 
+  ogImage: pageOgImage,
+  headerVariant = 'transparent'
+} = Astro.props;
+
+const siteUrl = settings.siteUrl || Astro.url.origin;
+const canonical = buildCanonicalUrl(Astro.url.pathname, siteUrl, canonicalUrl);
+
+// Static logo and site title
+const logoSrc = settings.logo;
+const siteTitle = settings.title;
+
+// OG Image Logic
+const resolvedOgImage = pageOgImage || `${siteUrl}/assets/images/default-og.jpg`;
+
+// Validate and clean structured data
+const cleanedStructuredData = structuredData ? validateSchemaObject(structuredData) : null;
+
+// Map nav items to Header format
+const mappedNavItems = navigation.map((item) => ({
+  title: item.label,
+  href: item.href,
+  active: Astro.url.pathname === item.href,
+}));
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    {description && <meta name="description" content={description} />}
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Outfit:wght@400;500;700&display=swap" rel="stylesheet">
+
+    {noIndex && <meta name="robots" content="noindex" />}
+    {noFollow && <meta name="robots" content="nofollow" />}
+    {noIndex && noFollow && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="canonical" href={canonical} />
+    <title>{title}</title>
+
+    {/* Open Graph / Facebook */}
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:image" content={resolvedOgImage} />
+
+    {/* Twitter */}
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonical} />
+    <meta property="twitter:title" content={title} />
+    {description && <meta property="twitter:description" content={description} />}
+    <meta property="twitter:image" content={resolvedOgImage} />
+    
+    {cleanedStructuredData && (
+      <script type="application/ld+json" set:html={JSON.stringify(cleanedStructuredData)} />
+    )}
+  </head>
+  <body class="flex min-h-screen flex-col bg-background text-foreground">
+    <Header 
+      logoSrc={logoSrc} 
+      siteTitle={siteTitle} 
+      navItems={mappedNavItems} 
+      variant={headerVariant}
+    />
+    
+    <main class="flex-1">
+      <slot />
+    </main>
+
+    <Footer 
+      logoSrc={logoSrc} 
+      siteTitle={siteTitle} 
+    />
+  </body>
+</html>

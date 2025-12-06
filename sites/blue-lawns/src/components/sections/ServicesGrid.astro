@@ -1,0 +1,128 @@
+---
+import Container from '../layout/Container.astro';
+import Card from '../ui/Card.astro';
+import Image from '../base/Image.astro';
+
+type GridColumnCount = 1 | 2 | 3 | 4 | 6;
+
+interface Service {
+  id?: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  image?: string;
+  isPrimary?: boolean;
+}
+
+interface Props {
+  heading?: string;
+  subheading?: string;
+  services?: Service[];
+  showAll?: boolean;
+  columns?: GridColumnCount;
+  showImages?: boolean;
+  showExcerpts?: boolean;
+}
+
+const { 
+  heading, 
+  subheading, 
+  services = [], 
+  showAll = false, 
+  columns = 3,
+  showImages = true, 
+  showExcerpts = true 
+} = Astro.props;
+
+const gridCols: Record<GridColumnCount, string> = {
+  1: 'grid-cols-1',
+  2: 'lg:grid-cols-2',
+  3: 'lg:grid-cols-3',
+  4: 'lg:grid-cols-4',
+  6: 'lg:grid-cols-6',
+};
+---
+
+<section class="py-24 bg-neutral-50 relative overflow-hidden">
+  {/* Ambient Background Mesh */}
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+    <div class="absolute top-0 left-1/4 w-[800px] h-[800px] bg-primary-100/30 rounded-full blur-[100px] -translate-y-1/2"></div>
+    <div class="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-secondary-100/20 rounded-full blur-[80px] translate-y-1/2"></div>
+  </div>
+
+  <Container class="relative z-10">
+    {(heading || subheading) && (
+      <div class="mb-20 text-center max-w-3xl mx-auto">
+        {heading && (
+          <h2 class="font-display text-4xl font-bold tracking-tight text-slate-900 lg:text-6xl mb-6">
+            {heading}
+          </h2>
+        )}
+        {subheading && (
+          <p class="text-xl text-slate-500 leading-relaxed font-light">
+            {subheading}
+          </p>
+        )}
+      </div>
+    )}
+
+    <div class={`grid gap-8 lg:gap-10 ${gridCols[columns] || 'lg:grid-cols-3'}`}>
+      {services.map((service) => (
+        <a 
+          href={`/services/${service.slug}`}
+          class="group relative block h-full overflow-hidden rounded-3xl bg-white shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl"
+        >
+          {showImages && (
+            <div class="relative aspect-[4/3] w-full overflow-hidden">
+              {service.image ? (
+                <div class="h-full w-full transform transition-transform duration-700 group-hover:scale-110">
+                  <Image 
+                    src={service.image} 
+                    alt={service.title} 
+                    class="h-full w-full object-cover" 
+                  />
+                </div>
+              ) : (
+                <div class="h-full w-full bg-gradient-to-br from-primary-100 to-slate-200"></div>
+              )}
+              {/* Gradient Overlay for Text Contrast */}
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-70"></div>
+            </div>
+          )}
+          
+          {/* Floating Content Card */}
+          <div class="relative p-8">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-2xl font-bold text-slate-900 group-hover:text-primary-600 transition-colors font-display">
+                {service.title}
+              </h3>
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-50 text-primary-600 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </span>
+            </div>
+            
+            {showExcerpts && service.excerpt && (
+              <p class="text-slate-500 leading-relaxed line-clamp-3 mb-6">
+                {service.excerpt}
+              </p>
+            )}
+            
+            <span class="inline-flex items-center text-sm font-bold uppercase tracking-wider text-primary-600 transition-colors">
+              View Service
+            </span>
+          </div>
+        </a>
+      ))}
+    </div>
+    
+    {showAll && (
+      <div class="mt-20 text-center">
+        <a href="/services" class="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white transition-all bg-primary-600 rounded-full shadow-lg hover:bg-primary-700 hover:shadow-primary-600/30 hover:-translate-y-1">
+          View All Services
+        </a>
+      </div>
+    )}
+  </Container>
+</section>

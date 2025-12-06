@@ -4,50 +4,74 @@ import Card from '../ui/Card.astro';
 import Button from '../ui/Button.astro';
 import Image from '../sanity/Image.astro';
 
+type GridColumnCount = 1 | 2 | 3 | 4 | 6;
+
 interface Service {
   title: string;
   slug: { current: string };
-  description?: string; // Short summary
-  image?: any; // Main image
+  excerpt?: string; // Schema on service doc uses excerpt
+  image?: any; 
 }
 
 interface Props {
   heading?: string;
-  subtitle?: string;
-  services?: Service[];
+  subheading?: string;
+  services?: Service[]; // References passed down
+  showAll?: boolean;
+  columns?: GridColumnCount;
+  showImages?: boolean;
+  showExcerpts?: boolean;
 }
 
-const { heading, subtitle, services = [] } = Astro.props;
+const { 
+  heading, 
+  subheading, 
+  services = [], 
+  showAll = false, 
+  columns = 3,
+  showImages = true, 
+  showExcerpts = true 
+} = Astro.props;
+
+const gridCols: Record<GridColumnCount, string> = {
+  1: 'grid-cols-1',
+  2: 'lg:grid-cols-2',
+  3: 'lg:grid-cols-3',
+  4: 'lg:grid-cols-4',
+  6: 'lg:grid-cols-6',
+};
 ---
 
-<section class="py-20 bg-surface">
+<section class="py-section-mobile lg:py-section-desktop bg-surface">
   <Container>
-    <div class="mb-16 text-center">
-      {heading && <h2 class="font-display text-3xl font-bold lg:text-4xl">{heading}</h2>}
-      {subtitle && <p class="mt-4 text-lg text-muted-foreground">{subtitle}</p>}
-    </div>
+    {(heading || subheading) && (
+      <div class="mb-section-gap-mobile lg:mb-section-gap text-center max-w-3xl mx-auto">
+        {heading && <h2 class="font-display text-3xl font-bold lg:text-4xl">{heading}</h2>}
+        {subheading && <p class="mt-4 text-lg text-foreground-secondary">{subheading}</p>}
+      </div>
+    )}
 
-    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+    <div class={`grid gap-8 md:grid-cols-2 ${gridCols[columns] || 'lg:grid-cols-3'}`}>
       {services.map((service) => (
-        <Card variant="elevated" padding="none" class="h-full flex flex-col">
-          <div slot="media" class="aspect-video w-full overflow-hidden bg-gray-100">
-            {service.image && (
+        <Card variant="elevated" padding="none" class="h-full flex flex-col overflow-hidden transition-all duration-normal hover:shadow-xl group">
+          {showImages && service.image && (
+            <div slot="media" class="aspect-video w-full overflow-hidden bg-neutral-100">
               <Image 
                 asset={service.image} 
                 alt={service.title} 
-                class="h-full w-full object-cover transition-transform duration-500 hover:scale-110" 
+                class="h-full w-full object-cover transition-transform duration-slow group-hover:scale-110" 
               />
-            )}
-          </div>
+            </div>
+          )}
           
           <div class="flex flex-1 flex-col p-6">
-            <h3 class="mb-2 text-2xl font-bold">{service.title}</h3>
-            {service.description && (
-              <p class="mb-6 flex-1 text-muted-foreground line-clamp-3">
-                {service.description}
+            <h3 class="mb-2 text-2xl font-bold text-foreground">{service.title}</h3>
+            {showExcerpts && service.excerpt && (
+              <p class="mb-6 flex-1 text-foreground-secondary line-clamp-3">
+                {service.excerpt}
               </p>
             )}
-            <Button href={`/services/${service.slug?.current}`} variant="outline" size="sm" class="w-full sm:w-auto">
+            <Button href={`/services/${service.slug?.current}`} variant="outline" size="sm" class="w-full sm:w-auto mt-auto">
               Learn More
             </Button>
           </div>

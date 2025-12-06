@@ -31,6 +31,14 @@ export const sanityConfig: ClientConfig = {
 
 export const client = createClient(sanityConfig);
 
+// Client with write access (server-side only)
+// Requires SANITY_API_WRITE_TOKEN in environment
+export const writeClient = createClient({
+  ...sanityConfig,
+  token: import.meta.env.SANITY_API_WRITE_TOKEN,
+  useCdn: false, // Always fresh for writes
+});
+
 export function getClient(overrides: Partial<ClientConfig> = {}) {
   return createClient({
     ...sanityConfig,

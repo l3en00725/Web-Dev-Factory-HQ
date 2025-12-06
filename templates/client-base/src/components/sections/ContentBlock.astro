@@ -2,30 +2,48 @@
 import Container from '../layout/Container.astro';
 import Image from '../sanity/Image.astro';
 import PortableText from '../sanity/PortableText.astro';
+import Button from '../ui/Button.astro';
 
 interface Props {
   heading?: string;
   body?: any;
   image?: any;
-  layout?: 'left' | 'right' | 'center';
+  imagePosition?: 'left' | 'right' | 'top' | 'bottom' | 'background';
+  ctaLabel?: string;
+  ctaLink?: string;
+  backgroundColor?: string;
 }
 
-const { heading, body, image, layout = 'left' } = Astro.props;
-const isReversed = layout === 'right';
-const isCenter = layout === 'center';
+const { 
+  heading, 
+  body, 
+  image, 
+  imagePosition = 'right',
+  ctaLabel,
+  ctaLink,
+  backgroundColor 
+} = Astro.props;
+
+const isReversed = imagePosition === 'right';
+const isVertical = imagePosition === 'top' || imagePosition === 'bottom';
 ---
 
-<section class="py-20 bg-background">
+<section class={`py-section-mobile lg:py-section-desktop ${backgroundColor || 'bg-background'}`}>
   <Container class:list={[
-    "grid gap-12 items-center",
-    isCenter ? "max-w-3xl text-center" : "lg:grid-cols-2"
+    "grid gap-section-gap-mobile lg:gap-section-gap items-center",
+    isVertical ? "text-center" : "lg:grid-cols-2"
   ]}>
     {/* Content Column */}
-    <div class:list={[isReversed && "lg:order-2"]}>
+    <div class:list={[isReversed && "lg:order-2", imagePosition === 'bottom' && "order-1"]}>
       {heading && <h2 class="mb-6 font-display text-3xl font-bold lg:text-4xl">{heading}</h2>}
       {body && (
-        <div class="prose prose-lg text-muted-foreground">
+        <div class="prose prose-lg max-w-none text-foreground-secondary">
           <PortableText value={body} />
+        </div>
+      )}
+      {ctaLabel && ctaLink && (
+        <div class="mt-8">
+            <Button href={ctaLink} variant="primary">{ctaLabel}</Button>
         </div>
       )}
     </div>
@@ -33,13 +51,15 @@ const isCenter = layout === 'center';
     {/* Image Column */}
     {image && (
       <div class:list={[
-        "relative overflow-hidden rounded-2xl shadow-lg",
+        "relative overflow-hidden rounded-2xl shadow-lg transition-transform duration-slow hover:scale-[1.02]",
         isReversed && "lg:order-1",
-        isCenter && "mx-auto w-full max-w-2xl mt-8"
+        isVertical && "mx-auto w-full max-w-3xl",
+        imagePosition === 'bottom' && "order-2 mt-8",
+        imagePosition === 'top' && "mb-8"
       ]}>
         <Image 
           asset={image} 
-          alt="" 
+          alt={image.alt || ""} 
           class="h-full w-full object-cover" 
         />
       </div>

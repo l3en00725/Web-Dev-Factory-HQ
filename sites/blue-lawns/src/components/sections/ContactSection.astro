@@ -1,0 +1,95 @@
+---
+import Container from '../layout/Container.astro';
+import ContactForm from '../form/ContactForm.astro';
+
+interface Props {
+  heading?: string;
+  subheading?: string;
+  showForm?: boolean;
+  showContactInfo?: boolean;
+  layout?: 'form-left' | 'form-right' | 'stacked';
+  contactEmail?: string;
+  contactPhone?: string;
+}
+
+const { 
+  heading = "Get In Touch", 
+  subheading, 
+  showForm = true, 
+  showContactInfo = true, 
+  layout = 'form-left',
+  contactEmail,
+  contactPhone
+} = Astro.props;
+
+const isReversed = layout === 'form-right';
+---
+
+<section class="py-24 bg-neutral-50 relative">
+  <div class="absolute top-0 left-0 w-full h-1/2 bg-primary-950"></div>
+  
+  <Container class="relative z-10">
+    <div class="grid lg:grid-cols-12 gap-8 lg:gap-12">
+      {/* Contact Info Card */}
+      <div class={`lg:col-span-5 ${isReversed ? "lg:order-2" : ""}`}>
+        <div class="h-full flex flex-col justify-between rounded-3xl bg-primary-900 p-8 lg:p-12 text-white shadow-2xl shadow-primary-900/20 relative overflow-hidden">
+          {/* Decorative circles */}
+          <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+          
+          <div class="relative z-10">
+            {heading && (
+              <h2 class="font-display text-3xl font-bold tracking-tight lg:text-4xl mb-6">
+                {heading}
+              </h2>
+            )}
+            {subheading && (
+              <p class="text-lg text-primary-100 mb-12 leading-relaxed">
+                {subheading}
+              </p>
+            )}
+            
+            {showContactInfo && (contactEmail || contactPhone) && (
+              <div class="space-y-8">
+                {contactPhone && (
+                  <div>
+                    <p class="text-sm font-bold uppercase tracking-widest text-primary-300 mb-2">Phone</p>
+                    <a href={`tel:${contactPhone.replace(/\s/g, '')}`} class="text-2xl font-display hover:text-secondary-400 transition-colors">
+                      {contactPhone}
+                    </a>
+                  </div>
+                )}
+                {contactEmail && (
+                  <div>
+                    <p class="text-sm font-bold uppercase tracking-widest text-primary-300 mb-2">Email</p>
+                    <a href={`mailto:${contactEmail}`} class="text-xl hover:text-secondary-400 transition-colors">
+                      {contactEmail}
+                    </a>
+                  </div>
+                )}
+                
+                <div class="pt-8 border-t border-white/10">
+                  <p class="text-sm text-primary-200">
+                    Serving Ocean View, Avalon, Stone Harbor, Sea Isle City, Cape May, and surrounding areas.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Form Card */}
+      {showForm && (
+        <div class={`lg:col-span-7 ${isReversed ? "lg:order-1" : ""}`}>
+          <div class="h-full rounded-3xl bg-white p-8 lg:p-12 shadow-xl shadow-slate-200/50 border border-neutral-100">
+            <div class="mb-8">
+              <h3 class="text-2xl font-bold text-slate-900 font-display">Send us a message</h3>
+              <p class="text-slate-500 mt-2">Fill out the form below and we'll get back to you shortly.</p>
+            </div>
+            <ContactForm />
+          </div>
+        </div>
+      )}
+    </div>
+  </Container>
+</section>

@@ -1,0 +1,60 @@
+---
+import Container from '../layout/Container.astro';
+
+interface StatItem {
+  value: string;
+  label: string;
+  prefix?: string;
+  suffix?: string;
+  icon?: string;
+}
+
+interface Props {
+  heading?: string;
+  subheading?: string;
+  items?: StatItem[];
+  enableAnimation?: boolean;
+  backgroundColor?: string;
+}
+
+const { heading, subheading, items = [] } = Astro.props;
+---
+
+<section class="bg-primary-950 py-24 lg:py-32 relative overflow-hidden">
+  {/* Ambient Background */}
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute top-0 left-1/4 w-[600px] h-[600px] bg-primary-800/30 rounded-full blur-[120px]"></div>
+    <div class="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-secondary-900/20 rounded-full blur-[100px]"></div>
+  </div>
+
+  <Container class="relative z-10">
+    {(heading || subheading) && (
+      <div class="mb-20 text-center max-w-3xl mx-auto">
+        {heading && (
+          <h2 class="font-display text-3xl font-bold tracking-tight text-white lg:text-5xl mb-6">
+            {heading}
+          </h2>
+        )}
+        {subheading && (
+          <p class="text-xl text-primary-200/80 font-light">
+            {subheading}
+          </p>
+        )}
+      </div>
+    )}
+
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      {items.map((item, index) => (
+        <div class="group relative flex flex-col items-center justify-center p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm transition-all duration-500 hover:bg-white/10 hover:-translate-y-2">
+          <div class="text-5xl lg:text-6xl font-display font-bold bg-gradient-to-br from-white to-primary-200 bg-clip-text text-transparent mb-4">
+            {item.prefix}{item.value}{item.suffix}
+          </div>
+          <div class="h-1 w-12 bg-secondary-500 rounded-full mb-4 group-hover:w-20 transition-all duration-300"></div>
+          <span class="text-lg font-medium text-primary-100 text-center">
+            {item.label}
+          </span>
+        </div>
+      ))}
+    </div>
+  </Container>
+</section>

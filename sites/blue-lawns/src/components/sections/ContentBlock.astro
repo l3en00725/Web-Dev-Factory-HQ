@@ -1,0 +1,87 @@
+---
+import Container from '../layout/Container.astro';
+import Image from '../base/Image.astro';
+import Button from '../ui/Button.astro';
+
+interface Props {
+  heading?: string;
+  body?: string;
+  image?: string;
+  imageAlt?: string;
+  imagePosition?: 'left' | 'right' | 'top' | 'bottom';
+  ctaLabel?: string;
+  ctaLink?: string;
+  backgroundColor?: string;
+}
+
+const { 
+  heading, 
+  body, 
+  image, 
+  imageAlt = '',
+  imagePosition = 'right',
+  ctaLabel,
+  ctaLink,
+  backgroundColor 
+} = Astro.props;
+
+const isReversed = imagePosition === 'left';
+const isVertical = imagePosition === 'top' || imagePosition === 'bottom';
+---
+
+<section class={`py-24 lg:py-32 ${backgroundColor || 'bg-white'} overflow-hidden`}>
+  <Container>
+    <div class:list={[
+      "grid gap-12 lg:gap-20 items-center",
+      isVertical ? "grid-cols-1 text-center" : "lg:grid-cols-2"
+    ]}>
+      {/* Content Column */}
+      <div class:list={[
+        isReversed && "lg:order-2", 
+        imagePosition === 'bottom' && "order-1",
+        "flex flex-col gap-6"
+      ]}>
+        {heading && (
+          <h2 class="font-display text-3xl font-bold tracking-tight text-slate-900 lg:text-5xl leading-tight">
+            {heading}
+          </h2>
+        )}
+        {body && (
+          <div class="prose prose-lg prose-slate max-w-none text-slate-600 font-light leading-relaxed">
+            <p>{body}</p>
+          </div>
+        )}
+        {ctaLabel && ctaLink && (
+          <div class={`mt-4 ${isVertical ? 'flex justify-center' : ''}`}>
+            <Button href={ctaLink} variant="primary" size="lg" class="shadow-lg shadow-primary-900/10">
+              {ctaLabel}
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Image Column */}
+      {image && (
+        <div class:list={[
+          "relative",
+          isReversed && "lg:order-1",
+          isVertical && "mx-auto w-full max-w-4xl",
+          imagePosition === 'bottom' && "order-2",
+          imagePosition === 'top' && "mb-8"
+        ]}>
+          {/* Decorative Elements */}
+          <div class="absolute -top-4 -left-4 w-2/3 h-2/3 bg-primary-100/50 rounded-[2rem] -z-10"></div>
+          <div class="absolute -bottom-4 -right-4 w-2/3 h-2/3 bg-secondary-100/50 rounded-[2rem] -z-10"></div>
+          
+          <div class="relative overflow-hidden rounded-[2rem] shadow-2xl shadow-slate-200/50">
+            <Image 
+              src={image} 
+              alt={imageAlt} 
+              class="h-full w-full object-cover hover:scale-105 transition-transform duration-700" 
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  </Container>
+</section>

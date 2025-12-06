@@ -1,6 +1,88 @@
 ---
-/* Placeholder page - will be rendered by Template Rendering Agent */
+import Base from '../../layouts/Base.astro';
+import PageBuilder from '../../components/sanity/PageBuilder.astro';
+import { getServices, getSettings, getNavItems } from '../../lib/sanity/queries';
+import { generateServiceSchema } from '../../lib/structured-data/Service';
+import { generateBreadcrumbSchema } from '../../lib/structured-data/Breadcrumbs';
+
+interface Service {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  image?: any;
+  excerpt?: string;
+  body?: any;
+  servicesGrid?: any;
+  pageBuilder?: any[];
+  isPrimaryService?: boolean;
+  seo?: {
+    title?: string;
+    description?: string;
+    metaTitle?: string;
+    metaDescription?: string;
+    canonicalUrl?: string;
+    noIndex?: boolean;
+    noFollow?: boolean;
+    ogImage?: any;
+  };
+}
+
+export async function getStaticPaths() {
+  const services = await getServices();
+  return services.map((service: any) => ({
+    params: { slug: service.slug.current },
+    props: { service: service as Service },
+  }));
+}
+
+const { service: serviceData } = Astro.props;
+const service = serviceData as Service;
+const [settings, navItems] = await Promise.all([
+  getSettings(),
+  getNavItems()
+]);
+
+const seo = service?.seo || {};
+const title = seo.metaTitle || service?.title;
+const description = seo.metaDescription || service?.excerpt;
+const siteUrl = settings?.siteUrl || Astro.url.origin;
+const canonicalUrl = seo.canonicalUrl || `${siteUrl}/services/${service.slug.current}`;
+
+// Generate Structured Data
+const serviceSchema = generateServiceSchema(service, settings, canonicalUrl);
+const breadcrumbSchema = generateBreadcrumbSchema([
+  { name: 'Home', url: '/' },
+  { name: 'Services', url: '/services' },
+  { name: service.title, url: `/services/${service.slug.current}` }
+], siteUrl);
+
+const structuredData = {
+  "@graph": [
+    serviceSchema,
+    breadcrumbSchema
+  ]
+};
 ---
-<div>Placeholder</div>
 
+<Base 
+  title={title} 
+  description={description}
+  settings={settings}
+  navItems={navItems}
+  canonicalUrl={canonicalUrl}
+  noIndex={seo.noIndex}
+  noFollow={seo.noFollow}
+  structuredData={structuredData}
+  ogImage={seo.ogImage}
+>
+  {/* Optional: Manual Hero if not in pageBuilder */}
+  {!service?.pageBuilder && (
+      <div class="bg-primary-900 text-white py-20">
+          <div class="container mx-auto px-6">
+            <h1 class="text-5xl font-bold">{service.title}</h1>
+          </div>
+      </div>
+  )}
 
+  {service?.pageBuilder && <PageBuilder sections={service.pageBuilder} templateId={settings?.selectedTemplate} />}
+</Base>

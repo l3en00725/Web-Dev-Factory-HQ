@@ -39,6 +39,20 @@ export default defineType({
       group: 'general',
       validation: (Rule) => Rule.uri({ scheme: ['http', 'https'] }),
     }),
+    defineField({
+      name: 'selectedTemplate',
+      title: 'Selected Template',
+      type: 'string',
+      group: 'general',
+      description: 'Template to use for rendering pages and sections',
+      options: {
+        list: [
+          { title: 'Client Base', value: 'client-base' },
+        ],
+      },
+      initialValue: 'client-base',
+      validation: (Rule) => Rule.required(),
+    }),
 
     // Branding
     defineField({
@@ -182,6 +196,69 @@ export default defineType({
       type: 'array',
       group: 'social',
       of: [{ type: 'socialLink' }],
+    }),
+    // Form Destination (CRM/FSM Integration)
+    defineField({
+      name: 'formDestination',
+      title: 'Form Destination',
+      type: 'object',
+      group: 'contact',
+      description: 'Configure where contact form submissions are routed',
+      fields: [
+        defineField({
+          name: 'destinationType',
+          title: 'Destination Type',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Email', value: 'email' },
+              { title: 'Webhook', value: 'webhook' },
+              { title: 'Jobber', value: 'jobber' },
+              { title: 'Custom Embed', value: 'custom' },
+            ],
+          },
+          validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+          name: 'endpointUrl',
+          title: 'Webhook/API Endpoint URL',
+          type: 'url',
+          description: 'Required for webhook, jobber, or custom API destinations',
+          hidden: ({ parent }) => !['webhook', 'jobber'].includes(parent?.destinationType),
+        }),
+        defineField({
+          name: 'toEmail',
+          title: 'Email Address',
+          type: 'string',
+          description: 'Required for email destination',
+          validation: (Rule) =>
+            Rule.custom((value, context) => {
+              const parent = context.parent?.parent;
+              if (parent?.destinationType === 'email' && !value) {
+                return 'Email address is required for email destination';
+              }
+              if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                return 'Must be a valid email address';
+              }
+              return true;
+            }),
+          hidden: ({ parent }) => parent?.destinationType !== 'email',
+        }),
+        defineField({
+          name: 'providerName',
+          title: 'Provider Name',
+          type: 'string',
+          description: 'Optional: Name of CRM/FSM provider (e.g., "ServiceTitan", "Housecall Pro")',
+          hidden: ({ parent }) => !['jobber', 'webhook'].includes(parent?.destinationType),
+        }),
+        defineField({
+          name: 'customEmbedCode',
+          title: 'Custom Embed Code',
+          type: 'text',
+          description: 'HTML/JavaScript embed code for custom forms (iframe, script tag, etc.)',
+          hidden: ({ parent }) => parent?.destinationType !== 'custom',
+        }),
+      ],
     }),
     // OG Template
     defineField({

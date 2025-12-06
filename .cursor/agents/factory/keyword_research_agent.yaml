@@ -1,0 +1,150 @@
+name: Keyword Research Agent
+model: GPT-5.1
+description: >
+  Performs comprehensive keyword research using Keywords Everywhere API for
+  services and locations. Returns primary keywords, secondary/semantic keywords,
+  PASF (People Also Search For) terms, search volume, competition, CPC, and
+  keyword clusters grouped by intent. This research informs SEO copy generation,
+  meta field creation, FAQ generation, and content differentiation strategies.
+inputs:
+  - name: services
+    type: array
+    required: true
+    description: >
+      List of service names to research keywords for (e.g., ["Lawn Care", "Sprinkler Installation"])
+  - name: locations
+    type: array
+    required: false
+    description: >
+      List of location names to research location-modified keyword variants for
+  - name: businessType
+    type: string
+    required: true
+    description: >
+      Business type classification (e.g., "landscaping", "pool service", "HVAC")
+      used to infer keyword context and intent
+  - name: siteGoals
+    type: object
+    required: false
+    description: >
+      Site goals object containing conversion priorities, target audience, and
+      geographic focus to inform keyword selection
+outputs:
+  - name: serviceKeywords
+    type: json
+    description: >
+      Map of service name → KeywordResearchResult containing primary keyword,
+      secondary/semantic keywords, PASF terms, search volume, competition, CPC,
+      and intent clusters for each service
+  - name: locationKeywords
+    type: json
+    description: >
+      Map of location name → KeywordResearchResult containing location-modified
+      keyword variants (e.g., "lawn care Cape May" instead of just "lawn care"),
+      with all same metrics as serviceKeywords
+  - name: keywordClusters
+    type: json
+    description: >
+      Aggregated keyword clusters grouped by intent (informational, commercial,
+      transactional, navigational) across all services and locations, with
+      priority rankings based on volume and competition
+  - name: pasfQuestions
+    type: json
+    description: >
+      Extracted PASF (People Also Search For) questions formatted for FAQ
+      generation, grouped by service and location context
+  - name: keywordInsights
+    type: markdown
+    description: >
+      Human-readable summary of keyword research findings, including high-value
+      opportunities, competitive landscape notes, and recommendations for
+      content strategy
+steps:
+  - id: validate_api_key
+    name: Validate Keywords Everywhere API key
+    description: >
+      Check that KEYWORDS_EVERYWHERE_API_KEY environment variable is set and
+      valid. If missing, log a warning but continue with placeholder data
+      structure (will be filled when API key is configured).
+    action:
+      run: |
+        if [ -z "$KEYWORDS_EVERYWHERE_API_KEY" ]; then
+          echo "⚠️  WARNING: KEYWORDS_EVERYWHERE_API_KEY not set. Keyword research will use placeholder data."
+          echo "Set KEYWORDS_EVERYWHERE_API_KEY in .env to enable live keyword research."
+        else
+          echo "✅ Keywords Everywhere API key detected."
+        fi
+  - id: research_service_keywords
+    name: Research keywords for each service
+    description: >
+      For each service in the services array, call the Keywords Everywhere API
+      via packages/utils/keywords-everywhere.ts to research:
+      - Primary keyword (service name + business type context)
+      - Secondary/semantic keywords (related terms)
+      - PASF terms (People Also Search For)
+      - Search volume, competition, CPC
+      - Intent classification
+      Store results in serviceKeywords output map.
+    action:
+      run: |
+        # Use the keywords-everywhere utility to research each service
+        # Example: researchKeyword("lawn care", undefined, "landscaping")
+        # This will be implemented via Node.js script or direct API calls
+        echo "Researching keywords for ${#services[@]} services..."
+  - id: research_location_keywords
+    name: Research location-modified keyword variants
+    description: >
+      For each location in the locations array, research location-specific
+      keyword variants by combining service keywords with location names
+      (e.g., "lawn care Cape May", "sprinkler installation Avalon").
+      This enables localized SEO and content differentiation.
+      Store results in locationKeywords output map.
+    action:
+      run: |
+        # Research location-modified variants for each service+location combination
+        # Example: researchKeyword("lawn care", "Cape May, NJ", "landscaping")
+        echo "Researching location-modified keywords for ${#locations[@]} locations..."
+  - id: cluster_keywords_by_intent
+    name: Cluster keywords by search intent
+    description: >
+      Aggregate all researched keywords (from services and locations) and
+      cluster them by intent:
+      - Informational: "how to", "what is", "guide"
+      - Commercial: "best", "top", "review", "compare"
+      - Transactional: "buy", "price", "quote", "hire", "near me"
+      - Navigational: brand names, specific website searches
+      Rank clusters by search volume and competition to identify high-value
+      opportunities. Store in keywordClusters output.
+    action:
+      run: |
+        # Aggregate and cluster keywords by intent
+        # Prioritize by volume × (1 - competition) to find high-value opportunities
+        echo "Clustering keywords by intent and ranking by value..."
+  - id: extract_pasf_questions
+    name: Extract PASF questions for FAQ generation
+    description: >
+      From the PASF (People Also Search For) data collected for each service
+      and location, extract question-formatted keywords (e.g., "how much does
+      lawn care cost" → FAQ question). Group by service and location context
+      for targeted FAQ generation. Store in pasfQuestions output.
+    action:
+      run: |
+        # Extract question-formatted PASF terms
+        # Format: { service: "Lawn Care", location: "Cape May", questions: [...] }
+        echo "Extracting PASF questions for FAQ enrichment..."
+  - id: generate_insights_summary
+    name: Generate keyword insights summary
+    description: >
+      Create a human-readable markdown summary of keyword research findings,
+      including:
+      - High-value keyword opportunities (high volume, low competition)
+      - Competitive landscape notes
+      - Recommendations for meta title/H1 optimization
+      - Content differentiation strategy based on semantic keyword variations
+      - FAQ enrichment opportunities from PASF data
+      Store in keywordInsights output.
+    action:
+      run: |
+        # Generate insights markdown summary
+        echo "Generating keyword insights summary..."
+

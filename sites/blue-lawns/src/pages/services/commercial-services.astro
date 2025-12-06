@@ -1,0 +1,80 @@
+---
+import Base from '../../layouts/Base.astro';
+import Container from '../../components/layout/Container.astro';
+import Hero from '../../components/sections/Hero.astro';
+import CTA from '../../components/sections/CTA.astro';
+import { generateBreadcrumbSchema } from '../../lib/structured-data/Breadcrumbs';
+import { generateServiceSchema } from '../../lib/structured-data/Service';
+import settings from '../../content/settings.json';
+import services from '../../content/services.json';
+
+const service = services.find(s => s.slug === 'commercial-services')!;
+const title = `${service.title} | ${settings.title}`;
+const description = service.description;
+
+const siteUrl = settings.siteUrl;
+const breadcrumbSchema = generateBreadcrumbSchema(
+  [
+    { name: 'Home', url: '/' },
+    { name: 'Services', url: '/services' },
+    { name: service.title, url: `/services/${service.slug}` },
+  ],
+  siteUrl
+);
+const serviceSchema = generateServiceSchema(service, settings, siteUrl);
+
+const structuredData = {
+  '@graph': [breadcrumbSchema, serviceSchema],
+};
+---
+
+<Base 
+  title={title} 
+  description={description}
+  structuredData={structuredData}
+>
+  <Hero
+    headline={service.title}
+    subheadline={service.excerpt}
+    image={service.image}
+    ctaLabel="Get a Free Quote"
+    ctaLink="/contact"
+    secondaryCtaLabel="View All Services"
+    secondaryCtaLink="/services"
+  />
+
+  <section class="py-section-mobile lg:py-section-desktop bg-background">
+    <Container>
+      <div class="max-w-3xl mx-auto">
+        <h2 class="font-display text-3xl font-bold mb-6">About Our {service.title}</h2>
+        <p class="text-lg text-foreground-secondary mb-8">{service.description}</p>
+        
+        {service.features && service.features.length > 0 && (
+          <div class="mt-12">
+            <h3 class="font-display text-2xl font-bold mb-6">What's Included</h3>
+            <ul class="grid gap-4 md:grid-cols-2">
+              {service.features.map((feature) => (
+                <li class="flex items-start gap-3">
+                  <svg class="w-5 h-5 text-secondary-500 mt-1 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="text-foreground-secondary">{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </Container>
+  </section>
+
+  <CTA
+    heading="Commercial Property Needs?"
+    body="Contact us for a customized commercial grounds maintenance plan."
+    buttonLabel="Get Started"
+    buttonLink="/contact"
+    secondaryButtonLabel="Call Us"
+    secondaryButtonLink={`tel:${settings.contact?.phone}`}
+  />
+</Base>
+

@@ -1,20 +1,33 @@
 ---
-import Base from "@/layouts/Base.astro";
+import Base from '../layouts/Base.astro';
+import PageBuilder from '../components/sanity/PageBuilder.astro';
+import { getHomepage, getSettings, getNavItems } from '../lib/sanity/queries';
+
+const [homepage, settings, navItems] = await Promise.all([
+  getHomepage(),
+  getSettings(),
+  getNavItems()
+]);
+
+const seo = homepage?.seo || {};
+const pageTitle = seo.metaTitle || homepage?.title || settings?.title || "Home";
+const pageDescription = seo.metaDescription || homepage?.description || settings?.description;
 ---
 
-<Base title="Welcome">
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
-    <div class="text-center text-white px-6">
-      <h1 class="text-5xl font-bold mb-4">Welcome to Your New Site</h1>
-      <p class="text-xl mb-8">Built with Astro, Tailwind CSS, and the Web-Dev-Factory-HQ pipeline</p>
-      <a 
-        href="https://astro.build" 
-        target="_blank"
-        class="inline-block bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
-      >
-        Learn More
-      </a>
+<Base 
+  title={pageTitle} 
+  description={pageDescription} 
+  settings={settings}
+  navItems={navItems}
+  ogImage={seo.ogImage}
+>
+  {homepage?.pageBuilder ? (
+    <PageBuilder sections={homepage.pageBuilder} templateId={homepage.selectedTemplate || settings?.selectedTemplate} />
+  ) : (
+    // Fallback for empty homepage
+    <div class="py-20 text-center">
+      <h1 class="text-4xl font-bold">Welcome</h1>
+      <p class="text-muted-foreground mt-4">Add sections to the Homepage in Sanity to see them here.</p>
     </div>
-  </div>
+  )}
 </Base>
-

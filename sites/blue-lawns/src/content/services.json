@@ -1,0 +1,83 @@
+[
+  {
+    "id": "lawn-care",
+    "slug": "lawn-care",
+    "title": "Lawn Care",
+    "excerpt": "Professional lawn maintenance including mowing, edging, fertilization, and weed control. Keep your lawn looking its best year-round.",
+    "description": "Our comprehensive lawn care services keep your property pristine throughout the seasons. From regular mowing and edging to fertilization programs and weed control, we provide everything your lawn needs to thrive in the coastal New Jersey climate.",
+    "image": "/images/services/lawn-care.jpg",
+    "isPrimary": true,
+    "features": [
+      "Weekly or bi-weekly mowing",
+      "Professional edging",
+      "Fertilization programs",
+      "Weed control",
+      "Aeration & overseeding"
+    ]
+  },
+  {
+    "id": "landscaping",
+    "slug": "landscaping",
+    "title": "Landscaping",
+    "excerpt": "Custom landscape design and installation. Transform your outdoor space with professional hardscaping and plantings.",
+    "description": "Transform your property with our expert landscaping services. We specialize in coastal-friendly designs that withstand salt air and sandy soil while creating beautiful, functional outdoor spaces.",
+    "image": "/images/services/landscaping.jpg",
+    "isPrimary": true,
+    "features": [
+      "Custom landscape design",
+      "Plant installation",
+      "Hardscape features",
+      "Retaining walls",
+      "Outdoor living spaces"
+    ]
+  },
+  {
+    "id": "fencing",
+    "slug": "fencing",
+    "title": "Fencing",
+    "excerpt": "Quality fence installation and repair. Privacy fencing, decorative options, and durable materials for coastal conditions.",
+    "description": "Protect your property and enhance your curb appeal with our professional fencing services. We offer a variety of styles and materials designed to withstand the coastal elements.",
+    "image": "/images/services/fencing.jpg",
+    "isPrimary": false,
+    "features": [
+      "Privacy fencing",
+      "Decorative fencing",
+      "Vinyl & composite options",
+      "Gate installation",
+      "Fence repair"
+    ]
+  },
+  {
+    "id": "seasonal-cleanup",
+    "slug": "seasonal-cleanup",
+    "title": "Seasonal Cleanup",
+    "excerpt": "Spring and fall cleanup services. Leaf removal, bed preparation, and property cleanup to keep your yard tidy.",
+    "description": "Keep your property looking its best with our seasonal cleanup services. We handle spring preparation and fall cleanup so your landscape is ready for each season.",
+    "image": "/images/services/seasonal-cleanup.jpg",
+    "isPrimary": false,
+    "features": [
+      "Spring cleanup & mulching",
+      "Fall leaf removal",
+      "Bed preparation",
+      "Debris removal",
+      "Storm cleanup"
+    ]
+  },
+  {
+    "id": "commercial-services",
+    "slug": "commercial-services",
+    "title": "Commercial Services",
+    "excerpt": "Professional grounds maintenance for businesses, HOAs, and commercial properties throughout Cape May County.",
+    "description": "Reliable commercial landscaping and grounds maintenance for businesses of all sizes. We serve retail centers, office parks, HOAs, and municipal properties.",
+    "image": "/images/services/commercial.jpg",
+    "isPrimary": false,
+    "features": [
+      "Grounds maintenance",
+      "Snow removal",
+      "HOA services",
+      "Retail & office parks",
+      "Municipal contracts"
+    ]
+  }
+]
+

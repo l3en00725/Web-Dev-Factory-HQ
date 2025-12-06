@@ -1,0 +1,83 @@
+---
+import Container from '../layout/Container.astro';
+import Button from '../ui/Button.astro';
+import Image from '../base/Image.astro';
+
+interface Props {
+  heading?: string;
+  body?: string;
+  buttonLabel?: string;
+  buttonLink?: string;
+  secondaryButtonLabel?: string;
+  secondaryButtonLink?: string;
+  backgroundColor?: string;
+  textColor?: 'light' | 'dark';
+  backgroundImage?: string;
+}
+
+const { 
+  heading, 
+  body, 
+  buttonLabel, 
+  buttonLink,
+  secondaryButtonLabel,
+  secondaryButtonLink,
+  backgroundColor,
+  textColor = 'light',
+  backgroundImage 
+} = Astro.props;
+
+const isDark = textColor === 'light';
+---
+
+<section class={`relative py-24 lg:py-32 text-center overflow-hidden ${backgroundColor || 'bg-primary-900'}`}>
+  {/* Background Image Overlay */}
+  <div class="absolute inset-0 z-0">
+    {backgroundImage ? (
+      <Image src={backgroundImage} alt="" class="w-full h-full object-cover opacity-20 transition-transform duration-[30s] hover:scale-110" />
+    ) : (
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,theme(colors.primary.800),theme(colors.primary.950))]"></div>
+    )}
+    <div class="absolute inset-0 bg-primary-950/60 mix-blend-multiply"></div>
+    
+    {/* Decorative ambient glow */}
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-secondary-500/20 rounded-full blur-[100px] pointer-events-none"></div>
+  </div>
+
+  <Container size="md" class="relative z-10 flex flex-col items-center gap-8">
+    {heading && (
+      <h2 class={`font-display text-4xl font-bold tracking-tight lg:text-5xl ${isDark ? 'text-white' : 'text-slate-900'} drop-shadow-sm`}>
+        {heading}
+      </h2>
+    )}
+    
+    {body && (
+      <p class={`text-xl leading-relaxed max-w-2xl mx-auto ${isDark ? 'text-primary-100/90' : 'text-slate-600'}`}>
+        {body}
+      </p>
+    )}
+
+    <div class="flex flex-col sm:flex-row gap-4 justify-center mt-4 w-full sm:w-auto">
+      {buttonLabel && buttonLink && (
+        <Button 
+          href={buttonLink} 
+          size="lg" 
+          variant="primary"
+          class="shadow-xl shadow-secondary-500/20 hover:-translate-y-1 transition-transform duration-300"
+        >
+          {buttonLabel}
+        </Button>
+      )}
+      {secondaryButtonLabel && secondaryButtonLink && (
+        <Button 
+          href={secondaryButtonLink} 
+          size="lg" 
+          variant={isDark ? 'outline' : 'secondary'}
+          class="backdrop-blur-sm bg-white/5 border-white/20 hover:bg-white/10 text-white"
+        >
+          {secondaryButtonLabel}
+        </Button>
+      )}
+    </div>
+  </Container>
+</section>

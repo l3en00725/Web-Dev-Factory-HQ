@@ -9,14 +9,41 @@ import ContactSection from '../sections/ContactSection.astro';
 import ContentBlock from '../sections/ContentBlock.astro';
 import Stats from '../sections/Stats.astro';
 import CTA from '../sections/CTA.astro';
+import { varyComponentProps, type VariationContext } from '../../lib/content-variation';
+
+// Template resolver utilities
+function isValidTemplate(templateId: string | null | undefined): boolean {
+  // For now, only client-base is supported
+  return templateId === 'client-base' || !templateId;
+}
+
+function getDefaultTemplate(): string {
+  return 'client-base';
+}
 
 interface Props {
   sections: any[];
+  templateId?: string | null;
+  variationContext?: VariationContext;
 }
 
-const { sections } = Astro.props;
+const { sections, templateId, variationContext } = Astro.props;
 
-const components = {
+// Resolve template (defaults to client-base if not provided or invalid)
+// Currently all templates use the same components, but this infrastructure
+// supports future multi-template component loading
+const resolvedTemplateId = templateId && isValidTemplate(templateId) 
+  ? templateId 
+  : getDefaultTemplate();
+
+// Log template resolution for debugging (only in dev)
+if (import.meta.env.DEV && resolvedTemplateId !== 'client-base') {
+  console.log(`[PageBuilder] Using template: ${resolvedTemplateId}`);
+}
+
+// Component registry - currently all sections from client-base
+// Future: This can be extended to load components dynamically based on templateId
+const components: Record<string, any> = {
   hero: Hero,
   features: Features,
   servicesGrid: ServicesGrid,
@@ -37,7 +64,13 @@ const components = {
       console.warn(`No component found for section type: ${section._type}`);
       return null;
     }
-    return <Component {...section} />;
+    
+    // Apply content variation if context is provided
+    const props = variationContext 
+      ? varyComponentProps(section, variationContext)
+      : section;
+
+    return <Component {...props} />;
   })
 }
 

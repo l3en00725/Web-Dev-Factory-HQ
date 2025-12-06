@@ -1,6 +1,40 @@
 ---
-/* Placeholder page - will be rendered by Template Rendering Agent */
+import Base from '../layouts/Base.astro';
+import Container from '../components/layout/Container.astro';
+import ContactSection from '../components/sections/ContactSection.astro';
+import { getSettings, getNavItems } from '../lib/sanity/queries';
+
+const [settings, navItems] = await Promise.all([
+  getSettings(),
+  getNavItems()
+]);
+
+const title = "Contact Us";
+const description = `Get in touch with ${settings?.title || 'us'}. We're here to help with all your service needs.`;
 ---
-<div>Placeholder</div>
 
-
+<Base 
+  title={title} 
+  description={description}
+  settings={settings}
+  navItems={navItems}
+>
+  <section class="bg-background py-20">
+    <Container size="lg">
+      <div class="text-center mb-12">
+        <h1 class="font-display text-4xl font-bold lg:text-5xl mb-4">{title}</h1>
+        <p class="text-xl text-muted-foreground max-w-2xl mx-auto">{description}</p>
+      </div>
+      
+      <ContactSection 
+        heading="Get In Touch"
+        subheading="Fill out the form below and we'll get back to you as soon as possible."
+        showForm={true}
+        showContactInfo={true}
+        layout="form-left"
+        contactEmail={settings?.contactEmail}
+        contactPhone={settings?.contactPhone}
+      />
+    </Container>
+  </section>
+</Base>

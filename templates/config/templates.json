@@ -1,0 +1,16 @@
+{
+  "templates": [
+    {
+      "templateId": "client-base",
+      "templateName": "Client Base",
+      "templatePath": "../client-base",
+      "description": "Primary template for service-based businesses with flexible page builder sections",
+      "previewImage": null,
+      "sectionsPath": "src/components/sections",
+      "layoutsPath": "src/layouts",
+      "stylesPath": "src/styles"
+    }
+  ],
+  "defaultTemplate": "client-base"
+}
+

@@ -1,34 +1,52 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Badge from '../components/ui/badge.astro';
-import Card from '../components/ui/card.astro';
-import Button from '../components/ui/button.astro';
-import Container from '../components/container.astro';
+import Base from '../layouts/Base.astro';
+import Container from '../components/layout/Container.astro';
+import ContactSection from '../components/sections/ContactSection.astro';
+import { generateLocalBusinessSchema } from '../lib/structured-data/LocalBusiness';
+import { generateBreadcrumbSchema } from '../lib/structured-data/Breadcrumbs';
+import settings from '../content/settings.json';
 
-const meta = {
-  title: 'Contact Blue Lawns | Lawn Care Services Cape May County NJ',
-  description: 'Contact Blue Lawns for lawn care and landscaping in Cape May County. Call 609-425-2954 or visit 57 W Katherine Ave Unit B, Ocean View, NJ 08230. Serving Avalon, Wildwood, Stone Harbor, Cape May.'
+const title = "Contact Us";
+const description = `Get in touch with ${settings.title}. We're here to help with all your lawn care and landscaping needs in Cape May County.`;
+
+// Structured data
+const siteUrl = settings.siteUrl;
+const localBusinessSchema = generateLocalBusinessSchema(settings, undefined, siteUrl);
+const breadcrumbSchema = generateBreadcrumbSchema(
+  [
+    { name: 'Home', url: '/' },
+    { name: 'Contact', url: '/contact' },
+  ],
+  siteUrl
+);
+
+const structuredData = {
+  '@graph': [localBusinessSchema, breadcrumbSchema],
 };
 ---
 
-<Layout title={meta.title}>
-  <Container>
-  <section class="hero">
-    <div class="hero__content space-y-4">
-      <Badge>Contact Blue Lawns</Badge>
-      <h1 class="hero__title">Contact Our Landscaping Experts</h1>
-      <p class="hero__lead">Get in touch with Blue Lawns for professional lawn care and landscaping services in Cape May County. We're here to help transform your outdoor space.</p>
-      <div class="hero__actions">
-        <Button href="/contact">Request a Quote</Button>
-        <Button variant="outline" href="/services">View Services</Button>
+<Base 
+  title={title} 
+  description={description}
+  structuredData={structuredData}
+  headerVariant="solid"
+>
+  <section class="bg-background py-section-mobile lg:py-section-desktop">
+    <Container size="lg">
+      <div class="text-center mb-12">
+        <h1 class="font-display text-4xl font-bold lg:text-5xl mb-4">{title}</h1>
+        <p class="text-xl text-foreground-secondary max-w-2xl mx-auto">{description}</p>
       </div>
-    </div>
+      
+      <ContactSection 
+        heading="Get In Touch"
+        subheading="Fill out the form below and we'll get back to you as soon as possible."
+        showForm={true}
+        showContactInfo={true}
+        layout="form-left"
+        contactEmail={settings.contact.email}
+        contactPhone={settings.contact.phone}
+      />
+    </Container>
   </section>
-
-  <div class="grid gap-8 md:grid-cols-2">
-
-  </div>
-
-
-  </Container>
-</Layout>
+</Base>

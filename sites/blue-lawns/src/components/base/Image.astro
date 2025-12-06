@@ -1,0 +1,46 @@
+---
+// Simplified static Image component (no Sanity)
+import { sanitizeAltText } from '../../lib/image-utils';
+
+interface Props {
+  src: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+  sizes?: string;
+  priority?: boolean;
+  class?: string;
+  fit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+}
+
+const { 
+  src, 
+  alt, 
+  width, 
+  height, 
+  sizes = "(max-width: 768px) 100vw, 50vw",
+  priority = false,
+  class: className,
+  fit = 'cover'
+} = Astro.props;
+
+const loading = priority ? "eager" : "lazy";
+const decoding = priority ? "sync" : "async";
+const sanitizedAlt = sanitizeAltText(alt, "Image");
+
+const style = {
+  aspectRatio: width && height ? `${width}/${height}` : 'auto',
+  objectFit: fit,
+};
+---
+
+<img
+  src={src}
+  alt={sanitizedAlt}
+  width={width}
+  height={height}
+  loading={loading}
+  decoding={decoding}
+  class={className}
+  style={style}
+/>

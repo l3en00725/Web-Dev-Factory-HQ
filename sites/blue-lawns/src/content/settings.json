@@ -1,0 +1,45 @@
+{
+  "title": "Blue Lawns",
+  "tagline": "Professional Lawn Care & Landscaping",
+  "description": "Expert lawn care and landscaping services in Cape May County, NJ. From routine maintenance to custom landscape design, we treat your home like our own.",
+  "logo": "/images/logo.svg",
+  "siteUrl": "https://www.bluelawns.com",
+  "contact": {
+    "email": "info@bluelawns.com",
+    "phone": "609-425-2954",
+    "address": {
+      "street": "57 W. Katherine Ave Unit B",
+      "city": "Ocean View",
+      "state": "NJ",
+      "zip": "08230"
+    }
+  },
+  "social": {
+    "facebook": "https://facebook.com/bluelawns",
+    "instagram": "https://instagram.com/bluelawns"
+  },
+  "businessHours": {
+    "weekdays": "7:00 AM - 6:00 PM",
+    "saturday": "8:00 AM - 4:00 PM",
+    "sunday": "Closed"
+  },
+  "brandColors": {
+    "primary": "#0ea5e9",
+    "secondary": "#22c55e",
+    "accent": "#f97316"
+  },
+  "analytics": {
+    "googleAnalyticsId": "G-MSCK89LLJ1"
+  },
+  "formDestination": {
+    "type": "webhook",
+    "webhookUrl": null,
+    "fallbackEmail": "info@bluelawns.com"
+  },
+  "seo": {
+    "defaultTitle": "Blue Lawns | Professional Lawn Care & Landscaping in Cape May County",
+    "titleTemplate": "%s | Blue Lawns",
+    "defaultDescription": "Expert lawn care and landscaping services in Cape May County, NJ. Licensed, insured, and satisfaction guaranteed."
+  }
+}
+

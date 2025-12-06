@@ -119,7 +119,15 @@ outputs:
     type: json
     description: >
       Clustered keyword strategy describing themes, intent, difficulty/volume
-      tiers, local modifiers, and mapping to page types.
+      tiers, local modifiers, and mapping to page types. Now enriched with
+      Keywords Everywhere API data including search volume, competition, CPC,
+      and PASF terms.
+  - name: keywordResearch
+    type: json
+    description: >
+      Comprehensive keyword research results from Keywords Everywhere API,
+      including serviceKeywords, locationKeywords, keywordClusters, and
+      pasfQuestions for FAQ enrichment.
   - name: seoContentBlocks
     type: markdown
     description: >
@@ -230,14 +238,37 @@ steps:
       (machine-usable Tailwind and component specs, including interactive
       patterns) and designRecommendations (human-readable guidance) for use in
       template rendering and Astro build phases.
+  - id: phase_4a_keyword_research
+    name: Phase 4a – Keyword research via Keywords Everywhere
+    description: >
+      BEFORE generating SEO copy, call the Keyword Research Agent
+      (`.cursor/agents/factory/keyword_research_agent.yaml`) to perform
+      comprehensive keyword research using the Keywords Everywhere API. Pass
+      services and locations from intakeObject, along with businessType and
+      siteGoals. Capture serviceKeywords, locationKeywords, keywordClusters,
+      pasfQuestions, and keywordInsights. These keyword insights will inform
+      meta field generation, FAQ creation, H1/H2 structures, and content
+      differentiation strategies in the SEO Copy phase.
+    run:
+      call: .cursor/agents/factory/keyword_research_agent.yaml
+      args:
+        services: $steps.phase_0_intake.intakeObject.services
+        locations: $steps.phase_0_intake.intakeObject.locations
+        businessType: $steps.phase_0_intake.intakeObject.businessType
+        siteGoals: $steps.phase_0_intake.intakeObject.siteGoals
+      set: keywordResearchResult
   - id: phase_4b_seo_copy_generation
     name: Phase 4b – SEO copy and strategy generation
     description: >
-      Before template rendering, call the SEO Copy Agent
+      After keyword research, call the SEO Copy Agent
       (`.cursor/agents/factory/seo_copy_agent.yaml`) using the canonical
       intakeObject from Phase 0 ($steps.phase_0_intake.intakeObject), the
-      current siteName, and any existing scrape artifacts (if Phase 0 or later
-      steps produced them). Capture optimized_meta, recommended_keywords,
+      current siteName, any existing scrape artifacts, and CRITICALLY the
+      keywordResearchResult from Phase 4a. The SEO Copy Agent must use KE
+      primary keywords when generating meta titles/H1s, location-modified
+      keyword variants for location pages, PASF questions for FAQ enrichment,
+      and semantic keyword variations for content differentiation (20–40%
+      unique per location). Capture optimized_meta, recommended_keywords,
       content_blocks, and redirect_map, then expose them from the orchestrator
       as seoMeta, keywordStrategy, seoContentBlocks, and redirectMap. These
       outputs must be deterministic and are consumed by template rendering,
@@ -251,6 +282,7 @@ steps:
         siteName: $inputs.siteName
         intakeObject: $steps.phase_0_intake.intakeObject
         scrapeArtifacts: $steps.phase_0_intake.scrapeArtifacts
+        keywordResearch: $steps.phase_4a_keyword_research.keywordResearchResult
       set: seoCopyResult
   - id: phase_5_render_template
     name: Phase 5 – Template rendering config
@@ -268,6 +300,40 @@ steps:
       template_config, designSpecs, and seoMeta to wire routes, layouts, SEO,
       navigation, and footers in a way that respects the design and keyword
       strategy produced in earlier phases.
+  - id: phase_10_dashboard_registration
+    name: Phase 10 – Register site with Central Dashboard Service
+    description: >
+      After the Astro site is built, register the new site with the Central
+      Dashboard Service (Supabase-based). This phase:
+      1. Creates a new entry in the dashboard-api `sites` table
+      2. Generates a unique `dashboard_uuid` for the site
+      3. Stores site metadata (siteName, siteUrl, sanity_project_id, sanity_dataset)
+      4. Creates default `dashboard_settings` entry
+      5. Returns the `dashboard_uuid` to be injected into the site's environment
+      6. Updates the site's .env or config with DASHBOARD_UUID and DASHBOARD_API_URL
+      
+      The dashboard_uuid enables the site to:
+      - Call /api/status?siteId=<uuid> to check connection status
+      - Connect Google Analytics 4 and Search Console via OAuth
+      - Access cached analytics data and AI insights
+      - Display dashboard UI at /dashboard route
+      
+      This is a multi-tenant service, so all sites share the same dashboard-api
+      infrastructure but have isolated data via Row Level Security (RLS).
+    action:
+      run: |
+        # Register site with dashboard service
+        # This calls scripts/register-dashboard.mjs which:
+        # 1. Calls POST /api/sites/register with site metadata
+        # 2. Receives dashboard_uuid from response
+        # 3. Writes DASHBOARD_UUID and DASHBOARD_API_URL to sites/<siteName>/.env.local
+        echo "Registering site with Central Dashboard Service..."
+        bun run scripts/register-dashboard.mjs \
+          --site "$inputs.siteName" \
+          --domain "$inputs.websiteUrl" \
+          --sanity-project "$SANITY_PROJECT_ID" \
+          --sanity-dataset "$SANITY_DATASET" \
+          --template "$inputs.templateName"
   - id: phase_6b_form_builder
     name: Phase 6b – Form Builder integration
     description: >

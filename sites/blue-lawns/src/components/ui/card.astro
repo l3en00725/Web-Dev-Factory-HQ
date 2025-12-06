@@ -1,23 +1,60 @@
 ---
-interface Props {
-  title?: string;
-  description?: string;
-  class?: string;
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  variant?: 'default' | 'elevated' | 'outline';
+  padding?: 'none' | 'sm' | 'md' | 'lg';
 }
 
-const { title, description, class: className } = Astro.props;
+const {
+  variant = 'default',
+  padding = 'md',
+  class: className,
+  ...rest
+} = Astro.props;
+
+const variants = {
+  default: 'bg-surface border border-border shadow-sm',
+  elevated: 'bg-surface border-none shadow-lg',
+  outline: 'bg-transparent border border-border shadow-none',
+};
+
+// Padding controls mainly for the content wrapper, but affects outer flow
+const paddings = {
+  none: 'p-0',
+  sm: 'p-4',
+  md: 'p-6',
+  lg: 'p-8',
+};
+
+const baseClasses = [
+  'group relative overflow-hidden rounded-xl transition-all duration-normal',
+  variants[variant],
+  className,
+].filter(Boolean).join(' ');
 ---
 
-<div class:list={[
-  'p-6 bg-white border border-[#E0F0FF] rounded-lg shadow-sm hover:shadow-md transition-shadow',
-  className
-]}>
-  {title && (
-    <h3 class="text-xl font-bold text-[#0B203D] mb-3">{title}</h3>
+<div class={baseClasses} {...rest}>
+  {Astro.slots.has('header') && (
+    <div class={`border-b border-border ${paddings[padding]} pb-4`}>
+      <slot name="header" />
+    </div>
   )}
-  {description && (
-    <p class="text-[#333]">{description}</p>
+
+  {Astro.slots.has('media') && (
+    <div class="w-full overflow-hidden">
+      <slot name="media" />
+    </div>
   )}
-  <slot />
+
+  <div class={paddings[padding]}>
+    <slot />
+  </div>
+
+  {Astro.slots.has('footer') && (
+    <div class={`mt-auto border-t border-border ${paddings[padding]} pt-4 bg-background-subtle`}>
+      <slot name="footer" />
+    </div>
+  )}
 </div>
 

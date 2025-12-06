@@ -18,6 +18,14 @@ inputs:
     description: >
       Structured description of primary conversion goals, target audience,
       geographic focus, and any must-have messaging.
+  - name: keywordResearch
+    type: json
+    required: false
+    description: >
+      Keyword research results from Keywords Everywhere API (Phase 4a),
+      containing serviceKeywords, locationKeywords, keywordClusters, and
+      pasfQuestions. When provided, MUST be used to inform meta titles, H1/H2
+      structures, FAQ generation, and content differentiation strategies.
 outputs:
   - name: hero_copy
     type: markdown
@@ -58,10 +66,13 @@ steps:
   - id: derive_keyword_and_intent
     name: Derive keyword themes and search intent
     description: >
-      From business_type and site_goals (and existing scrape data when available),
-      infer keyword clusters with estimated difficulty, volume tiers (high/mid),
-      local modifiers, and primary/secondary intent (informational, commercial,
-      transactional, navigational).
+      If keywordResearch input is provided, use the Keywords Everywhere API data
+      (serviceKeywords, locationKeywords, keywordClusters) as the authoritative
+      source for keyword themes, search volume, competition, CPC, and intent
+      classification. Otherwise, fall back to inferring from business_type and
+      site_goals (and existing scrape data when available) with estimated
+      difficulty, volume tiers (high/mid), local modifiers, and primary/secondary
+      intent (informational, commercial, transactional, navigational).
   - id: build_keyword_strategy
     name: Build keyword and topic strategy
     description: >
@@ -83,6 +94,10 @@ steps:
     description: >
       Generate contextual CTAs for major sections and a set of FAQs that mirror
       real customer questions, using language suitable for schema/FAQ markup.
+      If keywordResearch.pasfQuestions is provided, ENRICH FAQ generation with
+      PASF (People Also Search For) questions extracted from Keywords Everywhere
+      API data. Prioritize high-volume PASF questions that align with business
+      type and service offerings.
   - id: analyze_existing_site_seo
     name: Analyze existing site SEO signals
     description: >
@@ -94,13 +109,22 @@ steps:
     description: >
       Produce optimized_meta with explicit title and description proposals per
       key URL or page type, preserving critical slugs and annotating any risky
-      changes for review.
+      changes for review. CRITICAL: If keywordResearch is provided, service
+      pages MUST use the KE primary keyword from serviceKeywords when generating
+      meta titles and H1 structures. Location pages MUST use location-modified
+      keyword variants from locationKeywords (e.g., "Lawn Care Cape May" instead
+      of generic "Lawn Care"). Meta descriptions should incorporate secondary
+      keywords and semantic variations from the KE data.
   - id: produce_long_form_content
     name: Produce long-form SEO content blocks
     description: >
       Generate content_blocks that implement the keyword strategy: structured
       H1–H3 outlines, paragraphs, and in-line CTAs suitable for services,
-      locations, and pillar pages.
+      locations, and pillar pages. For location pages, use semantic keyword
+      variations from locationKeywords to achieve 20–40% content differentiation
+      (as per PLAN localization rules). Weave in semantic keywords naturally
+      rather than keyword stuffing. Use KE data to prioritize high-value keywords
+      (high volume, low competition) in primary content sections.
   - id: propose_redirect_map
     name: Propose redirect map and SEO safety checklist
     description: >

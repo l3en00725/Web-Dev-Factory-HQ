@@ -1,6 +1,6 @@
 ---
 import { client } from "../../lib/sanity/client";
-import imageUrlBuilder from "@sanity/image-url";
+import { createImageUrlBuilder } from "@sanity/image-url";
 
 interface Props {
   asset: any;
@@ -13,10 +13,10 @@ interface Props {
 
 const { asset, alt = "", width, height, class: className, loading = "lazy" } = Astro.props;
 
-const builder = imageUrlBuilder(client);
+const builder = createImageUrlBuilder(client);
 
-function urlFor(source) {
-  return builder.image(source);
+function urlFor(source: any): string {
+  return builder.image(source).url();
 }
 
 // Protect against missing asset
@@ -24,7 +24,7 @@ if (!asset) {
   return null;
 }
 
-let imgUrl = urlFor(asset).auto('format');
+let imgUrl = builder.image(asset).auto('format');
 if (width) imgUrl = imgUrl.width(width);
 if (height) imgUrl = imgUrl.height(height);
 

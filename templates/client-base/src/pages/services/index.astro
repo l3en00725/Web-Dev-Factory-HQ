@@ -1,0 +1,35 @@
+---
+import Base from '../../layouts/Base.astro';
+import Container from '../../components/layout/Container.astro';
+import ServicesGrid from '../../components/sections/ServicesGrid.astro';
+import { getServices, getSettings, getNavItems } from '../../lib/sanity/queries';
+
+const [services, settings, navItems] = await Promise.all([
+  getServices(),
+  getSettings(),
+  getNavItems()
+]);
+
+const title = "Our Services";
+const description = `Explore services offered by ${settings?.title || 'us'}.`;
+---
+
+<Base 
+  title={title} 
+  description={description}
+  settings={settings}
+  navItems={navItems}
+>
+  <section class="bg-background py-20">
+    <Container>
+        <div class="mb-12 text-center">
+            <h1 class="font-display text-4xl font-bold lg:text-5xl mb-4">{title}</h1>
+            <p class="text-xl text-muted-foreground max-w-2xl mx-auto">{description}</p>
+        </div>
+        
+        {/* Reuse the ServicesGrid component but pass services directly */}
+        <ServicesGrid services={services} />
+    </Container>
+  </section>
+</Base>
+

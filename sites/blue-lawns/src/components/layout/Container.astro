@@ -1,0 +1,27 @@
+---
+interface Props {
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  class?: string;
+}
+
+const { size = 'xl', class: className } = Astro.props;
+
+const sizes = {
+  sm: 'max-w-screen-sm',
+  md: 'max-w-screen-md',
+  lg: 'max-w-screen-lg',
+  xl: 'max-w-screen-xl', // Maps to our 1280px container-max token
+  full: 'max-w-full',
+};
+
+const classes = [
+  'mx-auto w-full px-6', // Default padding (1.5rem / 24px)
+  sizes[size],
+  className,
+].filter(Boolean).join(' ');
+---
+
+<div class={classes}>
+  <slot />
+</div>
+

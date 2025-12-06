@@ -1,0 +1,47 @@
+---
+import Base from '../../layouts/Base.astro';
+import Container from '../../components/layout/Container.astro';
+import ServicesGrid from '../../components/sections/ServicesGrid.astro';
+import { generateBreadcrumbSchema } from '../../lib/structured-data/Breadcrumbs';
+import settings from '../../content/settings.json';
+import services from '../../content/services.json';
+
+const title = "Our Services";
+const description = `Professional lawn care and landscaping services in Cape May County. ${settings.title} offers everything from routine maintenance to custom landscape design.`;
+
+// Structured data
+const siteUrl = settings.siteUrl;
+const breadcrumbSchema = generateBreadcrumbSchema(
+  [
+    { name: 'Home', url: '/' },
+    { name: 'Services', url: '/services' },
+  ],
+  siteUrl
+);
+
+const structuredData = {
+  '@graph': [breadcrumbSchema],
+};
+---
+
+<Base 
+  title={title} 
+  description={description}
+  structuredData={structuredData}
+  headerVariant="solid"
+>
+  <section class="bg-background py-section-mobile lg:py-section-desktop">
+    <Container>
+      <div class="mb-section-gap-mobile lg:mb-section-gap text-center">
+        <h1 class="font-display text-4xl font-bold tracking-tight lg:text-5xl mb-4">
+          {title}
+        </h1>
+        <p class="text-xl text-foreground-secondary max-w-2xl mx-auto">
+          {description}
+        </p>
+      </div>
+      
+      <ServicesGrid services={services} />
+    </Container>
+  </section>
+</Base>

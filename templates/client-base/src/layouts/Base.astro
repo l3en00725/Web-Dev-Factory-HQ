@@ -1,15 +1,63 @@
 ---
+import '../styles/tokens.css';
 import '../styles/design-system.css';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
+import { client } from '../lib/sanity/client';
+import { createImageUrlBuilder } from '@sanity/image-url';
+import { buildCanonicalUrl } from '../lib/seo-utils';
+import { validateSchemaObject } from '../lib/schema-validator';
 
 interface Props {
   title: string;
   description?: string;
   structuredData?: Record<string, unknown>;
+  settings?: any;
+  navItems?: any[];
+  canonicalUrl?: string;
+  noIndex?: boolean;
+  noFollow?: boolean;
+  ogImage?: any; // Sanity image object
 }
 
-const { title, description, structuredData } = Astro.props;
+const { title, description, structuredData, settings, navItems = [], canonicalUrl, noIndex, noFollow, ogImage: pageOgImage } = Astro.props;
+const siteUrl = settings?.siteUrl || Astro.url.origin;
+const canonical = buildCanonicalUrl(Astro.url.pathname, siteUrl, canonicalUrl);
+
+// Resolve Logo URL
+const builder = createImageUrlBuilder(client);
+const logoSrc = settings?.logo ? builder.image(settings.logo).width(200).url() : undefined;
+const siteTitle = settings?.title || 'Web Dev Factory Site';
+
+// OG Image Logic
+const ogEndpoint = `${siteUrl}/api/og`;
+const params = new URLSearchParams({
+  title: title,
+  subtitle: description?.slice(0, 100) || '',
+  color: settings?.primaryColor || '#3b82f6',
+});
+if (logoSrc) params.append('logo', logoSrc);
+
+const resolvedOgImage = pageOgImage 
+  ? builder.image(pageOgImage).width(1200).height(630).url()
+  : `${ogEndpoint}?${params.toString()}`;
+
+// Validate and clean structured data
+const cleanedStructuredData = structuredData ? validateSchemaObject(structuredData) : null;
+
+// Map Sanity Nav Items to Header format
+const mappedNavItems = navItems.map((item) => {
+  let href = '#';
+  if (item.href) {
+    href = item.href;
+  }
+
+  return {
+    title: item.label || item.title || 'Link',
+    href,
+    active: Astro.url.pathname === href,
+  };
+});
 ---
 
 <!doctype html>
@@ -19,19 +67,44 @@ const { title, description, structuredData } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     {description && <meta name="description" content={description} />}
+    {noIndex && <meta name="robots" content="noindex" />}
+    {noFollow && <meta name="robots" content="nofollow" />}
+    {noIndex && noFollow && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="canonical" href={canonical} />
     <title>{title}</title>
+
+    {/* Open Graph / Facebook */}
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:image" content={resolvedOgImage} />
+
+    {/* Twitter */}
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonical} />
+    <meta property="twitter:title" content={title} />
+    {description && <meta property="twitter:description" content={description} />}
+    <meta property="twitter:image" content={resolvedOgImage} />
     
-    {structuredData && (
-      <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    {cleanedStructuredData && (
+      <script type="application/ld+json" set:html={JSON.stringify(cleanedStructuredData)} />
     )}
   </head>
   <body class="flex min-h-screen flex-col bg-background text-foreground">
-    <Header />
+    <Header 
+      logoSrc={logoSrc} 
+      siteTitle={siteTitle} 
+      navItems={mappedNavItems} 
+    />
     
     <main class="flex-1">
       <slot />
     </main>
 
-    <Footer />
+    <Footer 
+      logoSrc={logoSrc} 
+      siteTitle={siteTitle} 
+    />
   </body>
 </html>

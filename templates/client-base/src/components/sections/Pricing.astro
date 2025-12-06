@@ -2,66 +2,85 @@
 import Container from '../layout/Container.astro';
 import Card from '../ui/Card.astro';
 import Button from '../ui/Button.astro';
-import PortableText from '../sanity/PortableText.astro';
 
-interface Plan {
-  title: string;
+interface PricingPlan {
+  name: string;
   price: string;
-  features?: string[]; // Simple strings for now, could be objects
-  cta?: { title: string; link: string };
+  frequency?: string;
+  description?: string;
+  features?: string[];
+  ctaLabel?: string;
+  ctaLink?: string;
   highlighted?: boolean;
+  badge?: string;
 }
 
 interface Props {
   heading?: string;
-  plans?: Plan[];
+  subheading?: string;
+  plans?: PricingPlan[];
+  footnote?: string;
 }
 
-const { heading, plans = [] } = Astro.props;
+const { heading, subheading, plans = [], footnote } = Astro.props;
 ---
 
-<section class="py-20 bg-background-subtle">
+<section class="py-section-mobile lg:py-section-desktop bg-background-subtle">
   <Container>
-    {heading && (
-      <h2 class="mb-12 text-center font-display text-3xl font-bold lg:text-4xl">{heading}</h2>
+    {(heading || subheading) && (
+      <div class="mb-section-gap-mobile lg:mb-section-gap text-center">
+        {heading && <h2 class="font-display text-3xl font-bold lg:text-4xl">{heading}</h2>}
+        {subheading && <p class="mt-4 text-foreground-secondary">{subheading}</p>}
+      </div>
     )}
 
     <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3 lg:items-start">
       {plans.map((plan) => (
         <Card 
           variant={plan.highlighted ? 'elevated' : 'default'} 
-          class:list={["flex flex-col p-8", plan.highlighted && "ring-2 ring-primary relative scale-105 z-10"]}
+          class:list={[
+            "flex flex-col p-8 transition-all duration-normal hover:shadow-xl",
+            plan.highlighted && "ring-2 ring-primary relative z-10 lg:scale-105"
+          ]}
         >
-          {plan.highlighted && (
+          {plan.highlighted && plan.badge && (
             <span class="absolute top-0 right-0 -mt-3 -mr-3 rounded-full bg-primary px-3 py-1 text-xs font-bold text-white shadow-sm">
-              Popular
+              {plan.badge}
             </span>
           )}
-          <h3 class="text-xl font-semibold">{plan.title}</h3>
+          <h3 class="text-xl font-semibold">{plan.name}</h3>
           <div class="my-4">
             <span class="text-4xl font-bold">{plan.price}</span>
+            {plan.frequency && <span class="text-muted-foreground ml-1 text-sm">{plan.frequency}</span>}
           </div>
+          {plan.description && <p class="text-sm text-foreground-secondary mb-6">{plan.description}</p>}
           
           <ul class="mb-8 flex-1 space-y-3">
             {plan.features?.map((feature) => (
-              <li class="flex items-start gap-2 text-muted-foreground">
+              <li class="flex items-start gap-2 text-foreground-secondary">
                 <svg class="mt-1 h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
                 <span class="text-sm">{feature}</span>
               </li>
             ))}
           </ul>
 
-          {plan.cta && (
+          {plan.ctaLabel && plan.ctaLink && (
             <Button 
-              href={plan.cta.link} 
+              href={plan.ctaLink} 
               variant={plan.highlighted ? 'primary' : 'outline'} 
               block
             >
-              {plan.cta.title}
+              {plan.ctaLabel}
             </Button>
           )}
         </Card>
       ))}
     </div>
+    
+    {footnote && (
+      <div class="mt-section-gap-mobile lg:mt-section-gap text-center text-sm text-foreground-secondary">
+        <p>{footnote}</p>
+      </div>
+    )}
   </Container>
 </section>

@@ -1,0 +1,196 @@
+---
+// templates/client-base/src/pages/dashboard/index.astro
+// Dashboard page - Analytics & Insights overview
+// Fetches connection status and displays analytics data
+
+import Base from '../../layouts/Base.astro';
+import Container from '../../components/layout/Container.astro';
+import { getSettings, getNavItems } from '../../lib/sanity/queries';
+
+export const prerender = false;
+
+const [settings, navItems] = await Promise.all([
+  getSettings(),
+  getNavItems()
+]);
+
+// Get dashboard UUID from environment (injected during Phase 10)
+// Priority: process.env (Runtime SSR) > import.meta.env (Build time) > settings fallback
+const dashboardUuid = process.env.DASHBOARD_UUID || import.meta.env.DASHBOARD_UUID || settings?.dashboardUuid || '';
+const dashboardApiUrl = process.env.DASHBOARD_API_URL || import.meta.env.DASHBOARD_API_URL || 'https://dashboard-api.example.com';
+
+// Fetch connection status
+let connectionStatus = {
+  analyticsConnected: false,
+  searchConsoleConnected: false,
+  keywordResearchReady: false,
+  sanityLeadsConfigured: false,
+};
+
+if (dashboardUuid) {
+  try {
+    const statusResponse = await fetch(`${dashboardApiUrl}/api/status?siteId=${dashboardUuid}`);
+    if (statusResponse.ok) {
+      connectionStatus = await statusResponse.json();
+    }
+  } catch (error) {
+    console.error('Failed to fetch dashboard status:', error);
+  }
+}
+
+const title = "Analytics Dashboard";
+const description = "View your site's analytics, keyword opportunities, leads, and AI insights.";
+---
+
+<Base 
+  title={title} 
+  description={description}
+  settings={settings}
+  navItems={navItems}
+>
+  <section class="bg-background py-20">
+    <Container>
+      <div class="mb-12">
+        <h1 class="font-display text-4xl font-bold lg:text-5xl mb-4">{title}</h1>
+        <p class="text-xl text-muted-foreground">{description}</p>
+      </div>
+
+      {/* Not Registered Message */}
+      {!dashboardUuid && (
+        <div class="mb-8 p-6 rounded-lg border border-yellow-300 bg-yellow-50">
+          <h2 class="text-xl font-semibold mb-2 text-yellow-800">Dashboard Not Configured</h2>
+          <p class="text-yellow-700">
+            This site is not registered with the dashboard service yet. 
+            The site will be automatically registered during the build process (Phase 10).
+          </p>
+          <p class="text-sm text-yellow-600 mt-2">
+            If you just created this site, run: <code class="bg-yellow-100 px-2 py-1 rounded">bun run register-dashboard --site your-site-name</code>
+          </p>
+        </div>
+      )}
+
+      {/* Connection Status Banner */}
+      {dashboardUuid && (!connectionStatus.analyticsConnected || !connectionStatus.searchConsoleConnected) && (
+        <div class="mb-8 p-6 rounded-lg border border-border bg-surface">
+          <h2 class="text-xl font-semibold mb-4">Connect Your Analytics</h2>
+          <div class="space-y-3">
+            {!connectionStatus.analyticsConnected && (
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium">Google Analytics 4</p>
+                  <p class="text-sm text-muted-foreground">Connect to view traffic and conversion data</p>
+                </div>
+                <a 
+                  href={`${dashboardApiUrl}/api/oauth/google?siteId=${dashboardUuid}&type=ga4`}
+                  class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+                >
+                  Connect GA4
+                </a>
+              </div>
+            )}
+            {!connectionStatus.searchConsoleConnected && (
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium">Google Search Console</p>
+                  <p class="text-sm text-muted-foreground">Connect to view search performance and queries</p>
+                </div>
+                <a 
+                  href={`${dashboardApiUrl}/api/oauth/google?siteId=${dashboardUuid}&type=search_console`}
+                  class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+                >
+                  Connect Search Console
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      {dashboardUuid && connectionStatus.analyticsConnected && connectionStatus.searchConsoleConnected && (
+        <div class="mb-8 p-4 rounded-lg bg-green-50 border border-green-200">
+          <p class="text-green-800">✓ All analytics services connected</p>
+        </div>
+      )}
+
+      {/* Dashboard Widgets */}
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Traffic Overview */}
+        {connectionStatus.analyticsConnected && (
+          <div class="rounded-lg border border-border bg-surface p-6">
+            <h2 class="text-2xl font-semibold mb-4">Traffic Overview</h2>
+            {/* TODO: Implement TrafficOverview component */}
+            <div class="text-muted-foreground">
+              <p>Traffic data will be displayed here</p>
+              <p class="text-sm mt-2">Component: TrafficOverview (pending implementation)</p>
+            </div>
+          </div>
+        )}
+
+        {/* Keyword Opportunities */}
+        {connectionStatus.keywordResearchReady && (
+          <div class="rounded-lg border border-border bg-surface p-6">
+            <h2 class="text-2xl font-semibold mb-4">Keyword Opportunities</h2>
+            {/* TODO: Implement KeywordOpportunities component */}
+            <div class="text-muted-foreground">
+              <p>Keyword research insights will be displayed here</p>
+              <p class="text-sm mt-2">Component: KeywordOpportunities (pending implementation)</p>
+            </div>
+          </div>
+        )}
+
+        {/* Leads Overview */}
+        {connectionStatus.sanityLeadsConfigured && (
+          <div class="rounded-lg border border-border bg-surface p-6">
+            <h2 class="text-2xl font-semibold mb-4">Leads Overview</h2>
+            {/* TODO: Implement LeadsOverview component */}
+            <div class="text-muted-foreground">
+              <p>Lead statistics will be displayed here</p>
+              <p class="text-sm mt-2">Component: LeadsOverview (pending implementation)</p>
+            </div>
+          </div>
+        )}
+
+        {/* Site Health */}
+        <div class="rounded-lg border border-border bg-surface p-6">
+          <h2 class="text-2xl font-semibold mb-4">Site Health</h2>
+          {/* TODO: Implement SiteHealthOverview component */}
+          <div class="text-muted-foreground">
+            <p>Site health metrics will be displayed here</p>
+            <p class="text-sm mt-2">Component: SiteHealthOverview (pending implementation)</p>
+          </div>
+        </div>
+
+        {/* AI Insights Summary */}
+        {connectionStatus.analyticsConnected && (
+          <div class="rounded-lg border border-border bg-surface p-6 lg:col-span-2">
+            <h2 class="text-2xl font-semibold mb-4">AI Insights</h2>
+            {/* TODO: Implement AIInsightsSummary component */}
+            <div class="text-muted-foreground">
+              <p>AI-generated insights and recommendations will be displayed here</p>
+              <p class="text-sm mt-2">Component: AIInsightsSummary (pending implementation)</p>
+              <p class="text-xs mt-4 italic">
+                Insights are generated by the Keyword Research Agent and SEO Agent based on analytics data.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Placeholder message if nothing is connected */}
+      {dashboardUuid && 
+       !connectionStatus.analyticsConnected && 
+       !connectionStatus.searchConsoleConnected && 
+       !connectionStatus.keywordResearchReady && 
+       !connectionStatus.sanityLeadsConfigured && (
+        <div class="mt-12 text-center py-12 rounded-lg border border-border bg-surface">
+          <p class="text-lg text-muted-foreground mb-4">
+            Connect your analytics services to view dashboard data
+          </p>
+          <p class="text-sm text-muted-foreground">
+            Start by connecting Google Analytics 4 or Search Console above
+          </p>
+        </div>
+      )}
+    </Container>
+  </section>
+</Base>
+

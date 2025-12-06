@@ -5,9 +5,10 @@ import {dashboardTool} from "@sanity/dashboard";
 import {schemaTypes} from "./schema";
 import {structure} from "./desk/structure";
 
-const projectId = process.env.SANITY_PROJECT_ID;
-const dataset = process.env.SANITY_DATASET || "production";
-export const apiVersion = process.env.SANITY_API_VERSION || "2023-10-01";
+// Sanity Studio reads from .env files automatically, or use hardcoded values for local dev
+const projectId = "m8m8m99r";
+const dataset = "production";
+export const apiVersion = "2023-10-01";
 
 export default defineConfig({
   name: "web-dev-factory",

@@ -1,0 +1,60 @@
+---
+import Base from '../../layouts/Base.astro';
+import Container from '../../components/layout/Container.astro';
+import Card from '../../components/ui/Card.astro';
+import { generateBreadcrumbSchema } from '../../lib/structured-data/Breadcrumbs';
+import settings from '../../content/settings.json';
+import locations from '../../content/locations.json';
+
+const title = "Service Areas";
+const description = `${settings.title} proudly serves ${locations.length} communities throughout Cape May County, NJ.`;
+
+// Structured data
+const siteUrl = settings.siteUrl;
+const breadcrumbSchema = generateBreadcrumbSchema(
+  [
+    { name: 'Home', url: '/' },
+    { name: 'Service Areas', url: '/locations' },
+  ],
+  siteUrl
+);
+
+const structuredData = {
+  '@graph': [breadcrumbSchema],
+};
+---
+
+<Base 
+  title={title} 
+  description={description}
+  structuredData={structuredData}
+  headerVariant="solid"
+>
+  <section class="bg-background py-section-mobile lg:py-section-desktop">
+    <Container>
+      <div class="mb-12 text-center">
+        <h1 class="font-display text-4xl font-bold lg:text-5xl mb-4">{title}</h1>
+        <p class="text-xl text-foreground-secondary max-w-2xl mx-auto">{description}</p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {locations.map((location) => (
+          <a 
+            href={`/locations/${location.slug}`}
+            class="group block rounded-xl border border-border bg-surface p-6 shadow-sm transition-all duration-normal hover:shadow-md hover:border-primary-300 hover:-translate-y-1"
+          >
+            <h2 class="text-xl font-semibold mb-2 group-hover:text-primary-600 transition-colors">
+              {location.title}
+            </h2>
+            <p class="text-foreground-secondary text-sm mb-3 line-clamp-2">
+              {location.description}
+            </p>
+            <p class="text-sm text-foreground-muted">
+              {location.city}, {location.state} {location.zip}
+            </p>
+          </a>
+        ))}
+      </div>
+    </Container>
+  </section>
+</Base>

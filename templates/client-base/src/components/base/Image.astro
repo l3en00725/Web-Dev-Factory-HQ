@@ -1,0 +1,106 @@
+---
+// templates/client-base/src/components/base/Image.astro
+import { 
+  buildSanityImageUrl, 
+  getSrcSet, 
+  getSanityDimensions, 
+  sanitizeAltText 
+} from '../../lib/image-utils';
+
+interface Props {
+  src?: string | any; // Can be a URL string or Sanity asset object
+  asset?: any; // Legacy prop support for Sanity
+  alt?: string;
+  width?: number;
+  height?: number;
+  sizes?: string;
+  priority?: boolean; // LCP / Above-the-fold flag
+  class?: string;
+  fit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+}
+
+const { 
+  src: rawSrc, 
+  asset: rawAsset, 
+  alt, 
+  width: overrideWidth, 
+  height: overrideHeight, 
+  sizes = "(max-width: 768px) 100vw, 50vw",
+  priority = false,
+  class: className,
+  fit = 'cover'
+} = Astro.props;
+
+// Normalize Sanity input
+const sanityAsset = rawAsset || (typeof rawSrc === 'object' ? rawSrc : null);
+const staticSrc = typeof rawSrc === 'string' ? rawSrc : null;
+
+let finalSrc = '';
+let finalSrcSet = '';
+let finalWidth = overrideWidth;
+let finalHeight = overrideHeight;
+let aspectRatio = 1;
+
+// Handle Sanity Image
+if (sanityAsset) {
+  const dims = getSanityDimensions(sanityAsset);
+  
+  // Infer dimensions if not overridden
+  if (dims && !overrideWidth) {
+    finalWidth = dims.width;
+    finalHeight = dims.height;
+    aspectRatio = dims.aspectRatio;
+  }
+
+  // If only width provided, calculate height to maintain aspect ratio
+  if (overrideWidth && !overrideHeight && dims) {
+    finalHeight = Math.round(overrideWidth / dims.aspectRatio);
+  }
+
+  finalSrc = buildSanityImageUrl(sanityAsset, finalWidth, finalHeight);
+  finalSrcSet = getSrcSet(sanityAsset, finalWidth || 2000);
+} 
+// Handle Static Image
+else if (staticSrc) {
+  finalSrc = staticSrc;
+  // For static images, we rely on the user/build process for srcset unless we use Astro's native <Image />
+  // For this phase, we are keeping it simple: pass-through for static strings.
+}
+
+const loading = priority ? "eager" : "lazy";
+const decoding = priority ? "sync" : "async";
+const sanitizedAlt = sanitizeAltText(alt, "Site image");
+
+// Styles for layout stability
+const style = {
+  aspectRatio: finalWidth && finalHeight ? `${finalWidth}/${finalHeight}` : 'auto',
+  objectFit: fit,
+};
+---
+
+{sanityAsset ? (
+  <img
+    src={finalSrc}
+    srcset={finalSrcSet}
+    sizes={sizes}
+    alt={sanitizedAlt}
+    width={finalWidth}
+    height={finalHeight}
+    loading={loading}
+    decoding={decoding}
+    class={className}
+    style={style}
+  />
+) : (
+  <img
+    src={finalSrc}
+    alt={sanitizedAlt}
+    width={finalWidth}
+    height={finalHeight}
+    loading={loading}
+    decoding={decoding}
+    class={className}
+    style={style}
+  />
+)}
+

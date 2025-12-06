@@ -1,0 +1,155 @@
+{
+  "siteName": "blue-lawns",
+  "businessName": "Blue Lawns",
+  "businessType": "landscaping service",
+  "brandColors": {
+    "primary": "#00843D",
+    "secondary": "#0A7541",
+    "accent": "#F2F7F3"
+  },
+  "contact": {
+    "email": "info@bluelawns.com",
+    "phone": "609-425-2954",
+    "address": {
+      "street": "57 W. Katherine Ave Unit B",
+      "city": "Ocean View",
+      "state": "NJ",
+      "zip": "08230"
+    }
+  },
+  "crmIntegration": {
+    "provider": "jobber",
+    "endpointUrl": null
+  },
+  "analytics": {
+    "googleAnalyticsId": "356368835"
+  },
+  "sourceUrl": "https://www.bluelawns.com",
+  "websiteUrl": "https://www.bluelawns.com",
+  "services": [
+    {
+      "title": "Lawn Care",
+      "slug": "lawn-care",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "title": "Landscaping",
+      "slug": "landscaping",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "title": "Fencing",
+      "slug": "fencing",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "title": "Seasonal Cleanup",
+      "slug": "seasonal-cleanup",
+      "description": "",
+      "enabled": true
+    },
+    {
+      "title": "Commercial Services",
+      "slug": "commercial-services",
+      "description": "",
+      "enabled": true
+    }
+  ],
+  "locations": [
+    {
+      "title": "Ocean View",
+      "slug": "ocean-view",
+      "city": "Ocean View",
+      "state": "NJ",
+      "region": "Cape May County",
+      "zip": "08230"
+    },
+    {
+      "title": "Cape May",
+      "slug": "cape-may",
+      "city": "Cape May",
+      "state": "NJ",
+      "region": "Cape May County",
+      "zip": ""
+    },
+    {
+      "title": "Avalon",
+      "slug": "avalon",
+      "city": "Avalon",
+      "state": "NJ",
+      "region": "Cape May County",
+      "zip": ""
+    },
+    {
+      "title": "Stone Harbor",
+      "slug": "stone-harbor",
+      "city": "Stone Harbor",
+      "state": "NJ",
+      "region": "Cape May County",
+      "zip": ""
+    },
+    {
+      "title": "Sea Isle City",
+      "slug": "sea-isle-city",
+      "city": "Sea Isle City",
+      "state": "NJ",
+      "region": "Cape May County",
+      "zip": ""
+    },
+    {
+      "title": "Wildwood",
+      "slug": "wildwood",
+      "city": "Wildwood",
+      "state": "NJ",
+      "region": "Cape May County",
+      "zip": ""
+    },
+    {
+      "title": "Wildwood Crest",
+      "slug": "wildwood-crest",
+      "city": "Wildwood Crest",
+      "state": "NJ",
+      "region": "Cape May County",
+      "zip": ""
+    },
+    {
+      "title": "North Wildwood",
+      "slug": "north-wildwood",
+      "city": "North Wildwood",
+      "state": "NJ",
+      "region": "Cape May County",
+      "zip": ""
+    },
+    {
+      "title": "Cape May Court House",
+      "slug": "cape-may-court-house",
+      "city": "Cape May Court House",
+      "state": "NJ",
+      "region": "Cape May County",
+      "zip": "08210"
+    },
+    {
+      "title": "Rio Grande",
+      "slug": "rio-grande",
+      "city": "Rio Grande",
+      "state": "NJ",
+      "region": "Cape May County",
+      "zip": ""
+    }
+  ],
+  "siteGoals": [
+    "rank locally",
+    "increase membership sign ups"
+  ],
+  "scrapeArtifacts": {
+    "pages": "sites/blue-lawns/data/scraped/pages.json",
+    "siteMap": "sites/blue-lawns/data/scraped/site-map.json",
+    "images": "sites/blue-lawns/data/scraped/images.json",
+    "serviceAreas": "sites/blue-lawns/data/scraped/service-areas.json"
+  },
+  "additionalNotes": "Rebuilding existing Blue Lawns website with factory system. Focus on local SEO and membership conversion optimization."
+}
+

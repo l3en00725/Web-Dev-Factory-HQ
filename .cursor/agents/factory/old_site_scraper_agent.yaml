@@ -28,28 +28,41 @@ steps:
     name: Derive site slug from source URL
     description: >
       Convert sourceUrl into a stable slug (e.g. host without protocol) to use
-      when naming the output/<site> directory.
-  - id: plan_crawl_scope
-    name: Plan crawl scope and rules
+      when naming the data/scraped/ directory.
+  - id: run_two_tier_scraper
+    name: Execute two-tier scraper (Tier 1: simple HTML → Tier 2: Playwright fallback)
     description: >
-      Determine which paths to include/exclude (e.g. avoid admin/login), crawl
-      depth, and rate limits, following any robots.txt constraints and the
-      factory’s scraping ethics.
+      Run scripts/scraper/index.mjs with sourceUrl. The scraper automatically:
+      - Tries Tier 1 (fetch + cheerio) first
+      - Falls back to Tier 2 (Playwright) if content is missing or JS-rendered
+      - Outputs to data/scraped/: site-map.json, pages.json, images.json, service-areas.json
+    action:
+      run: |
+        bun run scripts/scraper/index.mjs --url "${{ inputs.sourceUrl }}" --output "data/scraped"
   - id: extract_page_content
-    name: Extract page-level content
+    name: Extract page-level content from scraped data
     description: >
-      For each crawled URL, capture HTML snapshots, headings (H1–H3), body
-      text, CTAs, meta tags, and image references into a structured inventory.
+      Read data/scraped/pages.json and extract:
+      - URLs, titles, meta descriptions, headings (H1–H3)
+      - JSON-LD structured data
+      - Internal links
+      - Build content_inventory from scraped pages
   - id: collect_media_assets
     name: Collect and map media assets
     description: >
-      Identify and catalog images and other media (with alt text and
-      filenames) into a media listing suitable for later optimization scripts.
+      Read data/scraped/images.json and catalog:
+      - Logo, hero images, trust badges
+      - Alt text and filenames
+      - Create media listing for optimization scripts
   - id: synthesize_migration_dataset
     name: Synthesize migration-ready dataset
     description: >
-      Aggregate content_inventory into a migration_dataset that highlights
-      branding cues, repeated CTAs, common questions (for FAQs), and form
-      structures for use by schema, copy, and builder agents.
+      Aggregate content_inventory into a migration_dataset that highlights:
+      - Branding cues (colors, logo, taglines)
+      - Repeated CTAs and messaging patterns
+      - Common questions (for FAQs)
+      - Form structures and fields
+      - Service areas from data/scraped/service-areas.json
+      For use by schema, copy, and builder agents.
 
 

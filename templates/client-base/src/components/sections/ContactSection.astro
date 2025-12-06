@@ -1,60 +1,72 @@
 ---
 import Container from '../layout/Container.astro';
-import PortableText from '../sanity/PortableText.astro';
-// Will import Form component in Phase 6b when it's built
+import ContactForm from '../form/ContactForm.astro';
+import Image from '../base/Image.astro';
 
 interface Props {
   heading?: string;
-  text?: any;
-  formTitle?: string;
+  subheading?: string;
+  showForm?: boolean;
+  formType?: string;
+  showMap?: boolean;
+  showContactInfo?: boolean;
+  layout?: 'form-left' | 'form-right' | 'stacked';
+  contactEmail?: string;
+  contactPhone?: string;
 }
 
-const { heading, text, formTitle } = Astro.props;
+const { 
+  heading = "Get In Touch", 
+  subheading, 
+  showForm = true, 
+  showContactInfo = true, 
+  layout = 'form-left',
+  contactEmail,
+  contactPhone
+} = Astro.props;
+
+const isReversed = layout === 'form-right';
 ---
 
-<section class="py-20 bg-surface">
-  <Container class="grid gap-12 lg:grid-cols-2">
-    <div>
+<section class="py-section-mobile lg:py-section-desktop bg-surface">
+  <Container class={`grid gap-section-gap-mobile lg:gap-section-gap lg:grid-cols-2 ${layout === 'stacked' ? 'lg:grid-cols-1 max-w-3xl' : ''}`}>
+    <div class={isReversed ? "lg:order-2" : ""}>
       {heading && <h2 class="mb-6 font-display text-3xl font-bold lg:text-4xl">{heading}</h2>}
-      {text && (
-        <div class="prose prose-lg text-muted-foreground mb-8">
-          <PortableText value={text} />
-        </div>
+      {subheading && (
+        <p class="text-lg text-foreground-secondary mb-8">
+          {subheading}
+        </p>
       )}
       
-      <div class="mt-8 space-y-4">
-        <div class="flex items-center gap-3 text-muted-foreground">
-          <span class="font-semibold text-foreground">Email:</span> contact@example.com
+      {showContactInfo && (contactEmail || contactPhone) && (
+        <div class="mt-8 space-y-4">
+          {contactEmail && (
+            <div class="flex items-center gap-3 text-foreground-secondary">
+              <span class="font-semibold text-foreground">Email:</span>
+              <a href={`mailto:${contactEmail}`} class="text-primary hover:underline">
+                {contactEmail}
+              </a>
+            </div>
+          )}
+          {contactPhone && (
+            <div class="flex items-center gap-3 text-foreground-secondary">
+              <span class="font-semibold text-foreground">Phone:</span>
+              <a href={`tel:${contactPhone.replace(/\s/g, '')}`} class="text-primary hover:underline">
+                {contactPhone}
+              </a>
+            </div>
+          )}
         </div>
-        <div class="flex items-center gap-3 text-muted-foreground">
-          <span class="font-semibold text-foreground">Phone:</span> (555) 123-4567
-        </div>
-      </div>
+      )}
     </div>
 
-    <div class="rounded-2xl border border-border bg-background p-8 shadow-sm">
-      <div class="mb-6">
-        <h3 class="text-xl font-semibold">{formTitle || "Send us a message"}</h3>
+    {showForm && (
+      <div class={`rounded-2xl border border-border bg-background p-8 shadow-sm transition-all duration-normal hover:shadow-md ${isReversed ? "lg:order-1" : ""}`}>
+        <div class="mb-6">
+          <h3 class="text-xl font-semibold">Send us a message</h3>
+        </div>
+        <ContactForm />
       </div>
-      {/* Placeholder for actual Form component */}
-      <form class="space-y-4 opacity-50 pointer-events-none">
-        <div class="space-y-2">
-          <label class="text-sm font-medium">Name</label>
-          <input type="text" class="w-full rounded-md border border-border p-2" disabled />
-        </div>
-        <div class="space-y-2">
-          <label class="text-sm font-medium">Email</label>
-          <input type="email" class="w-full rounded-md border border-border p-2" disabled />
-        </div>
-        <div class="space-y-2">
-          <label class="text-sm font-medium">Message</label>
-          <textarea class="w-full rounded-md border border-border p-2 h-32" disabled></textarea>
-        </div>
-        <button class="w-full rounded-md bg-primary py-2 text-white font-medium">Send Message</button>
-      </form>
-      <p class="mt-4 text-center text-xs text-muted-foreground">
-        (Form system will be injected in Phase 6b)
-      </p>
-    </div>
+    )}
   </Container>
 </section>

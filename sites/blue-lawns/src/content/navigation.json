@@ -1,0 +1,33 @@
+[
+  {
+    "id": "home",
+    "label": "Home",
+    "href": "/",
+    "order": 1
+  },
+  {
+    "id": "services",
+    "label": "Services",
+    "href": "/services",
+    "order": 2
+  },
+  {
+    "id": "locations",
+    "label": "Locations",
+    "href": "/locations",
+    "order": 3
+  },
+  {
+    "id": "membership",
+    "label": "Membership",
+    "href": "/membership",
+    "order": 4
+  },
+  {
+    "id": "contact",
+    "label": "Contact",
+    "href": "/contact",
+    "order": 5
+  }
+]
+

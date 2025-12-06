@@ -3,33 +3,55 @@ import Container from '../layout/Container.astro';
 
 interface FAQItem {
   question: string;
-  answer: string; // Could be PortableText, simplified to string here
+  answer: string; 
 }
 
 interface Props {
   heading?: string;
-  faqs?: FAQItem[];
+  subheading?: string;
+  items?: FAQItem[];
+  enableSchema?: boolean;
+  layout?: 'accordion' | 'two-column' | 'cards';
 }
 
-const { heading, faqs = [] } = Astro.props;
+const { heading, subheading, items = [], enableSchema = true } = Astro.props;
+
+// Schema.org JSON-LD generation
+const schema = enableSchema ? {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": items.map(item => ({
+    "@type": "Question",
+    "name": item.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": item.answer
+    }
+  }))
+} : null;
 ---
 
-<section class="py-20 bg-background">
+<section class="py-section-mobile lg:py-section-desktop bg-background">
+  {schema && <script type="application/ld+json" is:inline set:html={JSON.stringify(schema)} />}
+  
   <Container size="md">
-    {heading && (
-      <h2 class="mb-12 text-center font-display text-3xl font-bold lg:text-4xl">{heading}</h2>
+    {(heading || subheading) && (
+      <div class="mb-section-gap-mobile lg:mb-section-gap text-center">
+        {heading && <h2 class="font-display text-3xl font-bold lg:text-4xl">{heading}</h2>}
+        {subheading && <p class="mt-4 text-foreground-secondary">{subheading}</p>}
+      </div>
     )}
 
     <div class="space-y-4">
-      {faqs.map((item) => (
-        <details class="group rounded-xl border border-border bg-surface open:shadow-sm transition-all">
-          <summary class="flex cursor-pointer list-none items-center justify-between p-6 font-medium text-foreground [&::-webkit-details-marker]:hidden">
+      {items.map((item) => (
+        <details class="group rounded-xl border border-border bg-surface open:shadow-sm transition-all duration-normal hover:shadow-md">
+          <summary class="flex cursor-pointer list-none items-center justify-between p-6 font-medium text-foreground hover:text-primary transition-colors duration-fast [&::-webkit-details-marker]:hidden">
             {item.question}
-            <span class="ml-4 transition-transform duration-300 group-open:rotate-180">
+            <span class="ml-4 transition-transform duration-normal group-open:rotate-180 shrink-0">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
             </span>
           </summary>
-          <div class="border-t border-border px-6 pb-6 pt-4 text-muted-foreground">
+          <div class="border-t border-border-subtle px-6 pb-6 pt-4 text-foreground-secondary">
             {item.answer}
           </div>
         </details>

@@ -1,0 +1,72 @@
+---
+// Dashboard page - Analytics & Insights overview
+// Note: This is a static placeholder for client-side dashboard integration
+import Base from '../../layouts/Base.astro';
+import Container from '../../components/layout/Container.astro';
+import settings from '../../content/settings.json';
+
+const title = "Analytics Dashboard";
+const description = "View your site analytics, keyword opportunities, and leads.";
+
+// Dashboard UUID would typically be set at build time or runtime
+const dashboardUuid = import.meta.env.DASHBOARD_UUID || '';
+const dashboardApiUrl = import.meta.env.DASHBOARD_API_URL || 'https://dashboard-api.example.com';
+---
+
+<Base 
+  title={title} 
+  description={description}
+  noIndex={true}
+  headerVariant="solid"
+>
+  <section class="bg-background py-section-mobile lg:py-section-desktop">
+    <Container>
+      <div class="mb-12">
+        <h1 class="font-display text-4xl font-bold lg:text-5xl mb-4">{title}</h1>
+        <p class="text-xl text-foreground-secondary">{description}</p>
+      </div>
+
+      {/* Not Configured Message */}
+      {!dashboardUuid && (
+        <div class="mb-8 p-6 rounded-xl border border-warning/30 bg-warning/5">
+          <h2 class="text-xl font-semibold mb-2 text-warning">Dashboard Not Configured</h2>
+          <p class="text-foreground-secondary">
+            This site is not registered with the dashboard service yet. 
+            Set the <code class="bg-surface px-2 py-1 rounded text-sm">DASHBOARD_UUID</code> environment variable to enable analytics.
+          </p>
+        </div>
+      )}
+
+      {/* Dashboard Widgets Placeholder */}
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="rounded-xl border border-border bg-surface p-6">
+          <h2 class="text-2xl font-semibold mb-4">Traffic Overview</h2>
+          <div class="text-foreground-secondary py-12 text-center">
+            <p>Connect Google Analytics to view traffic data</p>
+          </div>
+        </div>
+
+        <div class="rounded-xl border border-border bg-surface p-6">
+          <h2 class="text-2xl font-semibold mb-4">Recent Leads</h2>
+          <div class="text-foreground-secondary py-12 text-center">
+            <p>Lead data will appear here</p>
+          </div>
+        </div>
+
+        <div class="rounded-xl border border-border bg-surface p-6">
+          <h2 class="text-2xl font-semibold mb-4">Keyword Opportunities</h2>
+          <div class="text-foreground-secondary py-12 text-center">
+            <p>Connect Keywords Everywhere for insights</p>
+          </div>
+        </div>
+
+        <div class="rounded-xl border border-border bg-surface p-6">
+          <h2 class="text-2xl font-semibold mb-4">Site Health</h2>
+          <div class="text-foreground-secondary py-12 text-center">
+            <p>Site performance metrics</p>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+</Base>
