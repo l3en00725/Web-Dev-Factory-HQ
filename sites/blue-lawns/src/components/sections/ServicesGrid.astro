@@ -1,7 +1,7 @@
 ---
 import Container from '../layout/Container.astro';
-import Card from '../ui/Card.astro';
 import Image from '../base/Image.astro';
+import type { ImageMetadata } from 'astro';
 
 type GridColumnCount = 1 | 2 | 3 | 4 | 6;
 
@@ -10,7 +10,9 @@ interface Service {
   title: string;
   slug: string;
   excerpt?: string;
-  image?: string;
+  description?: string; // Add description alias
+  image?: string | ImageMetadata;
+  heroImage?: string; // Add heroImage alias from JSON
   isPrimary?: boolean;
 }
 
@@ -67,54 +69,60 @@ const gridCols: Record<GridColumnCount, string> = {
     )}
 
     <div class={`grid gap-8 lg:gap-10 ${gridCols[columns] || 'lg:grid-cols-3'}`}>
-      {services.map((service) => (
-        <a 
-          href={`/services/${service.slug}`}
-          class="group relative block h-full overflow-hidden rounded-3xl bg-white shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl"
-        >
-          {showImages && (
-            <div class="relative aspect-[4/3] w-full overflow-hidden">
-              {service.image ? (
-                <div class="h-full w-full transform transition-transform duration-700 group-hover:scale-110">
-                  <Image 
-                    src={service.image} 
-                    alt={service.title} 
-                    class="h-full w-full object-cover" 
-                  />
-                </div>
-              ) : (
-                <div class="h-full w-full bg-gradient-to-br from-primary-100 to-slate-200"></div>
-              )}
-              {/* Gradient Overlay for Text Contrast */}
-              <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-70"></div>
-            </div>
-          )}
-          
-          {/* Floating Content Card */}
-          <div class="relative p-8">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-2xl font-bold text-slate-900 group-hover:text-primary-600 transition-colors font-display">
-                {service.title}
-              </h3>
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-50 text-primary-600 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </span>
-            </div>
-            
-            {showExcerpts && service.excerpt && (
-              <p class="text-slate-500 leading-relaxed line-clamp-3 mb-6">
-                {service.excerpt}
-              </p>
+      {services.map((service) => {
+        // Resolve image source (handle both aliases)
+        const imageSrc = service.image || service.heroImage;
+        const excerpt = service.excerpt || service.description;
+
+        return (
+          <a 
+            href={`/services/${service.slug}`}
+            class="group relative block h-full overflow-hidden rounded-3xl bg-white shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl"
+          >
+            {showImages && (
+              <div class="relative aspect-[4/3] w-full overflow-hidden">
+                {imageSrc ? (
+                  <div class="h-full w-full transform transition-transform duration-700 group-hover:scale-110">
+                    <Image 
+                      src={imageSrc} 
+                      alt={service.title} 
+                      class="h-full w-full object-cover" 
+                    />
+                  </div>
+                ) : (
+                  <div class="h-full w-full bg-gradient-to-br from-primary-100 to-slate-200"></div>
+                )}
+                {/* Gradient Overlay for Text Contrast */}
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-70"></div>
+              </div>
             )}
             
-            <span class="inline-flex items-center text-sm font-bold uppercase tracking-wider text-primary-600 transition-colors">
-              View Service
-            </span>
-          </div>
-        </a>
-      ))}
+            {/* Floating Content Card */}
+            <div class="relative p-8">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-2xl font-bold text-slate-900 group-hover:text-primary-600 transition-colors font-display">
+                  {service.title}
+                </h3>
+                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-50 text-primary-600 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </div>
+              
+              {showExcerpts && excerpt && (
+                <p class="text-slate-500 leading-relaxed line-clamp-3 mb-6">
+                  {excerpt}
+                </p>
+              )}
+              
+              <span class="inline-flex items-center text-sm font-bold uppercase tracking-wider text-primary-600 transition-colors">
+                View Service
+              </span>
+            </div>
+          </a>
+        );
+      })}
     </div>
     
     {showAll && (

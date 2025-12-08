@@ -1,0 +1,70 @@
+[
+  {
+    "old_slug": "/",
+    "new_slug": "/",
+    "old_title": "Blue Lawns | Expert Lawn Care & Landscaping Services",
+    "new_title": "Blue Lawns | Professional Lawn Care & Landscaping in Cape May County",
+    "old_meta_description": "Transform your yard with expert lawn care, landscaping, and fencing. Get customized packages, 3D designs, and flexible financing. Request a quote today!",
+    "new_meta_description": "Expert lawn care and landscaping services in Cape May County, NJ. From routine maintenance to custom landscape design, we treat your home like our own.",
+    "status": "preserve",
+    "notes": "Main entry point, preserved."
+  },
+  {
+    "old_slug": "/membership",
+    "new_slug": "/membership",
+    "old_title": "Exclusive Lawn Care Memberships | Blue Lawns",
+    "new_title": "Lawn Care Membership Packages | Blue Lawns Priority Service",
+    "old_meta_description": "Join Blue Lawns membership for tailored lawn maintenance packages, including regular cuttings, seasonal cleanups, and sprinkler services.",
+    "new_meta_description": "Join the Blue Lawns Membership for priority scheduling, discounted rates, and comprehensive year-round lawn care packages.",
+    "status": "preserve",
+    "notes": "Direct mapping."
+  },
+  {
+    "old_slug": "/contact",
+    "new_slug": "/contact",
+    "old_title": "Contact Blue Lawns | Request a Quote Today",
+    "new_title": "Contact Blue Lawns | Get a Free Lawn Care Quote",
+    "old_meta_description": "Have questions or need a quote? Reach out to Blue Lawns for expert lawn, landscaping, or fencing services. Fast responses and friendly support!",
+    "new_meta_description": "Get a free quote for lawn care and landscaping in Cape May County. Call 609-425-2954 or fill out our online form today.",
+    "status": "preserve",
+    "notes": "Direct mapping."
+  },
+  {
+    "old_slug": "/faq",
+    "new_slug": "/faq", // Note: New site currently has FAQ as a section, might need a page if strictly preserving
+    "old_title": "Lawn Care & Landscaping FAQs | Blue Lawns",
+    "new_title": "Frequently Asked Questions | Blue Lawns Landscaping",
+    "old_meta_description": "Find answers to common questions about lawn care, landscaping, pricing, packages, and services. Learn how Blue Lawns makes outdoor care easy.",
+    "new_meta_description": "Common questions about our lawn care services, pricing, service areas, and scheduling. Get the answers you need.",
+    "status": "migrate-content",
+    "notes": "Content moved to FAQ section on home/services, or keep as dedicated page."
+  },
+  {
+    "old_slug": "/review",
+    "new_slug": "/#reviews",
+    "old_title": "Customer Reviews of Blue Lawns Services",
+    "new_title": "Client Reviews & Testimonials | Blue Lawns",
+    "old_meta_description": "Discover why clients trust Blue Lawns for exceptional landscaping services. Read testimonials and see our commitment to quality and reliability.",
+    "new_meta_description": "See what our neighbors in Cape May County are saying about Blue Lawns. 5-star rated lawn care and landscaping services.",
+    "status": "redirect",
+    "notes": "Redirect to homepage reviews section or create dedicated reviews page if high traffic."
+  },
+  {
+    "old_slug": "/knowledge-base",
+    "new_slug": "/blog",
+    "old_title": "Lawn Care Tips & Expert Advice | Blue Lawns Knowledge Base",
+    "new_title": "Lawn Care Tips & Advice | Blue Lawns Blog",
+    "old_meta_description": "Explore our knowledge base for expert lawn care tips, landscaping advice, and maintenance solutions. Get helpful insights to keep your lawn healthy and beautiful.",
+    "new_meta_description": "Expert advice on coastal lawn care, gardening tips, and landscape maintenance for New Jersey homeowners.",
+    "status": "structure-change",
+    "notes": "Old knowledge base should move to /blog structure."
+  },
+  {
+    "old_slug": "/knowledge-base/*",
+    "new_slug": "/blog/*",
+    "status": "redirect-pattern",
+    "notes": "Individual articles should be migrated to preserved slugs under /blog/"
+  }
+]
+
+

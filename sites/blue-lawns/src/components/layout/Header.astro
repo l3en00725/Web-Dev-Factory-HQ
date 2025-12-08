@@ -3,20 +3,20 @@ import Container from './Container.astro';
 import Logo from '../ui/Logo.astro';
 import Button from '../ui/Button.astro';
 import MobileMenu from './MobileMenu.astro';
+import servicesData from '../../content/services.json';
 
 interface Props {
-  logoSrc?: string;
-  siteTitle?: string;
   navItems?: { title: string; href: string; active?: boolean }[];
   variant?: 'transparent' | 'solid';
 }
 
 const { 
-  logoSrc, 
-  siteTitle = 'Blue Lawns', 
   navItems = [],
   variant = 'transparent'
 } = Astro.props;
+
+// Filter primary services for the dropdown
+const primaryServices = servicesData.filter(s => s.type === 'primary');
 ---
 
 <header 
@@ -31,34 +31,82 @@ const {
   data-scrolled="false"
 >
   <Container class="flex h-20 items-center justify-between">
-    <Logo src={logoSrc} text={siteTitle} class="scale-95 transform transition-transform hover:scale-100 text-inherit" />
+    <div class="flex-shrink-0">
+      <Logo 
+        class:list={[
+          "transition-all duration-300",
+          // Default Desktop
+          "w-[160px]",
+          // Scrolled State (smaller)
+          "group-data-[scrolled=true]:w-[140px]"
+        ]} 
+      />
+    </div>
 
     {/* Desktop Nav */}
     <nav class="hidden items-center gap-1 md:flex">
-      {navItems.map((item) => (
-        <a 
-          href={item.href} 
-          class:list={[
-            "relative px-4 py-2 text-sm font-medium transition-all duration-300 rounded-full",
-            // Base state (Transparent Header)
-            variant === 'transparent' 
-              ? (item.active 
-                  ? "text-white bg-white/20 font-semibold shadow-sm ring-1 ring-white/30" 
-                  : "text-white/90 hover:text-white hover:bg-white/10")
-              : (item.active 
-                  ? "text-primary-700 bg-primary-50 font-semibold" 
-                  : "text-slate-600 hover:text-primary-600 hover:bg-slate-50"),
+      {navItems.map((item) => {
+        const isServices = item.title === 'Services';
+        
+        return isServices ? (
+          <div class="relative group/dropdown px-2">
+            <button 
+              class:list={[
+                "flex items-center gap-1 px-4 py-2 text-sm font-medium transition-all duration-300 rounded-full cursor-pointer",
+                variant === 'transparent' 
+                  ? "text-white/90 hover:text-white hover:bg-white/10"
+                  : "text-slate-600 hover:text-primary-600 hover:bg-slate-50",
+                 // Scrolled override
+                 "group-data-[scrolled=true]:text-slate-600 group-data-[scrolled=true]:hover:text-primary-600 group-data-[scrolled=true]:hover:bg-slate-100"
+              ]}
+            >
+              {item.title}
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200 group-hover/dropdown:rotate-180"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
             
-            // Scrolled State Overrides (using group-data attribute from header)
-            // If active:
-            item.active && "group-data-[scrolled=true]:bg-primary-50 group-data-[scrolled=true]:text-primary-700 group-data-[scrolled=true]:ring-primary-100 group-data-[scrolled=true]:shadow-none",
-            // If inactive:
-            !item.active && "group-data-[scrolled=true]:text-slate-600 group-data-[scrolled=true]:hover:text-primary-600 group-data-[scrolled=true]:hover:bg-slate-100"
-          ]}
-        >
-          {item.title}
-        </a>
-      ))}
+            {/* Dropdown Menu */}
+            <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 invisible transition-all duration-200 group-hover/dropdown:opacity-100 group-hover/dropdown:translate-y-0 group-hover/dropdown:visible w-64">
+              <div class="bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden p-2">
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 py-2 mb-1">Primary Services</div>
+                {primaryServices.map(service => (
+                  <a 
+                    href={`/services/${service.slug}`} 
+                    class="block px-3 py-2 text-sm text-slate-700 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors"
+                  >
+                    {service.title}
+                  </a>
+                ))}
+                <div class="h-px bg-slate-100 my-2"></div>
+                <a href="/services" class="block px-3 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors text-center">
+                  View All Services
+                </a>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <a 
+            href={item.href} 
+            class:list={[
+              "relative px-4 py-2 text-sm font-medium transition-all duration-300 rounded-full",
+              // Base state (Transparent Header)
+              variant === 'transparent' 
+                ? (item.active 
+                    ? "text-white bg-white/20 font-semibold shadow-sm ring-1 ring-white/30" 
+                    : "text-white/90 hover:text-white hover:bg-white/10")
+                : (item.active 
+                    ? "text-primary-700 bg-primary-50 font-semibold" 
+                    : "text-slate-600 hover:text-primary-600 hover:bg-slate-50"),
+              
+              // Scrolled State Overrides
+              item.active && "group-data-[scrolled=true]:bg-primary-50 group-data-[scrolled=true]:text-primary-700 group-data-[scrolled=true]:ring-primary-100 group-data-[scrolled=true]:shadow-none",
+              !item.active && "group-data-[scrolled=true]:text-slate-600 group-data-[scrolled=true]:hover:text-primary-600 group-data-[scrolled=true]:hover:bg-slate-100"
+            ]}
+          >
+            {item.title}
+          </a>
+        );
+      })}
+      
       <div 
         class:list={[
           "ml-4 pl-4 border-l transition-colors duration-300",

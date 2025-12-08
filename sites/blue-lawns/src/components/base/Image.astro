@@ -1,46 +1,66 @@
 ---
-// Simplified static Image component (no Sanity)
-import { sanitizeAltText } from '../../lib/image-utils';
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { resolveImage } from '../../lib/image-helper';
 
 interface Props {
-  src: string;
-  alt?: string;
+  src: string | ImageMetadata;
+  alt: string;
   width?: number;
   height?: number;
   sizes?: string;
   priority?: boolean;
   class?: string;
-  fit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+  quality?: number;
+  format?: 'webp' | 'avif' | 'png' | 'jpeg';
+  fit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down'; // Keep for compatibility, though explicit class preferred
 }
 
 const { 
   src, 
-  alt, 
+  alt = "Blue Lawns Image", 
   width, 
   height, 
   sizes = "(max-width: 768px) 100vw, 50vw",
   priority = false,
   class: className,
-  fit = 'cover'
+  quality,
+  format,
+  fit // extracted but not passed to Image directly as style, unless needed
 } = Astro.props;
 
-const loading = priority ? "eager" : "lazy";
-const decoding = priority ? "sync" : "async";
-const sanitizedAlt = sanitizeAltText(alt, "Image");
+let finalSrc: ImageMetadata | string | undefined = src;
 
-const style = {
-  aspectRatio: width && height ? `${width}/${height}` : 'auto',
-  objectFit: fit,
-};
+if (typeof src === 'string') {
+  // Check if remote URL
+  if (src.startsWith('http')) {
+     finalSrc = src;
+  } else {
+     // Resolve local image path
+     finalSrc = resolveImage(src);
+  }
+}
+
+const loading = priority ? "eager" : "lazy";
+
+// If resolution failed, fallback or null (could add a placeholder logic here)
+// For now, if no image found, we render nothing or broken image behavior.
 ---
 
-<img
-  src={src}
-  alt={sanitizedAlt}
-  width={width}
-  height={height}
-  loading={loading}
-  decoding={decoding}
-  class={className}
-  style={style}
-/>
+{finalSrc ? (
+  <Image 
+    src={finalSrc} 
+    alt={alt}
+    width={width}
+    height={height}
+    sizes={sizes}
+    loading={loading}
+    class={className}
+    quality={quality}
+    format={format}
+  />
+) : (
+  <div class={`bg-gray-200 flex items-center justify-center text-gray-400 text-xs ${className}`}>
+    Image not found
+  </div>
+)}

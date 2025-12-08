@@ -1,83 +1,162 @@
 [
   {
-    "id": "lawn-care",
-    "slug": "lawn-care",
-    "title": "Lawn Care",
-    "excerpt": "Professional lawn maintenance including mowing, edging, fertilization, and weed control. Keep your lawn looking its best year-round.",
-    "description": "Our comprehensive lawn care services keep your property pristine throughout the seasons. From regular mowing and edging to fertilization programs and weed control, we provide everything your lawn needs to thrive in the coastal New Jersey climate.",
-    "image": "/images/services/lawn-care.jpg",
-    "isPrimary": true,
-    "features": [
-      "Weekly or bi-weekly mowing",
-      "Professional edging",
-      "Fertilization programs",
-      "Weed control",
-      "Aeration & overseeding"
-    ]
+    "id": "landscape-maintenance",
+    "title": "Landscape Maintenance",
+    "slug": "landscape-maintenance",
+    "type": "primary",
+    "description": "Comprehensive landscape care to keep your property pristine year-round.",
+    "fullDescription": "Our comprehensive landscape maintenance services ensure your property remains beautiful and healthy throughout every season. From weekly mowing and edging to fertilization, pruning, and bed care, we handle all aspects of your landscape's needs with professional attention to detail.",
+    "icon": "Sprout",
+    "heroImage": "src/assets/images/services/landscape-maintenance/hero.svg",
+    "galleryImages": [],
+    "seo": {
+      "title": "Landscape Maintenance Services | Blue Lawns",
+      "description": "Professional landscape maintenance for residential and commercial properties. Weekly care, pruning, and fertilization.",
+      "keywords": ["landscape maintenance", "lawn care", "pruning", "fertilization"]
+    }
   },
   {
     "id": "landscaping",
-    "slug": "landscaping",
     "title": "Landscaping",
-    "excerpt": "Custom landscape design and installation. Transform your outdoor space with professional hardscaping and plantings.",
-    "description": "Transform your property with our expert landscaping services. We specialize in coastal-friendly designs that withstand salt air and sandy soil while creating beautiful, functional outdoor spaces.",
-    "image": "/images/services/landscaping.jpg",
-    "isPrimary": true,
-    "features": [
-      "Custom landscape design",
-      "Plant installation",
-      "Hardscape features",
-      "Retaining walls",
-      "Outdoor living spaces"
-    ]
+    "slug": "landscaping",
+    "type": "primary",
+    "description": "Custom landscape design and installation to transform your outdoor space.",
+    "fullDescription": "Transform your outdoor living space with our expert landscaping services. We specialize in custom design and installation, selecting the perfect plants, trees, and shrubs that thrive in our coastal climate while reflecting your personal style.",
+    "icon": "Flower",
+    "heroImage": "src/assets/images/services/landscaping/hero.svg",
+    "galleryImages": [],
+    "seo": {
+      "title": "Professional Landscaping Design & Installation | Blue Lawns",
+      "description": "Expert landscape design and installation services. Create your dream outdoor space with our professional team.",
+      "keywords": ["landscaping", "garden design", "planting", "outdoor living"]
+    }
   },
   {
-    "id": "fencing",
-    "slug": "fencing",
-    "title": "Fencing",
-    "excerpt": "Quality fence installation and repair. Privacy fencing, decorative options, and durable materials for coastal conditions.",
-    "description": "Protect your property and enhance your curb appeal with our professional fencing services. We offer a variety of styles and materials designed to withstand the coastal elements.",
-    "image": "/images/services/fencing.jpg",
-    "isPrimary": false,
-    "features": [
-      "Privacy fencing",
-      "Decorative fencing",
-      "Vinyl & composite options",
-      "Gate installation",
-      "Fence repair"
-    ]
+    "id": "hardscaping",
+    "title": "Hardscaping",
+    "slug": "hardscaping",
+    "type": "primary",
+    "description": "Durable and beautiful patios, walkways, and retaining walls.",
+    "fullDescription": "Enhance functionality and curb appeal with our premium hardscaping services. We design and build durable patios, elegant walkways, sturdy retaining walls, and driveways using high-quality pavers and stone materials built to last.",
+    "icon": "BrickWall",
+    "heroImage": "src/assets/images/services/hardscaping/hero.svg",
+    "galleryImages": [],
+    "seo": {
+      "title": "Hardscaping Services: Patios & Walkways | Blue Lawns",
+      "description": "Custom hardscaping solutions including patios, walkways, and retaining walls. Quality craftsmanship guaranteed.",
+      "keywords": ["hardscaping", "patios", "walkways", "pavers", "retaining walls"]
+    }
   },
   {
-    "id": "seasonal-cleanup",
-    "slug": "seasonal-cleanup",
-    "title": "Seasonal Cleanup",
-    "excerpt": "Spring and fall cleanup services. Leaf removal, bed preparation, and property cleanup to keep your yard tidy.",
-    "description": "Keep your property looking its best with our seasonal cleanup services. We handle spring preparation and fall cleanup so your landscape is ready for each season.",
-    "image": "/images/services/seasonal-cleanup.jpg",
-    "isPrimary": false,
-    "features": [
-      "Spring cleanup & mulching",
-      "Fall leaf removal",
-      "Bed preparation",
-      "Debris removal",
-      "Storm cleanup"
-    ]
+    "id": "landscape-lighting",
+    "title": "Landscape Lighting",
+    "slug": "landscape-lighting",
+    "type": "primary",
+    "description": "Illuminate your property with professional outdoor lighting solutions.",
+    "fullDescription": "Bring your landscape to life at night with our professional landscape lighting services. We design and install low-voltage lighting systems that enhance safety, highlight architectural features, and create a warm, inviting ambiance for your outdoor spaces.",
+    "icon": "Lightbulb",
+    "heroImage": "src/assets/images/services/landscape-lighting/hero.svg",
+    "galleryImages": [],
+    "seo": {
+      "title": "Landscape Lighting Installation | Blue Lawns",
+      "description": "Professional outdoor lighting design and installation. Enhance security and beauty with low-voltage LED systems.",
+      "keywords": ["landscape lighting", "outdoor lighting", "pathway lighting", "security lighting"]
+    }
+  },
+  {
+    "id": "pool-service",
+    "title": "Pool Service & Maintenance",
+    "slug": "pool-service",
+    "type": "primary",
+    "description": "Reliable pool cleaning and maintenance for crystal clear water.",
+    "fullDescription": "Enjoy your pool without the hassle. Our pool service and maintenance packages include regular cleaning, chemical balancing, equipment checks, and opening/closing services to ensure your pool is always ready for a swim.",
+    "icon": "Waves",
+    "heroImage": "src/assets/images/services/pool-service/hero.svg",
+    "galleryImages": [],
+    "seo": {
+      "title": "Pool Service & Maintenance | Blue Lawns",
+      "description": "Expert pool cleaning and maintenance services. Keep your pool crystal clear and safe all season long.",
+      "keywords": ["pool service", "pool cleaning", "pool maintenance", "chemical balancing"]
+    }
   },
   {
     "id": "commercial-services",
-    "slug": "commercial-services",
     "title": "Commercial Services",
-    "excerpt": "Professional grounds maintenance for businesses, HOAs, and commercial properties throughout Cape May County.",
-    "description": "Reliable commercial landscaping and grounds maintenance for businesses of all sizes. We serve retail centers, office parks, HOAs, and municipal properties.",
-    "image": "/images/services/commercial.jpg",
-    "isPrimary": false,
-    "features": [
-      "Grounds maintenance",
-      "Snow removal",
-      "HOA services",
-      "Retail & office parks",
-      "Municipal contracts"
-    ]
+    "slug": "commercial-services",
+    "type": "primary",
+    "description": "Professional grounds maintenance for businesses and HOAs.",
+    "fullDescription": "We provide reliable commercial landscaping and grounds maintenance for businesses, HOAs, and municipal properties. Our team ensures your commercial property maintains a professional, manicured appearance that impresses clients and residents alike.",
+    "icon": "Building2",
+    "heroImage": "src/assets/images/services/commercial-services/hero.svg",
+    "galleryImages": [],
+    "seo": {
+      "title": "Commercial Landscaping Services | Blue Lawns",
+      "description": "Professional grounds maintenance for commercial properties, HOAs, and businesses. Reliable and licensed.",
+      "keywords": ["commercial landscaping", "HOA maintenance", "grounds keeping", "business landscaping"]
+    }
+  },
+  {
+    "id": "lawn-care",
+    "title": "Lawn Care",
+    "slug": "lawn-care",
+    "type": "secondary",
+    "description": "Expert lawn fertilization, weed control, and health services.",
+    "fullDescription": "Achieve a lush, green lawn with our specialized lawn care programs. We offer fertilization, weed control, aeration, overseeding, and pest management tailored to the specific needs of your soil and grass type.",
+    "icon": "Grass",
+    "heroImage": "src/assets/images/services/lawn-care/hero.svg",
+    "galleryImages": [],
+    "seo": {
+      "title": "Lawn Care Services: Fertilization & Weed Control | Blue Lawns",
+      "description": "Expert lawn care services including fertilization, weed control, and aeration for a healthy, green lawn.",
+      "keywords": ["lawn care", "fertilization", "weed control", "lawn health"]
+    }
+  },
+  {
+    "id": "seasonal-cleanup",
+    "title": "Seasonal Cleanup",
+    "slug": "seasonal-cleanup",
+    "type": "secondary",
+    "description": "Spring and fall property cleanups to keep your landscape tidy.",
+    "fullDescription": "Prepare your property for the changing seasons with our thorough spring and fall cleanup services. We handle leaf removal, debris clearing, bed preparation, and cutting back perennials to keep your landscape neat and healthy.",
+    "icon": "Leaf",
+    "heroImage": "src/assets/images/services/seasonal-cleanup/hero.svg",
+    "galleryImages": [],
+    "seo": {
+      "title": "Seasonal Spring & Fall Yard Cleanup | Blue Lawns",
+      "description": "Comprehensive seasonal yard cleanup services. Leaf removal, bed prep, and debris clearing for spring and fall.",
+      "keywords": ["seasonal cleanup", "spring cleanup", "fall cleanup", "leaf removal"]
+    }
+  },
+  {
+    "id": "power-washing",
+    "title": "Power Washing",
+    "slug": "power-washing",
+    "type": "secondary",
+    "description": "Restore the look of your exterior surfaces with professional cleaning.",
+    "fullDescription": "Revitalize your home's exterior with our professional power washing services. We safely and effectively clean siding, decks, patios, driveways, and fences, removing dirt, mold, and mildew to restore their original beauty.",
+    "icon": "Droplets",
+    "heroImage": "src/assets/images/services/power-washing/hero.svg",
+    "galleryImages": [],
+    "seo": {
+      "title": "Professional Power Washing Services | Blue Lawns",
+      "description": "Safe and effective power washing for homes, decks, and driveways. Remove dirt and mold instantly.",
+      "keywords": ["power washing", "pressure washing", "exterior cleaning", "deck cleaning"]
+    }
+  },
+  {
+    "id": "fencing",
+    "title": "Fencing",
+    "slug": "fencing",
+    "type": "secondary",
+    "description": "Quality fence installation and repair for privacy and security.",
+    "fullDescription": "Secure and enhance your property with our fencing services. We install and repair a variety of fence styles, including vinyl, wood, and aluminum, providing privacy, security, and aesthetic appeal for your home.",
+    "icon": "Fence",
+    "heroImage": "src/assets/images/services/fencing/hero.svg",
+    "galleryImages": [],
+    "seo": {
+      "title": "Fence Installation & Repair Services | Blue Lawns",
+      "description": "Quality fence installation and repair. Vinyl, wood, and aluminum fencing solutions for privacy and security.",
+      "keywords": ["fence installation", "fence repair", "vinyl fencing", "privacy fence"]
+    }
   }
 ]
-

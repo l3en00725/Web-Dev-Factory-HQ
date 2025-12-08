@@ -11,18 +11,14 @@ const { items } = Astro.props;
 
 <div 
   id="mobile-menu" 
-  class="fixed inset-0 z-[60] translate-x-full transition-transform duration-300 ease-in-out lg:hidden"
+  class="fixed inset-0 z-50 translate-x-full transition-transform duration-300 ease-in-out lg:hidden"
   aria-hidden="true"
 >
   {/* Backdrop */}
-  <div 
-    class="absolute inset-0 bg-slate-900/20 backdrop-blur-sm transition-opacity opacity-0" 
-    id="menu-backdrop"
-    aria-hidden="true"
-  ></div>
+  <div class="absolute inset-0 bg-slate-900/20 backdrop-blur-sm" id="menu-backdrop"></div>
 
   {/* Drawer */}
-  <div class="absolute right-0 top-0 h-full w-[85%] max-w-sm bg-white shadow-2xl flex flex-col z-10">
+  <div class="absolute right-0 top-0 h-full w-[85%] max-w-sm bg-white shadow-2xl flex flex-col">
     <div class="flex items-center justify-between p-6 border-b border-slate-100">
       <div class="w-[130px]">
         <Logo />
@@ -40,20 +36,12 @@ const { items } = Astro.props;
     
     <nav class="flex-1 overflow-y-auto px-6 py-8">
       <ul class="flex flex-col gap-2">
-        <li>
-          <a 
-            href="/"
-            class="mobile-nav-link block py-3 text-xl font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 transition-colors rounded-lg px-4"
-          >
-            Home
-          </a>
-        </li>
         {items.map((item) => (
           <li>
             <a 
               href={item.href} 
               class:list={[
-                "mobile-nav-link block py-3 text-xl font-medium transition-colors rounded-lg px-4",
+                "block py-3 text-xl font-medium transition-colors rounded-lg px-4",
                 item.active 
                   ? "text-primary-700 bg-primary-50" 
                   : "text-slate-600 hover:text-primary-600 hover:bg-slate-50"
@@ -67,7 +55,7 @@ const { items } = Astro.props;
     </nav>
 
     <div class="p-6 border-t border-slate-100 bg-slate-50">
-      <Button href="/contact" size="lg" variant="primary" block class="shadow-md">
+      <Button href="/contact" size="lg" variant="primary" class="w-full justify-center shadow-md">
         Get a Free Quote
       </Button>
       <p class="mt-4 text-center text-xs text-slate-500">
@@ -79,24 +67,14 @@ const { items } = Astro.props;
 
 <script>
   const menu = document.getElementById('mobile-menu');
+  // FIXED: Correct ID 'close-menu-btn' matches markup
   const closeBtn = document.getElementById('close-menu-btn');
   const backdrop = document.getElementById('menu-backdrop');
-  const navLinks = document.querySelectorAll('.mobile-nav-link');
   
-  function openMenu() {
-    if (menu && backdrop) {
-      menu.setAttribute('aria-hidden', 'false');
-      menu.classList.remove('translate-x-full');
-      backdrop.classList.remove('opacity-0');
-      document.body.style.overflow = 'hidden'; // Prevent scroll
-    }
-  }
-
   function closeMenu() {
-    if (menu && backdrop) {
+    if (menu) {
       menu.setAttribute('aria-hidden', 'true');
       menu.classList.add('translate-x-full');
-      backdrop.classList.add('opacity-0');
       document.body.style.overflow = '';
     }
   }
@@ -104,18 +82,17 @@ const { items } = Astro.props;
   // Toggle logic is driven by custom event 'toggle-menu' dispatched from Header
   document.addEventListener('toggle-menu', () => {
     const isOpen = menu?.getAttribute('aria-hidden') === 'false';
-    if (!isOpen) {
-      openMenu();
-    } else {
-      closeMenu();
+    if (menu) {
+      menu.setAttribute('aria-hidden', (!isOpen).toString());
+      if (!isOpen) {
+        menu.classList.remove('translate-x-full');
+        document.body.style.overflow = 'hidden'; // Prevent scroll
+      } else {
+        closeMenu();
+      }
     }
   });
 
   closeBtn?.addEventListener('click', closeMenu);
   backdrop?.addEventListener('click', closeMenu);
-  
-  // Close menu when a link is clicked
-  navLinks.forEach(link => {
-    link.addEventListener('click', closeMenu);
-  });
 </script>

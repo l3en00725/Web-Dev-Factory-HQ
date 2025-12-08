@@ -2,44 +2,69 @@
 import Container from '../layout/Container.astro';
 import Button from '../ui/Button.astro';
 import Image from '../base/Image.astro';
+import type { ImageMetadata } from 'astro';
 
 interface Props {
   headline?: string;
   subheadline?: string;
-  image?: string;
+  image?: ImageMetadata | string; // Updated to accept ImageMetadata
   ctaLabel?: string;
   ctaLink?: string;
   secondaryCtaLabel?: string;
   secondaryCtaLink?: string;
   alignment?: 'left' | 'center' | 'right';
+  // Props requested in prompt (aliased to existing ones if possible, or added)
+  title?: string;
+  subtitle?: string;
+  primaryCta?: { label: string; href: string };
+  backgroundImage?: ImageMetadata | string;
 }
 
 const {
   headline,
   subheadline,
-  image,
+  image: propImage,
   ctaLabel,
   ctaLink,
   secondaryCtaLabel,
   secondaryCtaLink,
-  alignment = 'left'
+  alignment = 'left',
+  title,
+  subtitle,
+  primaryCta,
+  backgroundImage
 } = Astro.props;
+
+// Normalize props to support both old and new signatures
+const finalHeadline = title || headline;
+const finalSubheadline = subtitle || subheadline;
+const finalImage = backgroundImage || propImage || '/images/blue-lawns-avalon-lawn-care-hero.svg';
+const finalCtaLabel = primaryCta?.label || ctaLabel;
+const finalCtaLink = primaryCta?.href || ctaLink;
 
 const alignClass = {
   left: 'items-start text-left',
   center: 'items-center text-center',
   right: 'items-end text-right',
 };
+
+// Testimonial Avatars - Real people from the optimized library
+const avatars = [
+  '/images/optimized/blue-lawns-rio-grande-generic-testimonial-160.svg',
+  '/images/optimized/blue-lawns-ocean-view-generic-testimonial-161.svg',
+  '/images/optimized/blue-lawns-cape-may-generic-testimonial-162.svg',
+  '/images/optimized/blue-lawns-rio-grande-generic-testimonial-160.svg' // Reuse first one to make 4
+];
 ---
 
 <section class="relative flex min-h-[90vh] w-full items-center justify-center overflow-hidden bg-primary-950">
   {/* Background Image Layer */}
   <div class="absolute inset-0 z-0 select-none">
-    {image ? (
+    {finalImage ? (
       <div class="relative h-full w-full">
         <Image
-          src={image}
-          alt={headline || "Hero Background"}
+          src={finalImage}
+          alt={finalHeadline || "Blue Lawns Coastal Landscape"}
           class="h-full w-full object-cover object-center opacity-90"
           priority={true}
         />
@@ -70,29 +95,29 @@ const alignClass = {
     </div>
 
     <div class="max-w-4xl">
-      {headline && (
+      {finalHeadline && (
         <h1 class="font-display text-5xl font-bold leading-[1.1] tracking-tight text-white drop-shadow-lg lg:text-7xl xl:text-8xl">
-          {headline.split('<br/>').map((line) => (
+          {finalHeadline.split('<br/>').map((line) => (
              <span class="block">{line}</span>
           ))}
         </h1>
       )}
-      {subheadline && (
+      {finalSubheadline && (
         <p class="mt-6 max-w-2xl text-xl leading-relaxed text-primary-50 drop-shadow-md lg:text-2xl font-light opacity-90">
-          {subheadline}
+          {finalSubheadline}
         </p>
       )}
     </div>
 
     <div class="mt-4 flex flex-col gap-4 sm:flex-row">
-      {ctaLabel && ctaLink && (
+      {finalCtaLabel && finalCtaLink && (
         <Button 
-          href={ctaLink} 
+          href={finalCtaLink} 
           size="lg" 
           variant="primary" 
           class="min-w-[180px] border-transparent bg-secondary-500 text-white shadow-xl shadow-secondary-900/20 hover:bg-secondary-600 hover:-translate-y-1 transition-all duration-300"
         >
-          {ctaLabel}
+          {finalCtaLabel}
         </Button>
       )}
       {secondaryCtaLabel && secondaryCtaLink && (
@@ -110,10 +135,15 @@ const alignClass = {
     {/* Social Proof */}
     <div class="mt-10 flex items-center gap-4 rounded-2xl border border-white/10 bg-primary-950/30 px-6 py-3 backdrop-blur-sm">
        <div class="flex -space-x-3">
-        {[1, 2, 3, 4].map((i) => (
-          <div class="h-10 w-10 rounded-full border-2 border-primary-900 bg-slate-200 overflow-hidden">
-             {/* Fallback avatars if no images available */}
-             <div class="h-full w-full bg-gradient-to-br from-slate-300 to-slate-400"></div>
+        {avatars.map((src, i) => (
+          <div class="h-10 w-10 rounded-full border-2 border-primary-900 bg-slate-200 overflow-hidden relative">
+            <Image 
+              src={src} 
+              alt={`Trusted neighbor ${i + 1}`}
+              class="h-full w-full object-cover"
+              width={40}
+              height={40}
+            />
           </div>
         ))}
       </div>

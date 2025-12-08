@@ -1,0 +1,31 @@
+{
+  "rewrites": [
+    {
+      "context": "Homepage Hero",
+      "original": "Expert lawn care and landscaping services in Cape May County, NJ.",
+      "rewritten": "Elevate Your Coastal Home with Premium Lawn Care & Landscaping. We bring golf-course precision and artistic design to properties across Cape May County, ensuring your outdoor space is as breathtaking as the coast itself."
+    },
+    {
+      "context": "Lawn Care Service",
+      "original": "Professional lawn maintenance including mowing, edging, fertilization, and weed control.",
+      "rewritten": "Complete Lawn Stewardship for the Coastal Climate. Beyond simple mowing, we provide a holistic care regimen designed for sandy soils and salt air—including precision edging, organic-based fertilization, and proactive weed defense to keep your turf lush, green, and resilient."
+    },
+    {
+      "context": "Landscaping Service",
+      "original": "Custom landscape design and installation. Transform your outdoor space with professional hardscaping and plantings.",
+      "rewritten": "Bespoke Coastal Landscapes. Our design team curates outdoor sanctuaries that blend naturally with the seaside environment. From salt-tolerant native gardens to elegant hardscaped patios, we craft spaces that invite relaxation and withstand the elements."
+    },
+    {
+      "context": "CTA Section",
+      "original": "Request a quote today!",
+      "rewritten": "Ready for a lawn you'll love coming home to? Request your complimentary consultation today and let's bring your vision to life."
+    },
+    {
+      "context": "About/Why Us",
+      "original": "We treat your home like our own.",
+      "rewritten": "Your Neighbors in Excellence. As a locally rooted team, we treat every property with the same meticulous care we give our own homes. We pride ourselves on reliability, transparency, and a level of craftsmanship that sets the standard in Cape May County."
+    }
+  ]
+}
+
+

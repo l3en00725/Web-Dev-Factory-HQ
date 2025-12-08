@@ -1,184 +1,78 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
   theme: {
     extend: {
       colors: {
-        // Primary Brand Scale
         primary: {
-          50: 'var(--color-primary-50)',
-          100: 'var(--color-primary-100)',
-          200: 'var(--color-primary-200)',
-          300: 'var(--color-primary-300)',
-          400: 'var(--color-primary-400)',
-          500: 'var(--color-primary-500)',
-          600: 'var(--color-primary-600)',
-          700: 'var(--color-primary-700)',
-          800: 'var(--color-primary-800)',
-          900: 'var(--color-primary-900)',
-          950: 'var(--color-primary-950)',
-          DEFAULT: 'var(--color-primary)',
-          foreground: 'var(--color-primary-foreground)',
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
+          950: '#0f172a', // Blue Lawns Navy Blue (Base)
         },
-        // Secondary (Growth Green)
         secondary: {
-          50: 'var(--color-secondary-50)',
-          100: 'var(--color-secondary-100)',
-          200: 'var(--color-secondary-200)',
-          300: 'var(--color-secondary-300)',
-          400: 'var(--color-secondary-400)',
-          500: 'var(--color-secondary-500)',
-          600: 'var(--color-secondary-600)',
-          700: 'var(--color-secondary-700)',
-          800: 'var(--color-secondary-800)',
-          900: 'var(--color-secondary-900)',
+          50: '#f0fdf4',
+          100: '#dcfce7',
+          200: '#bbf7d0',
+          300: '#86efac',
+          400: '#4ade80',
+          500: '#22c55e', // Blue Lawns Green (Accent)
+          600: '#16a34a',
+          700: '#15803d',
+          800: '#166534',
+          900: '#14532d',
+          950: '#052e16',
         },
-        // Accent (Conversion Orange)
-        accent: {
-          50: 'var(--color-accent-50)',
-          100: 'var(--color-accent-100)',
-          200: 'var(--color-accent-200)',
-          300: 'var(--color-accent-300)',
-          400: 'var(--color-accent-400)',
-          500: 'var(--color-accent-500)',
-          600: 'var(--color-accent-600)',
-          700: 'var(--color-accent-700)',
-          800: 'var(--color-accent-800)',
-          900: 'var(--color-accent-900)',
-        },
-        // Neutral Gray Scale
-        neutral: {
-          50: 'var(--color-neutral-50)',
-          100: 'var(--color-neutral-100)',
-          200: 'var(--color-neutral-200)',
-          300: 'var(--color-neutral-300)',
-          400: 'var(--color-neutral-400)',
-          500: 'var(--color-neutral-500)',
-          600: 'var(--color-neutral-600)',
-          700: 'var(--color-neutral-700)',
-          800: 'var(--color-neutral-800)',
-          900: 'var(--color-neutral-900)',
-          950: 'var(--color-neutral-950)',
-        },
-        // Semantic Colors
-        success: {
-          DEFAULT: 'var(--color-success)',
-          foreground: 'var(--color-success-foreground)',
-        },
-        warning: {
-          DEFAULT: 'var(--color-warning)',
-          foreground: 'var(--color-warning-foreground)',
-        },
-        error: {
-          DEFAULT: 'var(--color-error)',
-          foreground: 'var(--color-error-foreground)',
-        },
-        info: {
-          DEFAULT: 'var(--color-info)',
-          foreground: 'var(--color-info-foreground)',
-        },
-        // Background & Surface
-        background: {
-          DEFAULT: 'var(--color-bg)',
-          subtle: 'var(--color-bg-subtle)',
-          muted: 'var(--color-bg-muted)',
-        },
-        surface: {
-          DEFAULT: 'var(--color-surface)',
-          elevated: 'var(--color-surface-elevated)',
-          subtle: 'var(--color-surface-subtle)',
-          muted: 'var(--color-surface-muted)',
-        },
-        // Text Colors
-        foreground: {
-          DEFAULT: 'var(--color-text-primary)',
-          secondary: 'var(--color-text-secondary)',
-          tertiary: 'var(--color-text-tertiary)',
-          muted: 'var(--color-text-muted)',
-          inverse: 'var(--color-text-inverse)',
-          disabled: 'var(--color-text-disabled)',
-        },
-        // Border
-        border: {
-          DEFAULT: 'var(--color-border)',
-          subtle: 'var(--color-border-subtle)',
-          strong: 'var(--color-border-strong)',
-        },
+        gray: {
+          50: '#f9fafb',
+          100: '#f3f4f6',
+          200: '#e5e7eb',
+          300: '#d1d5db',
+          400: '#9ca3af',
+          500: '#6b7280',
+          600: '#4b5563',
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
+          950: '#030712',
+        }
       },
       fontFamily: {
-        sans: ['var(--font-sans)', 'sans-serif'],
-        display: ['var(--font-display)', 'sans-serif'],
-        mono: ['var(--font-mono)', 'monospace'],
+        sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
+        display: ['"Outfit"', 'system-ui', 'sans-serif'],
+        mono: ['"Fira Code"', 'monospace'],
       },
-      fontSize: {
-        xs: ['var(--font-size-xs)', { lineHeight: 'var(--line-height-tight)' }],
-        sm: ['var(--font-size-sm)', { lineHeight: 'var(--line-height-normal)' }],
-        base: ['var(--font-size-base)', { lineHeight: 'var(--line-height-normal)' }],
-        lg: ['var(--font-size-lg)', { lineHeight: 'var(--line-height-relaxed)' }],
-        xl: ['var(--font-size-xl)', { lineHeight: 'var(--line-height-relaxed)' }],
-        '2xl': ['var(--font-size-2xl)', { lineHeight: 'var(--line-height-tight)' }],
-        '3xl': ['var(--font-size-3xl)', { lineHeight: 'var(--line-height-tight)' }],
-        '4xl': ['var(--font-size-4xl)', { lineHeight: 'var(--line-height-tight)' }],
-        '5xl': ['var(--font-size-5xl)', { lineHeight: 'var(--line-height-tight)' }],
-        '6xl': ['var(--font-size-6xl)', { lineHeight: 'var(--line-height-tight)' }],
-        '7xl': ['var(--font-size-7xl)', { lineHeight: 'var(--line-height-tight)' }],
+      container: {
+        center: true,
+        padding: {
+          DEFAULT: '1rem',
+          sm: '1.5rem',
+          lg: '2rem',
+        },
+        screens: {
+          sm: '640px',
+          md: '768px',
+          lg: '1024px',
+          xl: '1280px',
+          '2xl': '1400px', // Custom max width
+        },
       },
       spacing: {
-        'section-mobile': 'var(--section-padding-y-mobile)',
-        'section-desktop': 'var(--section-padding-y-desktop)',
-        'section-gap': 'var(--section-gap)',
-        'section-gap-mobile': 'var(--section-gap-mobile)',
-        'container-padding': 'var(--container-padding)',
-        'container-padding-mobile': 'var(--container-padding-mobile)',
-      },
-      maxWidth: {
-        'container-7xl': 'var(--container-7xl)',
-      },
-      borderRadius: {
-        xs: 'var(--radius-xs)',
-        sm: 'var(--radius-sm)',
-        md: 'var(--radius-md)',
-        lg: 'var(--radius-lg)',
-        xl: 'var(--radius-xl)',
-        '2xl': 'var(--radius-2xl)',
-        '3xl': 'var(--radius-3xl)',
-        full: 'var(--radius-full)',
-      },
-      boxShadow: {
-        none: 'var(--shadow-none)',
-        xs: 'var(--shadow-xs)',
-        sm: 'var(--shadow-sm)',
-        md: 'var(--shadow-md)',
-        lg: 'var(--shadow-lg)',
-        xl: 'var(--shadow-xl)',
-        '2xl': 'var(--shadow-2xl)',
-        inner: 'var(--shadow-inner)',
-        float: 'var(--shadow-float)',
-      },
-      transitionDuration: {
-        instant: 'var(--duration-instant)',
-        fast: 'var(--duration-fast)',
-        normal: 'var(--duration-normal)',
-        slow: 'var(--duration-slow)',
-        slower: 'var(--duration-slower)',
-        slowest: 'var(--duration-slowest)',
-      },
-      transitionTimingFunction: {
-        'ease-in': 'var(--ease-in)',
-        'ease-out': 'var(--ease-out)',
-        'ease-in-out': 'var(--ease-in-out)',
-        'ease-bounce': 'var(--ease-bounce)',
-        'ease-spring': 'var(--ease-spring)',
-      },
-      zIndex: {
-        surface: 'var(--depth-surface)',
-        card: 'var(--depth-card)',
-        dropdown: 'var(--depth-dropdown)',
-        modal: 'var(--depth-modal)',
-        tooltip: 'var(--depth-tooltip)',
-        toast: 'var(--depth-toast)',
-      },
+        'section-mobile': '5rem', // py-20
+        'section-desktop': '6rem', // py-24
+        'hero-desktop': '8rem',    // py-32
+      }
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/forms'),
+  ],
 }

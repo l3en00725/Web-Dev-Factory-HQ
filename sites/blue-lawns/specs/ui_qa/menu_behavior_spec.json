@@ -1,0 +1,16 @@
+{
+  "desktop": {
+    "behavior": "Sticky on scroll",
+    "initialState": "Transparent (on home) or Solid (on subpages)",
+    "scrolledState": "Solid white, shadow, smaller logo",
+    "logoWidth": "160px",
+    "scrolledLogoWidth": "140px"
+  },
+  "mobile": {
+    "toggle": "Hamburger icon (right aligned)",
+    "menuType": "Slide-over drawer (from right)",
+    "logoWidth": "130px",
+    "closeTrigger": "X button or Backdrop click",
+    "animation": "translate-x transition"
+  }
+}

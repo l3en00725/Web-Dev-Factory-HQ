@@ -1,0 +1,51 @@
+{
+  "template": {
+    "author": "{{NAME}}",
+    "location": "{{LOCATION}}",
+    "date": "{{DATE}}",
+    "rating": 5,
+    "service": "{{SERVICE_TYPE}}",
+    "content": "{{REVIEW_TEXT}}",
+    "source": "Google"
+  },
+  "reviews": [
+    {
+      "id": "rev-001",
+      "author": "Sarah M.",
+      "location": "Avalon, NJ",
+      "rating": 5,
+      "service": "Landscaping",
+      "content": "Blue Lawns transformed our backyard into a summer oasis. The team was professional, punctual, and the design exceeded our expectations.",
+      "date": "2024-05-15"
+    },
+    {
+      "id": "rev-002",
+      "author": "James P.",
+      "location": "Stone Harbor, NJ",
+      "rating": 5,
+      "service": "Lawn Care",
+      "content": "Best lawn service on the island. They show up on time and my grass has never looked greener.",
+      "date": "2024-06-02"
+    },
+    {
+      "id": "rev-003",
+      "author": "Emily R.",
+      "location": "Cape May, NJ",
+      "rating": 5,
+      "service": "Seasonal Cleanup",
+      "content": "Excellent fall cleanup service. They removed every leaf and prepped our beds perfectly for winter.",
+      "date": "2023-11-20"
+    }
+  ],
+  "ui_component_spec": {
+    "tag": "article",
+    "className": "review-card bg-white p-6 rounded-lg shadow-sm border border-primary-50",
+    "structure": [
+      { "element": "div", "class": "flex items-center mb-4", "children": ["StarRating", "AuthorInfo"] },
+      { "element": "p", "class": "text-neutral-600 italic", "content": "{content}" },
+      { "element": "div", "class": "mt-4 text-xs text-neutral-400 uppercase tracking-wider", "content": "{service} • {location}" }
+    ]
+  }
+}
+
+

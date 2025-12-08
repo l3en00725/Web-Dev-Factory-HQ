@@ -1,6 +1,12 @@
 ---
 import '../styles/tokens.css';
 import '../styles/design-system.css';
+import '@fontsource/dm-sans/400.css';
+import '@fontsource/dm-sans/500.css';
+import '@fontsource/dm-sans/700.css';
+import '@fontsource/outfit/400.css';
+import '@fontsource/outfit/500.css';
+import '@fontsource/outfit/700.css';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
 import { buildCanonicalUrl } from '../lib/seo-utils';
@@ -59,11 +65,6 @@ const mappedNavItems = navigation.map((item) => ({
     <meta name="generator" content={Astro.generator} />
     {description && <meta name="description" content={description} />}
     
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Outfit:wght@400;500;700&display=swap" rel="stylesheet">
-
     {noIndex && <meta name="robots" content="noindex" />}
     {noFollow && <meta name="robots" content="nofollow" />}
     {noIndex && noFollow && <meta name="robots" content="noindex, nofollow" />}
@@ -77,7 +78,9 @@ const mappedNavItems = navigation.map((item) => ({
     {description && <meta property="og:description" content={description} />}
     <meta property="og:image" content={resolvedOgImage} />
 
-    {/* Twitter */}
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/logo/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo/favicon-180.png">
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={canonical} />
     <meta property="twitter:title" content={title} />
@@ -88,10 +91,8 @@ const mappedNavItems = navigation.map((item) => ({
       <script type="application/ld+json" set:html={JSON.stringify(cleanedStructuredData)} />
     )}
   </head>
-  <body class="flex min-h-screen flex-col bg-background text-foreground">
+  <body class="flex min-h-screen flex-col bg-gray-50 text-gray-900 font-sans antialiased">
     <Header 
-      logoSrc={logoSrc} 
-      siteTitle={siteTitle} 
       navItems={mappedNavItems} 
       variant={headerVariant}
     />
@@ -100,9 +101,6 @@ const mappedNavItems = navigation.map((item) => ({
       <slot />
     </main>
 
-    <Footer 
-      logoSrc={logoSrc} 
-      siteTitle={siteTitle} 
-    />
+    <Footer />
   </body>
 </html>

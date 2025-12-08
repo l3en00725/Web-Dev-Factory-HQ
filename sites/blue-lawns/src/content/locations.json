@@ -1,113 +1,57 @@
 [
   {
     "id": "ocean-view",
+    "town": "Ocean View",
     "slug": "ocean-view",
-    "title": "Ocean View",
-    "city": "Ocean View",
-    "state": "NJ",
-    "zip": "08230",
-    "region": "Cape May County",
-    "description": "Professional lawn care and landscaping services in Ocean View, NJ. Our home base location serving the heart of Cape May County.",
-    "image": "/images/locations/ocean-view.jpg"
+    "geo": {
+      "lat": 39.1751,
+      "lng": -74.7268
+    },
+    "description": "Serving the beautiful community of Ocean View with premium landscaping services. We understand the local soil conditions and coastal climate nuances specific to Ocean View properties.",
+    "heroImage": "src/assets/images/locations/ocean-view/hero.jpg"
   },
   {
     "id": "cape-may",
+    "town": "Cape May",
     "slug": "cape-may",
-    "title": "Cape May",
-    "city": "Cape May",
-    "state": "NJ",
-    "zip": "08204",
-    "region": "Cape May County",
-    "description": "Expert landscaping and lawn maintenance in historic Cape May. We understand the unique needs of Victorian-era properties and coastal gardens.",
-    "image": "/images/locations/cape-may.jpg"
+    "geo": {
+      "lat": 38.9351,
+      "lng": -74.9060
+    },
+    "description": "Providing expert lawn and landscape care for historic Cape May. Our team specializes in maintaining the classic charm and curb appeal of Cape May's unique Victorian and coastal homes.",
+    "heroImage": "src/assets/images/locations/cape-may/hero.jpg"
   },
   {
     "id": "avalon",
+    "town": "Avalon",
     "slug": "avalon",
-    "title": "Avalon",
-    "city": "Avalon",
-    "state": "NJ",
-    "zip": "08202",
-    "region": "Cape May County",
-    "description": "Premium lawn care services in Avalon. Serving beachfront properties and luxury homes with attention to detail.",
-    "image": "/images/locations/avalon.jpg"
+    "geo": {
+      "lat": 39.1007,
+      "lng": -74.7185
+    },
+    "description": "Delivering high-end landscape maintenance for Avalon's premier properties. We offer reliable service that keeps your vacation home or permanent residence looking immaculate year-round.",
+    "heroImage": "src/assets/images/locations/avalon/hero.jpg"
   },
   {
     "id": "stone-harbor",
+    "town": "Stone Harbor",
     "slug": "stone-harbor",
-    "title": "Stone Harbor",
-    "city": "Stone Harbor",
-    "state": "NJ",
-    "zip": "08247",
-    "region": "Cape May County",
-    "description": "Trusted landscaping partner in Stone Harbor. From beach homes to year-round residences, we keep your property looking its best.",
-    "image": "/images/locations/stone-harbor.jpg"
+    "geo": {
+      "lat": 39.0487,
+      "lng": -74.7568
+    },
+    "description": "Professional landscaping services for Stone Harbor. From dune grass management to luxury hardscaping, we cater to the specific needs of Stone Harbor homeowners.",
+    "heroImage": "src/assets/images/locations/stone-harbor/hero.jpg"
   },
   {
     "id": "sea-isle-city",
+    "town": "Sea Isle City",
     "slug": "sea-isle-city",
-    "title": "Sea Isle City",
-    "city": "Sea Isle City",
-    "state": "NJ",
-    "zip": "08243",
-    "region": "Cape May County",
-    "description": "Reliable lawn and landscape services in Sea Isle City. We maintain properties for both seasonal visitors and permanent residents.",
-    "image": "/images/locations/sea-isle-city.jpg"
-  },
-  {
-    "id": "wildwood",
-    "slug": "wildwood",
-    "title": "Wildwood",
-    "city": "Wildwood",
-    "state": "NJ",
-    "zip": "08260",
-    "region": "Cape May County",
-    "description": "Full-service landscaping in Wildwood. From residential lawns to commercial properties, we serve the entire Wildwood area.",
-    "image": "/images/locations/wildwood.jpg"
-  },
-  {
-    "id": "wildwood-crest",
-    "slug": "wildwood-crest",
-    "title": "Wildwood Crest",
-    "city": "Wildwood Crest",
-    "state": "NJ",
-    "zip": "08260",
-    "region": "Cape May County",
-    "description": "Professional lawn care in Wildwood Crest. Specializing in beachfront property maintenance and seasonal services.",
-    "image": "/images/locations/wildwood-crest.jpg"
-  },
-  {
-    "id": "north-wildwood",
-    "slug": "north-wildwood",
-    "title": "North Wildwood",
-    "city": "North Wildwood",
-    "state": "NJ",
-    "zip": "08260",
-    "region": "Cape May County",
-    "description": "Dependable landscaping services in North Wildwood. We handle everything from weekly mowing to complete landscape renovations.",
-    "image": "/images/locations/north-wildwood.jpg"
-  },
-  {
-    "id": "cape-may-court-house",
-    "slug": "cape-may-court-house",
-    "title": "Cape May Court House",
-    "city": "Cape May Court House",
-    "state": "NJ",
-    "zip": "08210",
-    "region": "Cape May County",
-    "description": "Local lawn care experts in Cape May Court House. Serving the county seat with professional grounds maintenance.",
-    "image": "/images/locations/cape-may-court-house.jpg"
-  },
-  {
-    "id": "rio-grande",
-    "slug": "rio-grande",
-    "title": "Rio Grande",
-    "city": "Rio Grande",
-    "state": "NJ",
-    "zip": "08242",
-    "region": "Cape May County",
-    "description": "Quality landscaping services in Rio Grande. Residential and commercial property maintenance throughout the year.",
-    "image": "/images/locations/rio-grande.jpg"
+    "geo": {
+      "lat": 39.1523,
+      "lng": -74.6943
+    },
+    "description": "Your trusted local landscapers in Sea Isle City. We provide comprehensive outdoor care, ensuring your property stands out in this vibrant coastal community.",
+    "heroImage": "src/assets/images/locations/sea-isle-city/hero.jpg"
   }
 ]
-

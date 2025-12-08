@@ -1,0 +1,77 @@
+---
+import Container from '../layout/Container.astro';
+import { Shield, Clock, MapPin, Sparkles } from 'lucide-react'; // Assuming we can use this, or replace with SVG
+
+interface Benefit {
+  title: string;
+  text: string;
+  icon: string;
+}
+
+interface Props {
+  title?: string;
+  subtitle?: string;
+  benefits?: Benefit[];
+}
+
+const defaultBenefits: Benefit[] = [
+  {
+    title: "Local Expertise",
+    text: "We know Cape May County's soil, climate, and plants better than anyone.",
+    icon: "MapPin"
+  },
+  {
+    title: "Reliable Schedule",
+    text: "You can set your clock to our visits. We show up when we say we will.",
+    icon: "Clock"
+  },
+  {
+    title: "Fully Insured",
+    text: "Peace of mind knowing your property is protected by comprehensive coverage.",
+    icon: "Shield"
+  },
+  {
+    title: "Premium Results",
+    text: "We don't cut corners. We treat your lawn like it's our own.",
+    icon: "Sparkles"
+  }
+];
+
+const { 
+  title = "Why Choose Blue Lawns?", 
+  subtitle = "The standard for excellence in coastal landscaping",
+  benefits = defaultBenefits 
+} = Astro.props;
+---
+
+<section class="py-24 bg-slate-50 relative">
+  <Container>
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      <h2 class="font-display text-4xl font-bold tracking-tight text-slate-900 lg:text-5xl mb-6">
+        {title}
+      </h2>
+      <p class="text-xl text-slate-500 leading-relaxed font-light">
+        {subtitle}
+      </p>
+    </div>
+
+    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+      {benefits.map((b) => (
+        <div class="bg-white rounded-xl p-8 shadow-sm border border-slate-100 hover:shadow-md transition-shadow duration-300 text-center group">
+          <div class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary-50 text-primary-600 mb-6 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300">
+             {/* Simple SVG Fallbacks if Lucide isn't set up directly or for reliability */}
+             {b.icon === 'MapPin' && <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>}
+             {b.icon === 'Clock' && <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>}
+             {b.icon === 'Shield' && <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>}
+             {b.icon === 'Sparkles' && <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>}
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-3">{b.title}</h3>
+          <p class="text-slate-500 leading-relaxed">
+            {b.text}
+          </p>
+        </div>
+      ))}
+    </div>
+  </Container>
+</section>
+

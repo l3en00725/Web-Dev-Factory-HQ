@@ -1,0 +1,78 @@
+---
+// Logo Integration Patches
+// Apply these changes to implement the new logo assets and sizing logic.
+---
+
+<!-- FILE: src/components/ui/Logo.astro -->
+---
+interface Props {
+  class?: string;
+  variant?: 'default' | 'light' | 'dark'; // Kept for API compatibility, though we use the image now
+  loading?: 'eager' | 'lazy';
+}
+
+const { 
+  class: className,
+  loading = 'eager'
+} = Astro.props;
+---
+
+<a href="/" class:list={["block relative transition-opacity hover:opacity-90", className]} aria-label="Blue Lawns Home">
+  <picture>
+    <source srcset="/logo/logo.webp" type="image/webp" />
+    <img 
+      src="/logo/logo.png" 
+      alt="Blue Lawns – Coastal Lawn Care & Landscaping" 
+      class="h-auto w-full object-contain"
+      width="160"
+      height="45"
+      loading={loading}
+    />
+  </picture>
+</a>
+
+<!-- FILE: src/components/layout/Header.astro -->
+// Update the Logo component usage in Header.astro
+// Replace the existing <Logo ... /> line with:
+
+<div class="flex-shrink-0">
+  <Logo 
+    class:list={[
+      "transition-all duration-300",
+      // Default Desktop
+      "w-[160px]",
+      // Scrolled State (smaller)
+      "group-data-[scrolled=true]:w-[140px]"
+    ]} 
+  />
+</div>
+
+<!-- FILE: src/components/layout/Footer.astro -->
+// Update the Logo component usage in Footer.astro
+// Replace the existing <Logo ... /> line with:
+
+<div class="mb-6">
+  <Logo class="w-[150px]" loading="lazy" />
+</div>
+
+<!-- FILE: src/components/layout/MobileMenu.astro -->
+// Update the Header section in MobileMenu.astro
+// Replace the existing Title/Logo span with:
+
+<div class="flex items-center justify-between p-6 border-b border-slate-100">
+  <div class="w-[130px]">
+    <Logo />
+  </div>
+  <button 
+    id="close-menu-btn"
+    class="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500"
+    aria-label="Close menu"
+  >
+    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+</div>
+
+
+

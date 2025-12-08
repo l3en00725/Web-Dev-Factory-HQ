@@ -1,0 +1,161 @@
+{
+  "images": [
+    {
+      "id": "hero-main",
+      "filename": "blue-lawns-coastal-hero",
+      "formats": ["webp"],
+      "sizes": [600, 1200, 2000],
+      "alt": "Lush green lawn with coastal landscaping in Cape May County NJ",
+      "type": "hero",
+      "ratio": "16:9",
+      "placement": "Homepage Hero",
+      "prompt": "Photorealistic wide shot of a pristine green lawn in front of a high-end coastal home in New Jersey, soft morning sunlight, dew on grass, ocean breeze feel, blue hydrangea accents."
+    },
+    {
+      "id": "service-lawn-care",
+      "filename": "lawn-mowing-maintenance-service",
+      "formats": ["webp"],
+      "sizes": [600, 1200],
+      "alt": "Professional lawn mowing service ensuring perfect stripes on green grass",
+      "type": "service-card",
+      "ratio": "1:1",
+      "placement": "Services Grid - Lawn Care",
+      "prompt": "Close up of freshly cut grass with perfect mowing stripes, bright green, sunny day, low angle shot."
+    },
+    {
+      "id": "service-landscaping",
+      "filename": "custom-landscape-design-installation",
+      "formats": ["webp"],
+      "sizes": [600, 1200],
+      "alt": "Beautiful coastal landscape design with native plants and hardscaping",
+      "type": "service-card",
+      "ratio": "1:1",
+      "placement": "Services Grid - Landscaping",
+      "prompt": "Elegant coastal garden design featuring dune grass, river rocks, and colorful perennials, soft focus background."
+    },
+    {
+      "id": "service-fencing",
+      "filename": "vinyl-privacy-fencing-installation",
+      "formats": ["webp"],
+      "sizes": [600, 1200],
+      "alt": "White vinyl privacy fence installation for coastal home security",
+      "type": "service-card",
+      "ratio": "1:1",
+      "placement": "Services Grid - Fencing",
+      "prompt": "Clean white vinyl privacy fence bordering a green lawn, blue sky background, simple and modern."
+    },
+    {
+      "id": "service-cleanup",
+      "filename": "seasonal-yard-cleanup-service",
+      "formats": ["webp"],
+      "sizes": [600, 1200],
+      "alt": "Thorough seasonal yard cleanup removing leaves and debris",
+      "type": "service-card",
+      "ratio": "1:1",
+      "placement": "Services Grid - Seasonal Cleanup",
+      "prompt": "Raking autumn leaves on a neat lawn, golden hour lighting, clean and organized look."
+    },
+    {
+      "id": "service-commercial",
+      "filename": "commercial-landscape-maintenance",
+      "formats": ["webp"],
+      "sizes": [600, 1200],
+      "alt": "Commercial property landscaping for businesses and HOAs",
+      "type": "service-card",
+      "ratio": "1:1",
+      "placement": "Services Grid - Commercial",
+      "prompt": "Modern office building exterior with perfectly manicured shrubs and lawn, professional corporate look."
+    },
+    {
+      "id": "trust-badge",
+      "filename": "trusted-by-500-neighbors-badge",
+      "formats": ["webp", "png"],
+      "sizes": [300, 600],
+      "alt": "Badge indicating Blue Lawns is trusted by over 500 local neighbors",
+      "type": "illustration",
+      "ratio": "1:1",
+      "placement": "Homepage Trust Section",
+      "prompt": "Circular badge design, 'Trusted by 500+ Neighbors', coastal blue and green color palette, clean vector style, subtle drop shadow."
+    },
+    {
+      "id": "location-ocean-view",
+      "filename": "ocean-view-nj-landscaping",
+      "formats": ["webp"],
+      "sizes": [600, 1200],
+      "alt": "Professional landscaping services in Ocean View New Jersey",
+      "type": "location-card",
+      "ratio": "4:3",
+      "placement": "Location Page - Ocean View",
+      "prompt": "Scenic view of a residential street in Ocean View, NJ, with well-kept lawns and trees, sunny afternoon."
+    },
+    {
+      "id": "location-cape-may",
+      "filename": "cape-may-historic-landscaping",
+      "formats": ["webp"],
+      "sizes": [600, 1200],
+      "alt": "Historic Victorian home landscaping in Cape May NJ",
+      "type": "location-card",
+      "ratio": "4:3",
+      "placement": "Location Page - Cape May",
+      "prompt": "Victorian style house in Cape May with vibrant flower beds and a green lawn, historic charm."
+    },
+    {
+      "id": "location-avalon",
+      "filename": "avalon-nj-luxury-lawn-care",
+      "formats": ["webp"],
+      "sizes": [600, 1200],
+      "alt": "Luxury lawn care for beachfront homes in Avalon NJ",
+      "type": "location-card",
+      "ratio": "4:3",
+      "placement": "Location Page - Avalon",
+      "prompt": "Modern beachfront home in Avalon with dune landscaping and a pristine lawn, ocean visible in distance."
+    },
+     {
+      "id": "location-stone-harbor",
+      "filename": "stone-harbor-nj-garden-maintenance",
+      "formats": ["webp"],
+      "sizes": [600, 1200],
+      "alt": "Garden maintenance services in Stone Harbor New Jersey",
+      "type": "location-card",
+      "ratio": "4:3",
+      "placement": "Location Page - Stone Harbor",
+      "prompt": "Charming Stone Harbor backyard with a patio and lush garden, relaxing summer vibe."
+    },
+    {
+      "id": "contact-illustration",
+      "filename": "contact-blue-lawns-support",
+      "formats": ["webp", "png"],
+      "sizes": [600, 1200],
+      "alt": "Friendly customer support illustration for Blue Lawns contact page",
+      "type": "illustration",
+      "ratio": "4:3",
+      "placement": "Contact Page",
+      "prompt": "Flat modern illustration of a friendly landscaper or support agent, coastal colors, welcoming and helpful."
+    },
+    {
+      "id": "og-default",
+      "filename": "blue-lawns-social-share",
+      "formats": ["jpg"],
+      "sizes": [1200],
+      "alt": "Blue Lawns professional landscaping and lawn care services",
+      "type": "og-image",
+      "ratio": "1.91:1",
+      "placement": "Default Open Graph Image",
+      "prompt": "Branded social share image with Blue Lawns logo, tagline 'Professional Lawn Care & Landscaping', and a beautiful lawn background."
+    }
+  ],
+  "icons": [
+    "icon-lawn-mower",
+    "icon-shovel",
+    "icon-fence",
+    "icon-leaf",
+    "icon-building",
+    "icon-phone",
+    "icon-email",
+    "icon-map-pin",
+    "icon-facebook",
+    "icon-instagram"
+  ]
+}
+
+
