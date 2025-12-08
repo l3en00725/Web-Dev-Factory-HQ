@@ -13,6 +13,7 @@ interface Service {
   description?: string; // Add description alias
   image?: string | ImageMetadata;
   heroImage?: string; // Add heroImage alias from JSON
+  alt?: string; // SEO alt text
   isPrimary?: boolean;
 }
 
@@ -85,7 +86,7 @@ const gridCols: Record<GridColumnCount, string> = {
                   <div class="h-full w-full transform transition-transform duration-700 group-hover:scale-110">
                     <Image 
                       src={imageSrc} 
-                      alt={service.title} 
+                      alt={service.alt || service.title} 
                       class="h-full w-full object-cover" 
                     />
                   </div>

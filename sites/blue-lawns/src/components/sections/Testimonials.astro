@@ -23,21 +23,21 @@ const defaultTestimonials: Testimonial[] = [
     location: "Cape May",
     text: "Blue Lawns transformed our backyard into a paradise. The team was professional, punctual, and the attention to detail was incredible.",
     rating: 5,
-    avatar: "/images/optimized/blue-lawns-rio-grande-generic-testimonial-160.svg"
+    avatar: "src/assets/images/avatars/avatar-1.png"
   },
   {
     name: "Michael Ross",
     location: "Avalon",
     text: "We've used several landscaping companies over the years, but none compare to Blue Lawns. Their weekly maintenance keeps our property looking perfect.",
     rating: 5,
-    avatar: "/images/optimized/blue-lawns-ocean-view-generic-testimonial-161.svg"
+    avatar: "src/assets/images/avatars/avatar-2.png"
   },
   {
     name: "Elena Rodriguez",
     location: "Stone Harbor",
     text: "Excellent service for our summer home. It's such a relief to arrive and find the pool and lawn in pristine condition every time.",
     rating: 5,
-    avatar: "/images/optimized/blue-lawns-cape-may-generic-testimonial-162.svg"
+    avatar: "src/assets/images/avatars/avatar-3.png"
   }
 ];
 
@@ -68,7 +68,7 @@ const {
           <div class="flex items-center gap-4 mb-6">
             <div class="h-12 w-12 rounded-full overflow-hidden bg-slate-100 flex-shrink-0">
                <Image 
-                  src={t.avatar || "/images/optimized/blue-lawns-rio-grande-generic-testimonial-160.svg"} 
+                  src={t.avatar || "src/assets/images/avatars/avatar-1.png"} 
                   alt={t.name}
                   width={48}
                   height={48}

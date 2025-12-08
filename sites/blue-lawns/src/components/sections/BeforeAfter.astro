@@ -2,11 +2,13 @@
 import Container from '../layout/Container.astro';
 import Image from '../base/Image.astro';
 
+import type { ImageMetadata } from 'astro';
+
 interface Props {
   title?: string;
   subtitle?: string;
-  beforeImage?: string;
-  afterImage?: string;
+  beforeImage?: string | ImageMetadata;
+  afterImage?: string | ImageMetadata;
 }
 
 const {

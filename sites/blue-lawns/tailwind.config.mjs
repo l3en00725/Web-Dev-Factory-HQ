@@ -4,6 +4,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        background: 'var(--color-bg)',
+        foreground: 'var(--color-text)',
         primary: {
           50: '#f0f9ff',
           100: '#e0f2fe',
@@ -68,6 +70,11 @@ module.exports = {
         'section-mobile': '5rem', // py-20
         'section-desktop': '6rem', // py-24
         'hero-desktop': '8rem',    // py-32
+        'container-padding': 'var(--container-padding)',
+        'container-padding-mobile': 'var(--container-padding-mobile)',
+      },
+      maxWidth: {
+        'container-7xl': 'var(--container-7xl)',
       }
     },
   },

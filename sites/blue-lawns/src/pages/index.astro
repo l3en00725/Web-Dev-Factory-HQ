@@ -11,6 +11,10 @@ import CTA from '../components/sections/CTA.astro';
 import servicesData from '../content/services.json';
 import settings from '../content/settings.json';
 
+import heroMain from '../assets/images/general/hero-main.jpg';
+import beforeYard from '../assets/images/general/before-yard.jpg';
+import afterYard from '../assets/images/general/after-yard.jpg';
+
 // Data Logic
 const primaryServices = servicesData.filter(s => s.type === 'primary');
 const secondaryServices = servicesData.filter(s => s.type === 'secondary');
@@ -27,13 +31,10 @@ const pageDescription = "Professional landscaping, lawn care, and hardscaping se
   <main>
     {/* 1. Hero */}
     <Hero 
-      title="Professional Landscaping<br/>& Lawn Care"
-      subtitle="The trusted choice for homeowners in Avalon, Stone Harbor, and Sea Isle City. We create and maintain outdoor spaces that families love."
-      ctaLabel="Get a Free Quote"
-      ctaLink="/contact"
-      secondaryCtaLabel="Our Services"
-      secondaryCtaLink="/services"
-      image="/images/blue-lawns-avalon-lawn-care-hero.svg"
+      title="Professional Landscaping in Cape May County"
+      subtitle="The most reliable crew in Cape May County. Licensed, insured, and obsessed with details."
+      primaryCta={{ label: "Get a Free Quote", href: "/contact" }}
+      backgroundImage={heroMain}
       alignment="left"
     />
 
@@ -41,20 +42,16 @@ const pageDescription = "Professional landscaping, lawn care, and hardscaping se
     <SocialProof />
 
     {/* 3. Primary Services */}
-    <div class="bg-white">
-      <ServicesGrid 
-        heading="Our Core Services" 
-        subheading="Comprehensive care for your coastal property, from weekly maintenance to complete transformations."
-        services={primaryServices}
-        columns={3}
-      />
-    </div>
+    <ServicesGrid 
+      heading="Our Core Services" 
+      services={primaryServices}
+      columns={3}
+    />
 
     {/* 4. Secondary Services */}
-    <div class="bg-slate-50 border-t border-slate-200">
+    <div class="bg-gray-50">
       <ServicesGrid 
         heading="More Capabilities" 
-        subheading="Everything else you need to keep your home looking its best."
         services={secondaryServices}
         columns={4}
       />
@@ -64,7 +61,10 @@ const pageDescription = "Professional landscaping, lawn care, and hardscaping se
     <Benefits />
 
     {/* 6. Before/After */}
-    <BeforeAfter />
+    <BeforeAfter 
+      beforeImage={beforeYard}
+      afterImage={afterYard}
+    />
 
     {/* 7. Testimonials */}
     <Testimonials />

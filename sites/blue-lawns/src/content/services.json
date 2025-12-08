@@ -4,15 +4,21 @@
     "title": "Landscape Maintenance",
     "slug": "landscape-maintenance",
     "type": "primary",
-    "description": "Comprehensive landscape care to keep your property pristine year-round.",
-    "fullDescription": "Our comprehensive landscape maintenance services ensure your property remains beautiful and healthy throughout every season. From weekly mowing and edging to fertilization, pruning, and bed care, we handle all aspects of your landscape's needs with professional attention to detail.",
+    "description": "Reclaim your weekends. We deliver golf-course quality cuts every week so you never have to touch a mower again.",
+    "fullDescription": "Stop spending your precious weekends sweating behind a lawnmower. Our comprehensive landscape maintenance program ensures your property looks pristine year-round. From precision mowing and edging to seasonal pruning and bed care, we handle every detail with obsessive care, giving you a landscape you can be proud of without lifting a finger.",
     "icon": "Sprout",
-    "heroImage": "src/assets/images/services/landscape-maintenance/hero.svg",
+    "heroImage": "src/assets/images/services/landscape-maintenance/hero.webp",
+    "alt": "Landscape Maintenance service in Cape May County",
     "galleryImages": [],
     "seo": {
       "title": "Landscape Maintenance Services | Blue Lawns",
       "description": "Professional landscape maintenance for residential and commercial properties. Weekly care, pruning, and fertilization.",
-      "keywords": ["landscape maintenance", "lawn care", "pruning", "fertilization"]
+      "keywords": [
+        "landscape maintenance",
+        "lawn care",
+        "pruning",
+        "fertilization"
+      ]
     }
   },
   {
@@ -20,15 +26,21 @@
     "title": "Landscaping",
     "slug": "landscaping",
     "type": "primary",
-    "description": "Custom landscape design and installation to transform your outdoor space.",
-    "fullDescription": "Transform your outdoor living space with our expert landscaping services. We specialize in custom design and installation, selecting the perfect plants, trees, and shrubs that thrive in our coastal climate while reflecting your personal style.",
+    "description": "Your neighbors will be jealous. We design and install stunning coastal landscapes that thrive in salt air.",
+    "fullDescription": "Transform your boring yard into a coastal oasis. We specialize in custom landscape design and installation, selecting the perfect native plants and materials that flourish in our local climate. Whether you want a complete overhaul or a simple refresh, we create outdoor spaces that reflect your style and boost your curb appeal immediately.",
     "icon": "Flower",
-    "heroImage": "src/assets/images/services/landscaping/hero.svg",
+    "heroImage": "src/assets/images/services/landscaping/hero.webp",
+    "alt": "Landscaping service in Cape May County",
     "galleryImages": [],
     "seo": {
       "title": "Professional Landscaping Design & Installation | Blue Lawns",
       "description": "Expert landscape design and installation services. Create your dream outdoor space with our professional team.",
-      "keywords": ["landscaping", "garden design", "planting", "outdoor living"]
+      "keywords": [
+        "landscaping",
+        "garden design",
+        "planting",
+        "outdoor living"
+      ]
     }
   },
   {
@@ -36,15 +48,22 @@
     "title": "Hardscaping",
     "slug": "hardscaping",
     "type": "primary",
-    "description": "Durable and beautiful patios, walkways, and retaining walls.",
-    "fullDescription": "Enhance functionality and curb appeal with our premium hardscaping services. We design and build durable patios, elegant walkways, sturdy retaining walls, and driveways using high-quality pavers and stone materials built to last.",
+    "description": "Expand your living space outdoors. Durable patios and walkways built to host summer BBQs for decades.",
+    "fullDescription": "Enhance functionality and value with our premium hardscaping services. We design and build durable patios, elegant walkways, and sturdy retaining walls using high-quality pavers and stone. Our installations are engineered to withstand coastal weather while providing the perfect foundation for your outdoor entertainment area.",
     "icon": "BrickWall",
-    "heroImage": "src/assets/images/services/hardscaping/hero.svg",
+    "heroImage": "src/assets/images/services/hardscaping/hero.webp",
+    "alt": "Hardscaping service in Cape May County",
     "galleryImages": [],
     "seo": {
       "title": "Hardscaping Services: Patios & Walkways | Blue Lawns",
       "description": "Custom hardscaping solutions including patios, walkways, and retaining walls. Quality craftsmanship guaranteed.",
-      "keywords": ["hardscaping", "patios", "walkways", "pavers", "retaining walls"]
+      "keywords": [
+        "hardscaping",
+        "patios",
+        "walkways",
+        "pavers",
+        "retaining walls"
+      ]
     }
   },
   {
@@ -52,15 +71,21 @@
     "title": "Landscape Lighting",
     "slug": "landscape-lighting",
     "type": "primary",
-    "description": "Illuminate your property with professional outdoor lighting solutions.",
-    "fullDescription": "Bring your landscape to life at night with our professional landscape lighting services. We design and install low-voltage lighting systems that enhance safety, highlight architectural features, and create a warm, inviting ambiance for your outdoor spaces.",
+    "description": "Magic after sunset. Showcase your home's architecture and increase security with elegant low-voltage lighting.",
+    "fullDescription": "Don't let the beauty of your home disappear when the sun goes down. Our professional landscape lighting systems highlight your property's best features, improve safety along pathways, and create a warm, inviting ambiance for evening enjoyment. We use energy-efficient LED fixtures designed to last in the marine environment.",
     "icon": "Lightbulb",
-    "heroImage": "src/assets/images/services/landscape-lighting/hero.svg",
+    "heroImage": "src/assets/images/services/landscape-lighting/hero.webp",
+    "alt": "Landscape Lighting service in Cape May County",
     "galleryImages": [],
     "seo": {
       "title": "Landscape Lighting Installation | Blue Lawns",
       "description": "Professional outdoor lighting design and installation. Enhance security and beauty with low-voltage LED systems.",
-      "keywords": ["landscape lighting", "outdoor lighting", "pathway lighting", "security lighting"]
+      "keywords": [
+        "landscape lighting",
+        "outdoor lighting",
+        "pathway lighting",
+        "security lighting"
+      ]
     }
   },
   {
@@ -68,15 +93,21 @@
     "title": "Pool Service & Maintenance",
     "slug": "pool-service",
     "type": "primary",
-    "description": "Reliable pool cleaning and maintenance for crystal clear water.",
-    "fullDescription": "Enjoy your pool without the hassle. Our pool service and maintenance packages include regular cleaning, chemical balancing, equipment checks, and opening/closing services to ensure your pool is always ready for a swim.",
+    "description": "Crystal clear water, zero stress. We handle the chemicals and cleaning so you can just jump in.",
+    "fullDescription": "Enjoy your pool without the hassle of maintenance. Our reliable pool service packages keep your water balanced, clear, and safe for your family. We handle everything from opening and closing to weekly cleaning and equipment checks, ensuring your pool is always swim-ready when you are.",
     "icon": "Waves",
-    "heroImage": "src/assets/images/services/pool-service/hero.svg",
+    "heroImage": "src/assets/images/services/pool-service/hero.webp",
+    "alt": "Pool Service & Maintenance service in Cape May County",
     "galleryImages": [],
     "seo": {
       "title": "Pool Service & Maintenance | Blue Lawns",
       "description": "Expert pool cleaning and maintenance services. Keep your pool crystal clear and safe all season long.",
-      "keywords": ["pool service", "pool cleaning", "pool maintenance", "chemical balancing"]
+      "keywords": [
+        "pool service",
+        "pool cleaning",
+        "pool maintenance",
+        "chemical balancing"
+      ]
     }
   },
   {
@@ -84,15 +115,21 @@
     "title": "Commercial Services",
     "slug": "commercial-services",
     "type": "primary",
-    "description": "Professional grounds maintenance for businesses and HOAs.",
-    "fullDescription": "We provide reliable commercial landscaping and grounds maintenance for businesses, HOAs, and municipal properties. Our team ensures your commercial property maintains a professional, manicured appearance that impresses clients and residents alike.",
+    "description": "Make a powerful first impression. Immaculate grounds maintenance for businesses that mean business.",
+    "fullDescription": "Your property's appearance speaks volumes about your business. We provide reliable commercial landscaping and grounds maintenance for HOAs, retail centers, and municipal properties. Our team ensures your grounds are always manicured, professional, and welcoming to clients and residents, protecting your brand image year-round.",
     "icon": "Building2",
-    "heroImage": "src/assets/images/services/commercial-services/hero.svg",
+    "heroImage": "src/assets/images/services/commercial-services/hero.webp",
+    "alt": "Commercial Services service in Cape May County",
     "galleryImages": [],
     "seo": {
       "title": "Commercial Landscaping Services | Blue Lawns",
       "description": "Professional grounds maintenance for commercial properties, HOAs, and businesses. Reliable and licensed.",
-      "keywords": ["commercial landscaping", "HOA maintenance", "grounds keeping", "business landscaping"]
+      "keywords": [
+        "commercial landscaping",
+        "HOA maintenance",
+        "grounds keeping",
+        "business landscaping"
+      ]
     }
   },
   {
@@ -100,15 +137,21 @@
     "title": "Lawn Care",
     "slug": "lawn-care",
     "type": "secondary",
-    "description": "Expert lawn fertilization, weed control, and health services.",
-    "fullDescription": "Achieve a lush, green lawn with our specialized lawn care programs. We offer fertilization, weed control, aeration, overseeding, and pest management tailored to the specific needs of your soil and grass type.",
+    "description": "A weed-free lawn, guaranteed. Scientifically tailored fertilization programs for Cape May County soil.",
+    "fullDescription": "Achieve the lush, deep green lawn you've always wanted. Our lawn care programs are specifically tailored to local soil conditions, combining precise fertilization, effective weed control, and aeration to promote deep root growth and resilience against pests and drought.",
     "icon": "Grass",
-    "heroImage": "src/assets/images/services/lawn-care/hero.svg",
+    "heroImage": "src/assets/images/services/lawn-care/hero.webp",
+    "alt": "Lawn Care service in Cape May County",
     "galleryImages": [],
     "seo": {
       "title": "Lawn Care Services: Fertilization & Weed Control | Blue Lawns",
       "description": "Expert lawn care services including fertilization, weed control, and aeration for a healthy, green lawn.",
-      "keywords": ["lawn care", "fertilization", "weed control", "lawn health"]
+      "keywords": [
+        "lawn care",
+        "fertilization",
+        "weed control",
+        "lawn health"
+      ]
     }
   },
   {
@@ -116,15 +159,21 @@
     "title": "Seasonal Cleanup",
     "slug": "seasonal-cleanup",
     "type": "secondary",
-    "description": "Spring and fall property cleanups to keep your landscape tidy.",
-    "fullDescription": "Prepare your property for the changing seasons with our thorough spring and fall cleanup services. We handle leaf removal, debris clearing, bed preparation, and cutting back perennials to keep your landscape neat and healthy.",
+    "description": "Erase the mess. We clear leaves and debris in a flash, preparing your property for the season ahead.",
+    "fullDescription": "Don't let leaves and debris suffocate your lawn. Our thorough spring and fall cleanup services remove accumulated organic matter, prepare your beds for planting or winter dormancy, and give your entire property a fresh, tidy start for the changing season.",
     "icon": "Leaf",
-    "heroImage": "src/assets/images/services/seasonal-cleanup/hero.svg",
+    "heroImage": "src/assets/images/services/seasonal-cleanup/hero.webp",
+    "alt": "Seasonal Cleanup service in Cape May County",
     "galleryImages": [],
     "seo": {
       "title": "Seasonal Spring & Fall Yard Cleanup | Blue Lawns",
       "description": "Comprehensive seasonal yard cleanup services. Leaf removal, bed prep, and debris clearing for spring and fall.",
-      "keywords": ["seasonal cleanup", "spring cleanup", "fall cleanup", "leaf removal"]
+      "keywords": [
+        "seasonal cleanup",
+        "spring cleanup",
+        "fall cleanup",
+        "leaf removal"
+      ]
     }
   },
   {
@@ -132,15 +181,21 @@
     "title": "Power Washing",
     "slug": "power-washing",
     "type": "secondary",
-    "description": "Restore the look of your exterior surfaces with professional cleaning.",
-    "fullDescription": "Revitalize your home's exterior with our professional power washing services. We safely and effectively clean siding, decks, patios, driveways, and fences, removing dirt, mold, and mildew to restore their original beauty.",
+    "description": "Instantly look new again. Safely remove years of salt spray, mold, and grime from your siding and decks.",
+    "fullDescription": "Revitalize your home's exterior appearance in a single day. Our professional power washing service safely removes unsightly mold, mildew, salt spray, and dirt from siding, decks, patios, and driveways, restoring their original beauty and preventing long-term damage.",
     "icon": "Droplets",
-    "heroImage": "src/assets/images/services/power-washing/hero.svg",
+    "heroImage": "src/assets/images/services/power-washing/hero.webp",
+    "alt": "Power Washing service in Cape May County",
     "galleryImages": [],
     "seo": {
       "title": "Professional Power Washing Services | Blue Lawns",
       "description": "Safe and effective power washing for homes, decks, and driveways. Remove dirt and mold instantly.",
-      "keywords": ["power washing", "pressure washing", "exterior cleaning", "deck cleaning"]
+      "keywords": [
+        "power washing",
+        "pressure washing",
+        "exterior cleaning",
+        "deck cleaning"
+      ]
     }
   },
   {
@@ -148,15 +203,21 @@
     "title": "Fencing",
     "slug": "fencing",
     "type": "secondary",
-    "description": "Quality fence installation and repair for privacy and security.",
-    "fullDescription": "Secure and enhance your property with our fencing services. We install and repair a variety of fence styles, including vinyl, wood, and aluminum, providing privacy, security, and aesthetic appeal for your home.",
+    "description": "Privacy meets style. Secure your personal oasis with durable vinyl or wood fencing installed by pros.",
+    "fullDescription": "Create the privacy and security your family needs without sacrificing style. We install high-quality vinyl, wood, and aluminum fencing designed to withstand coastal winds while complementing your home's architecture. Perfect for pool enclosures, pet safety, and backyard seclusion.",
     "icon": "Fence",
-    "heroImage": "src/assets/images/services/fencing/hero.svg",
+    "heroImage": "src/assets/images/services/fencing/fencing-service-hero.webp",
+    "alt": "Fencing by Blue Lawns in Cape May County",
     "galleryImages": [],
     "seo": {
       "title": "Fence Installation & Repair Services | Blue Lawns",
       "description": "Quality fence installation and repair. Vinyl, wood, and aluminum fencing solutions for privacy and security.",
-      "keywords": ["fence installation", "fence repair", "vinyl fencing", "privacy fence"]
+      "keywords": [
+        "fence installation",
+        "fence repair",
+        "vinyl fencing",
+        "privacy fence"
+      ]
     }
   }
 ]
