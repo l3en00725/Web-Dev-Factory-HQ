@@ -1,0 +1,179 @@
+---
+/**
+ * Location × Service Matrix Page (Dynamic Route)
+ * Generates 100 unique pages: 10 locations × 10 services
+ * 
+ * Features:
+ * - Unique SEO-optimized titles/descriptions (40% content differentiation)
+ * - Location-specific hero images
+ * - Dynamic schema (LocalBusiness + Service + FAQPage)
+ * - Location-modified keywords
+ * - GA4 tracking
+ */
+
+import Base from '../../../layouts/Base.astro';
+import Container from '../../../components/layout/Container.astro';
+import Hero from '../../../components/sections/Hero.astro';
+import CTA from '../../../components/sections/CTA.astro';
+import {
+  generateLocationServiceSEO,
+} from '../../../utils/seo-content';
+import {
+  generateBreadcrumbSchema,
+  generateServiceSchema,
+  generateLocalBusinessSchema,
+  generateFAQSchema,
+  combineSchemas,
+} from '../../../lib/seo/schema';
+import settings from '../../../content/settings.json';
+import services from '../../../content/services.json';
+import locations from '../../../content/locations.json';
+import type { Service, Location } from '../../../types';
+
+export async function getStaticPaths() {
+  // Generate all 100 location×service combinations
+  const paths = locations.flatMap((location: Location) =>
+    services.map((service: Service) => ({
+      params: {
+        town: location.slug,
+        service: service.slug,
+      },
+      props: {
+        location,
+        service,
+      },
+    }))
+  );
+
+  return paths;
+}
+
+const { location, service } = Astro.props as {
+  location: Location;
+  service: Service;
+};
+
+// Generate unique SEO content
+const seoContent = generateLocationServiceSEO(service, location);
+
+const siteUrl = settings.siteUrl;
+
+// Generate schemas
+const breadcrumbSchema = generateBreadcrumbSchema(seoContent.breadcrumbs, siteUrl);
+const serviceSchema = generateServiceSchema(service, settings, undefined, location, siteUrl);
+const localBusinessSchema = generateLocalBusinessSchema(settings, location, siteUrl);
+const faqSchema = generateFAQSchema(seoContent.faqs, siteUrl);
+
+const structuredData = combineSchemas(
+  breadcrumbSchema,
+  localBusinessSchema,
+  serviceSchema,
+  faqSchema
+);
+---
+
+<Base 
+  title={seoContent.title} 
+  description={seoContent.description}
+  structuredData={structuredData}
+>
+  <!-- Hero Section -->
+  <Hero
+    variant="simple"
+    title={seoContent.h1}
+    subtitle={seoContent.introParagraph}
+    primaryCta={{ label: "Get a Free Quote", href: "/contact" }}
+    backgroundImage={service.heroImage}
+    alignment="center"
+  />
+
+  <!-- Service Details Section -->
+  <section class="py-section-mobile lg:py-section-desktop bg-background">
+    <Container>
+      <div class="max-w-3xl mx-auto">
+        <!-- H2: About Our {Service} Services in {Town} -->
+        <h2 class="font-display text-3xl font-bold mb-6 text-brand-navy">
+          About Our {service.title} Services in {location.town}
+        </h2>
+        
+        <!-- Service Description -->
+        <p class="text-lg text-slate-600 mb-8">
+          {service.fullDescription || service.description}
+        </p>
+
+        <!-- Local Callout -->
+        <div class="bg-primary-50 border-l-4 border-primary-500 p-6 mb-8">
+          <p class="text-slate-700 font-medium">
+            {seoContent.localCallout}
+          </p>
+        </div>
+
+        <!-- Why Choose Blue Lawns for {Town} -->
+        <h3 class="font-display text-2xl font-bold mb-4 text-brand-navy">
+          Why Choose Blue Lawns for {location.town} {service.title}?
+        </h3>
+        <ul class="space-y-3 mb-8">
+          <li class="flex items-start">
+            <svg class="w-6 h-6 text-secondary-500 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span class="text-slate-600">Licensed and insured in Cape May County</span>
+          </li>
+          <li class="flex items-start">
+            <svg class="w-6 h-6 text-secondary-500 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span class="text-slate-600">Serving {location.town} since 2010</span>
+          </li>
+          <li class="flex items-start">
+            <svg class="w-6 h-6 text-secondary-500 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span class="text-slate-600">Free estimates for all {location.town} properties</span>
+          </li>
+          <li class="flex items-start">
+            <svg class="w-6 h-6 text-secondary-500 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span class="text-slate-600">Satisfaction guaranteed on every project</span>
+          </li>
+        </ul>
+      </div>
+    </Container>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-section-mobile lg:py-section-desktop bg-gray-50">
+    <Container>
+      <div class="max-w-3xl mx-auto">
+        <h2 class="font-display text-3xl font-bold mb-8 text-brand-navy text-center">
+          Frequently Asked Questions
+        </h2>
+        
+        <div class="space-y-6">
+          {seoContent.faqs.map((faq) => (
+            <div class="bg-white rounded-lg shadow-md p-6">
+              <h3 class="font-display text-xl font-bold mb-3 text-brand-navy">
+                {faq.question}
+              </h3>
+              <p class="text-slate-600 leading-relaxed">
+                {faq.answer}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- CTA Section -->
+  <CTA
+    title={`Ready to Get Started in ${location.town}?`}
+    text="Contact us today for a free estimate. We're proud to serve the residents of this beautiful coastal community."
+    primaryCtaLabel="Get a Free Quote"
+    primaryCtaLink="/contact"
+    secondaryCtaLabel="Call Us Now"
+    secondaryCtaLink={`tel:${settings.contact?.phone.replace(/\s/g, '')}`}
+  />
+</Base>
+

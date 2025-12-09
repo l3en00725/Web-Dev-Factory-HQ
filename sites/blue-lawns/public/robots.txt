@@ -1,12 +1,26 @@
 # robots.txt for Blue Lawns
-# https://www.bluelawns.com
+# Updated: December 2024
 
 User-agent: *
 Allow: /
 
-# Sitemaps
+# Sitemap
 Sitemap: https://www.bluelawns.com/sitemap.xml
 
-# Disallow admin/api routes
+# Disallow admin/internal areas
 Disallow: /api/
 Disallow: /dashboard/
+Disallow: /_*
+
+# Disallow reports and temp files
+Disallow: /reports/
+Disallow: /*.json$
+
+# Allow crawling of all public pages
+Allow: /services/
+Allow: /locations/
+Allow: /membership
+Allow: /contact
+
+# Crawl-delay (optional, for politeness)
+# Crawl-delay: 1

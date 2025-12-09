@@ -9,8 +9,8 @@ import settings from '../../content/settings.json';
 import services from '../../content/services.json';
 
 const service = services.find(s => s.slug === 'landscaping')!;
-const title = `${service.title} | ${settings.title}`;
-const description = service.description;
+const title = `${service.title} Services | ${settings.title}`;
+const description = `Expert ${service.title.toLowerCase()} services in Cape May County. ${service.description} Licensed, insured, and satisfaction guaranteed.`;
 
 const siteUrl = settings.siteUrl;
 const breadcrumbSchema = generateBreadcrumbSchema(
@@ -34,47 +34,29 @@ const structuredData = {
   structuredData={structuredData}
 >
   <Hero
-    headline={service.title}
-    subheadline={service.excerpt}
-    image={service.image}
-    ctaLabel="Get a Free Quote"
-    ctaLink="/contact"
-    secondaryCtaLabel="View All Services"
-    secondaryCtaLink="/services"
+    variant="simple"
+    title={service.title}
+    subtitle={service.description}
+    primaryCta={{ label: "Get a Free Quote", href: "/contact" }}
+    backgroundImage={service.heroImage}
+    alignment="center"
   />
 
   <section class="py-section-mobile lg:py-section-desktop bg-background">
     <Container>
       <div class="max-w-3xl mx-auto">
-        <h2 class="font-display text-3xl font-bold mb-6">About Our {service.title} Services</h2>
-        <p class="text-lg text-foreground-secondary mb-8">{service.description}</p>
-        
-        {service.features && service.features.length > 0 && (
-          <div class="mt-12">
-            <h3 class="font-display text-2xl font-bold mb-6">What's Included</h3>
-            <ul class="grid gap-4 md:grid-cols-2">
-              {service.features.map((feature) => (
-                <li class="flex items-start gap-3">
-                  <svg class="w-5 h-5 text-secondary-500 mt-1 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-                  </svg>
-                  <span class="text-foreground-secondary">{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <h2 class="font-display text-3xl font-bold mb-6 text-brand-navy">About Our {service.title} Services</h2>
+        <p class="text-lg text-slate-600 mb-8">{service.fullDescription || service.description}</p>
       </div>
     </Container>
   </section>
 
   <CTA
-    heading="Ready to Transform Your Property?"
-    body="Contact us today for a free landscape design consultation."
-    buttonLabel="Get Started"
-    buttonLink="/contact"
-    secondaryButtonLabel="Call Us"
-    secondaryButtonLink={`tel:${settings.contact?.phone}`}
+    title="Ready to Transform Your Property?"
+    text="Contact us today for a free landscape consultation and quote."
+    primaryCtaLabel="Get Started"
+    primaryCtaLink="/contact"
+    secondaryCtaLabel="Call Us"
+    secondaryCtaLink={`tel:${settings.contact?.phone.replace(/\s/g, '')}`}
   />
 </Base>
-

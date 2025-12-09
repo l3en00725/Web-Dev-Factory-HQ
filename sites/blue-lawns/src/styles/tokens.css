@@ -76,9 +76,12 @@
   --color-surface-muted: var(--color-neutral-100);
 
   /* Text Colors (Enhanced) */
-  --color-text: var(--color-neutral-900);
-  --color-text-primary: var(--color-neutral-900);
-  --color-text-secondary: var(--color-neutral-600);
+  --color-brand-navy: #0E1B2C;      /* Brand navy for headings (replaces black) */
+  --color-brand-body: #44546A;      /* Brand body text (gray-blue) */
+  
+  --color-text: var(--color-brand-body);
+  --color-text-primary: var(--color-brand-navy);
+  --color-text-secondary: var(--color-brand-body);
   --color-text-tertiary: var(--color-neutral-500);
   --color-text-muted: var(--color-neutral-500);
   --color-text-inverse: #ffffff;

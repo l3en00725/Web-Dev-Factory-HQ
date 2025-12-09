@@ -1,0 +1,67 @@
+---
+/**
+ * LocationServiceCard - Links to location×service matrix page
+ * Used on individual location pages to navigate to specific service pages for that location
+ */
+import { Image } from 'astro:assets';
+import { resolveImage } from '../lib/image-helper';
+
+interface Props {
+  service: {
+    title: string;
+    slug: string;
+    description: string;
+    heroImage: string;
+    icon?: string;
+    alt?: string;
+  };
+  locationSlug: string;
+  locationTown: string;
+}
+
+const { service, locationSlug, locationTown } = Astro.props;
+
+const image = resolveImage(service.heroImage);
+---
+
+<a
+  href={`/locations/${locationSlug}/${service.slug}`}
+  class="group block h-full bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+>
+  <div class="aspect-[4/3] w-full relative overflow-hidden bg-slate-100">
+    {image ? (
+      <Image 
+        src={image} 
+        alt={service.alt || `${service.title} services in ${locationTown}`}
+        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        width={600}
+      />
+    ) : (
+      <div class="w-full h-full flex items-center justify-center text-slate-400">
+        <span class="text-sm">Image not available</span>
+      </div>
+    )}
+    
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+  </div>
+
+  <div class="p-6 flex flex-col gap-3">
+    <div>
+      <h3 class="text-xl font-bold text-brand-navy font-display mb-2 group-hover:text-primary-600 transition-colors">
+        {service.title}
+      </h3>
+      
+      <p class="text-slate-600 text-sm leading-relaxed font-sans line-clamp-2">
+        {service.description}
+      </p>
+    </div>
+
+    <div class="mt-auto pt-3 flex items-center text-primary-600 font-medium text-sm">
+      Learn More
+      <svg class="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+      </svg>
+    </div>
+  </div>
+</a>
+

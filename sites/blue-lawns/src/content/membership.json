@@ -1,0 +1,36 @@
+{
+  "plans": [
+    {
+      "name": "Preserve",
+      "priceMonthly": 262,
+      "priceYearly": 250,
+      "description": "Essential care to keep your lawn healthy.",
+      "isPopular": false,
+      "colorTheme": "white",
+      "features": ["Lawn cuttings", "Spring clean up", "Sprinkler winterization"]
+    },
+    {
+      "name": "Nurture",
+      "priceMonthly": 315,
+      "priceYearly": 300,
+      "description": "Complete care for a thriving landscape.",
+      "isPopular": true,
+      "colorTheme": "navy",
+      "features": ["Lawn cuttings", "Spring clean up", "Sprinkler winterization", "Fall lawn renovation"]
+    }
+  ],
+  "comparisonMatrix": [
+    { "feature": "Lawn cuttings", "preserve": true, "nurture": true },
+    { "feature": "Lawn treatments", "preserve": true, "nurture": true },
+    { "feature": "Spring cleanup", "preserve": true, "nurture": true },
+    { "feature": "Fall cleanup", "preserve": true, "nurture": true },
+    { "feature": "New mulch application", "preserve": true, "nurture": true },
+    { "feature": "Bed maintenance", "preserve": true, "nurture": true },
+    { "feature": "Sprinkler system check", "preserve": true, "nurture": true },
+    { "feature": "Sprinkler winterization", "preserve": true, "nurture": true },
+    { "feature": "Annual flower install", "preserve": false, "nurture": true },
+    { "feature": "Fall lawn renovation", "preserve": false, "nurture": true },
+    { "feature": "Summer Pruning", "preserve": false, "nurture": true },
+    { "feature": "Ornamental care", "preserve": false, "nurture": true }
+  ]
+}

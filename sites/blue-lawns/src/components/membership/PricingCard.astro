@@ -1,0 +1,76 @@
+---
+import Button from '../ui/Button.astro';
+
+interface Props {
+  plan: {
+    name: string;
+    priceMonthly: number;
+    priceYearly: number;
+    description: string;
+    isPopular: boolean;
+    colorTheme: string;
+    features: string[];
+  };
+}
+
+const { plan } = Astro.props;
+
+const isNavy = plan.colorTheme === 'navy';
+---
+
+<div class:list={[
+  "relative p-8 rounded-2xl transition-all duration-300 flex flex-col h-full border",
+  isNavy ? "bg-slate-900 text-white border-slate-800" : "bg-white text-brand-navy border-slate-200 shadow-lg"
+]}>
+  {plan.isPopular && (
+    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary-500 text-white px-4 py-1 rounded-full text-sm font-bold shadow-sm uppercase tracking-wide">
+      Popular
+    </div>
+  )}
+
+  <div class="mb-8">
+    <h3 class:list={["text-2xl font-bold mb-2", isNavy ? "text-white" : "text-brand-navy"]}>
+      {plan.name}
+    </h3>
+    <p class:list={["text-sm min-h-[40px]", isNavy ? "text-slate-400" : "text-slate-500"]}>
+      {plan.description}
+    </p>
+  </div>
+
+  <div class="mb-8">
+    <div class="price-monthly block group-data-[period=yearly]:hidden">
+      <div class="flex items-baseline gap-1">
+        <span class="text-4xl font-bold">${plan.priceMonthly}</span>
+        <span class:list={["text-sm", isNavy ? "text-slate-400" : "text-slate-500"]}>/ Month</span>
+      </div>
+      <p class:list={["text-xs mt-2", isNavy ? "text-slate-500" : "text-slate-400"]}>Billed monthly</p>
+    </div>
+    
+    <div class="price-yearly hidden group-data-[period=yearly]:block">
+      <div class="flex items-baseline gap-1">
+        <span class="text-4xl font-bold">${plan.priceYearly}</span>
+        <span class:list={["text-sm", isNavy ? "text-slate-400" : "text-slate-500"]}>/ Month</span>
+      </div>
+      <p class:list={["text-xs mt-2", isNavy ? "text-slate-500" : "text-slate-400"]}>Billed annually (${plan.priceYearly * 12}/year)</p>
+    </div>
+  </div>
+
+  <ul class="space-y-4 mb-8 flex-1">
+    {plan.features.map(feature => (
+      <li class="flex items-start gap-3 text-sm">
+        <svg class:list={["w-5 h-5 shrink-0 mt-0.5", isNavy ? "text-secondary-400" : "text-secondary-500"]} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span class:list={[isNavy ? "text-slate-300" : "text-slate-600"]}>{feature}</span>
+      </li>
+    ))}
+  </ul>
+
+  <Button 
+    href="https://clienthub.getjobber.com/client_hubs/1340bb14-d0cd-4f63-9273-6565d44833b6/public/work_request/new?source=social_media" 
+    variant={isNavy ? 'primary' : 'outline'} 
+    class="w-full justify-center"
+  >
+    Get Started
+  </Button>
+</div>

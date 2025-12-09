@@ -6,7 +6,7 @@ const destination = settings.formDestination;
 ---
 
 <contact-form class="block">
-  <form id="contactForm" class="space-y-4">
+  <form id="contactForm" data-form="lead" class="space-y-4">
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <div class="space-y-2">
         <label for="name" class="text-sm font-medium text-foreground">Name</label>
@@ -74,6 +74,14 @@ const destination = settings.formDestination;
         form.addEventListener('submit', async (e) => {
           e.preventDefault();
           if (!submitBtn || !statusDiv) return;
+
+          // Track form submission event (before async operation)
+          if (typeof window.trackEvent === 'function') {
+            window.trackEvent('lead_submission', {
+              form_id: form.id || 'contactForm',
+              form_name: 'contact'
+            });
+          }
 
           // Reset status
           statusDiv.classList.add('hidden');

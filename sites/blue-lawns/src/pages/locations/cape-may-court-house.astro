@@ -2,7 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import Container from '../../components/layout/Container.astro';
 import Hero from '../../components/sections/Hero.astro';
-import ServicesGrid from '../../components/sections/ServicesGrid.astro';
+import LocationServiceCard from '../../components/LocationServiceCard.astro';
 import CTA from '../../components/sections/CTA.astro';
 import { generateBreadcrumbSchema } from '../../lib/structured-data/Breadcrumbs';
 import { generateLocalBusinessSchema } from '../../lib/structured-data/LocalBusiness';
@@ -11,15 +11,15 @@ import services from '../../content/services.json';
 import locations from '../../content/locations.json';
 
 const location = locations.find(l => l.slug === 'cape-may-court-house')!;
-const title = `${location.title} Lawn Care & Landscaping | ${settings.title}`;
-const description = location.description;
+const title = `Landscaping in ${location.town}, NJ | ${settings.title}`;
+const description = `Professional lawn care and landscaping services in ${location.town}, NJ. ${location.description} Get a free quote today.`;
 
 const siteUrl = settings.siteUrl;
 const breadcrumbSchema = generateBreadcrumbSchema(
   [
     { name: 'Home', url: '/' },
-    { name: 'Locations', url: '/locations' },
-    { name: location.title, url: `/locations/${location.slug}` },
+    { name: 'Service Areas', url: '/locations' },
+    { name: location.town, url: `/locations/${location.slug}` },
   ],
   siteUrl
 );
@@ -29,7 +29,7 @@ const structuredData = {
   '@graph': [breadcrumbSchema, localBusinessSchema],
 };
 
-const primaryServices = services.filter(s => s.isPrimary);
+const primaryServices = services.filter(s => s.type === 'primary');
 ---
 
 <Base 
@@ -38,37 +38,44 @@ const primaryServices = services.filter(s => s.isPrimary);
   structuredData={structuredData}
 >
   <Hero
-    headline={`Lawn Care in ${location.title}`}
-    subheadline={`Professional landscaping and lawn maintenance services for ${location.city}, ${location.state}. Licensed, insured, and satisfaction guaranteed.`}
-    ctaLabel="Get a Free Quote"
-    ctaLink="/contact"
-    secondaryCtaLabel="View Services"
-    secondaryCtaLink="/services"
+    variant="simple"
+    title={`Lawn Care in ${location.town}`}
+    subtitle={`Professional landscaping and lawn maintenance services for ${location.town}, NJ. Licensed, insured, and satisfaction guaranteed.`}
+    primaryCta={{ label: "Get a Free Quote", href: "/contact" }}
+    backgroundImage={location.heroImage}
+    alignment="center"
   />
 
   <section class="py-section-mobile lg:py-section-desktop bg-background">
     <Container>
       <div class="max-w-3xl mx-auto text-center mb-12">
-        <h2 class="font-display text-3xl font-bold mb-6">Serving {location.title}, {location.state}</h2>
-        <p class="text-lg text-foreground-secondary">{location.description}</p>
+        <h2 class="font-display text-3xl font-bold mb-6 text-brand-navy">Serving {location.town}, NJ</h2>
+        <p class="text-lg text-slate-600">{location.description}</p>
       </div>
     </Container>
   </section>
 
-  <ServicesGrid 
-    heading={`Our Services in ${location.title}`}
-    subheading="We offer a full range of lawn care and landscaping services."
-    services={primaryServices}
-    showAll={true}
-  />
+  <section class="py-section-mobile lg:py-section-desktop bg-white">
+    <Container>
+      <h2 class="font-display text-3xl font-bold mb-12 text-center text-brand-navy">Our Services in {location.town}</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {primaryServices.map((service) => (
+          <LocationServiceCard 
+            service={service} 
+            locationSlug={location.slug}
+            locationTown={location.town}
+          />
+        ))}
+      </div>
+    </Container>
+  </section>
 
   <CTA
-    heading={`Ready to Get Started in ${location.title}?`}
-    body="Contact us today for a free estimate. We're proud to serve the residents of this beautiful coastal community."
-    buttonLabel="Contact Us"
-    buttonLink="/contact"
-    secondaryButtonLabel="Call Now"
-    secondaryButtonLink={`tel:${settings.contact?.phone}`}
+    title={`Ready to Get Started in ${location.town}?`}
+    text="Contact us today for a free estimate. We're proud to serve the residents of this beautiful coastal community."
+    primaryCtaLabel="Contact Us"
+    primaryCtaLink="/contact"
+    secondaryCtaLabel="Call Now"
+    secondaryCtaLink={`tel:${settings.contact?.phone.replace(/\s/g, '')}`}
   />
 </Base>
-
