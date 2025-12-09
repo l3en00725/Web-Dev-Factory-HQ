@@ -13,7 +13,8 @@ import CTA from '../components/sections/CTA.astro';
 import servicesData from '../content/services.json';
 import settings from '../content/settings.json';
 
-import heroMain from '../assets/images/general/hero-main.jpg';
+import heroMain from '../assets/images/general/hero-main.avif';
+import heroMainWebp from '../assets/images/general/hero-main-optimized.webp';
 import beforeYard from '../assets/images/general/before-yard.jpg';
 import afterYard from '../assets/images/general/after-yard.jpg';
 
@@ -29,6 +30,7 @@ const pageDescription = "Professional landscaping, lawn care, and hardscaping se
 <Layout 
   title={pageTitle}
   description={pageDescription}
+  heroImage="/opengraph.jpg"
   headerVariant="transparent"
   headerMode="dark"
 >
@@ -39,6 +41,7 @@ const pageDescription = "Professional landscaping, lawn care, and hardscaping se
       subtitle="Professional landscaping for Cape May County. We handle the hard work, you handle the weekends."
       primaryCta={{ label: "Get Quote", href: "/contact" }}
       backgroundImage={heroMain}
+      backgroundImageWebp={heroMainWebp}
       alignment="left"
     />
 
