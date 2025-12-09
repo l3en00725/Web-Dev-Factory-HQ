@@ -6,6 +6,8 @@ module.exports = {
       colors: {
         background: 'var(--color-bg)',
         foreground: 'var(--color-text)',
+        'brand-navy': '#0E1B2C',
+        'brand-body': '#44546A',
         primary: {
           50: '#f0f9ff',
           100: '#e0f2fe',

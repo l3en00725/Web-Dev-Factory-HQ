@@ -9,6 +9,10 @@ export default defineConfig({
   site: "https://www.bluelawns.com",
   trailingSlash: "never",
   output: "static",
+  server: {
+    host: "0.0.0.0",
+    port: 4321
+  },
   integrations: [react(), sitemap(), mdx()],
   markdown: {
     rehypePlugins: [

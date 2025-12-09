@@ -32,7 +32,7 @@ const { heading, subheading, plans = [], footnote } = Astro.props;
     {(heading || subheading) && (
       <div class="mb-20 text-center max-w-3xl mx-auto">
         {heading && (
-          <h2 class="font-display text-4xl font-bold tracking-tight text-slate-900 lg:text-5xl mb-6">
+          <h2 class="font-display text-4xl font-bold tracking-tight text-brand-navy lg:text-5xl mb-6">
             {heading}
           </h2>
         )}
@@ -51,7 +51,7 @@ const { heading, subheading, plans = [], footnote } = Astro.props;
             "relative flex flex-col rounded-3xl p-8 transition-all duration-300",
             plan.highlighted 
               ? "bg-primary-900 text-white shadow-2xl shadow-primary-900/20 scale-105 z-10 ring-1 ring-white/10" 
-              : "bg-white text-slate-900 shadow-lg hover:shadow-xl border border-neutral-100"
+              : "bg-white text-brand-navy shadow-lg hover:shadow-xl border border-neutral-100"
           ]}
         >
           {plan.highlighted && plan.badge && (
@@ -61,7 +61,7 @@ const { heading, subheading, plans = [], footnote } = Astro.props;
           )}
 
           <div class="mb-8">
-            <h3 class={`text-xl font-bold mb-2 ${plan.highlighted ? 'text-white' : 'text-slate-900'}`}>
+            <h3 class={`text-xl font-bold mb-2 ${plan.highlighted ? 'text-white' : 'text-brand-navy'}`}>
               {plan.name}
             </h3>
             <p class={`text-sm ${plan.highlighted ? 'text-primary-200' : 'text-slate-500'}`}>

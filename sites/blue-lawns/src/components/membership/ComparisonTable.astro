@@ -1,0 +1,58 @@
+---
+interface Props {
+  matrix: {
+    feature: string;
+    preserve: boolean;
+    nurture: boolean;
+  }[];
+}
+
+const { matrix } = Astro.props;
+---
+
+<div class="mt-24 max-w-4xl mx-auto overflow-hidden rounded-2xl border border-slate-200 shadow-sm bg-white">
+  <div class="p-6 bg-slate-50 border-b border-slate-200">
+    <h3 class="text-xl font-bold text-brand-navy text-center">Compare All Features</h3>
+  </div>
+  
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-white">
+        <tr>
+          <th class="p-4 pl-6 font-medium text-slate-500 w-1/2">Feature</th>
+          <th class="p-4 font-bold text-brand-navy text-center w-1/4">Preserve</th>
+          <th class="p-4 font-bold text-brand-navy text-center w-1/4 bg-slate-50/50">Nurture</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {matrix.map((row, index) => (
+          <tr class:list={["hover:bg-slate-50/50 transition-colors", index % 2 === 0 ? "bg-white" : "bg-slate-50/30"]}>
+            <td class="p-4 pl-6 font-medium text-slate-700">{row.feature}</td>
+            <td class="p-4 text-center">
+              {row.preserve ? (
+                <div class="flex justify-center">
+                  <svg class="w-6 h-6 text-secondary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              ) : (
+                <span class="text-slate-300 font-bold text-xl">-</span>
+              )}
+            </td>
+            <td class="p-4 text-center bg-slate-50/50">
+              {row.nurture ? (
+                <div class="flex justify-center">
+                  <svg class="w-6 h-6 text-secondary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              ) : (
+                <span class="text-slate-300 font-bold text-xl">-</span>
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>

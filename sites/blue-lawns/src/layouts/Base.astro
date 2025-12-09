@@ -91,8 +91,26 @@ const mappedNavItems = navigation.map((item) => ({
     {cleanedStructuredData && (
       <script type="application/ld+json" set:html={JSON.stringify(cleanedStructuredData)} />
     )}
+    
+    {/* Google Analytics GA4 */}
+    {settings.analytics?.googleAnalyticsId && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${settings.analytics.googleAnalyticsId}`}></script>
+        <script is:inline define:vars={{ gaId: settings.analytics.googleAnalyticsId }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', gaId, {
+            'send_page_view': false // We'll handle this with our custom tracker
+          });
+        </script>
+      </>
+    )}
+    
+    {/* Custom Analytics Event Tracker */}
+    <script is:inline src="/js/analytics.js"></script>
   </head>
-  <body class="flex min-h-screen flex-col bg-gray-50 text-gray-900 font-sans antialiased">
+  <body class="flex min-h-screen flex-col bg-gray-50 text-brand-navy font-sans antialiased">
     <Header 
       navItems={mappedNavItems} 
       variant={headerVariant}

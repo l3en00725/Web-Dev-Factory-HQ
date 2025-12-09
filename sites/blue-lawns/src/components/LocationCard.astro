@@ -1,0 +1,70 @@
+---
+import { Image } from 'astro:assets';
+import { resolveImage } from '../lib/image-helper';
+import Button from './ui/Button.astro';
+
+interface Props {
+  location: {
+    town: string;
+    description: string;
+    heroImage: string;
+    badges?: string[];
+    slug: string;
+  };
+}
+
+const { location } = Astro.props;
+
+const image = resolveImage(location.heroImage);
+---
+
+<a 
+  href={`/locations/${location.slug}`}
+  class="group block h-full bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+>
+  <div class="aspect-[4/3] w-full relative overflow-hidden bg-slate-100">
+    {image ? (
+      <Image 
+        src={image} 
+        alt={`Landscaping services in ${location.town}`}
+        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        width={600}
+      />
+    ) : (
+      <div class="w-full h-full flex items-center justify-center text-slate-400">
+        <span class="text-sm">Image not available</span>
+      </div>
+    )}
+    
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+  </div>
+
+  <div class="p-6 flex flex-col gap-4">
+    <div>
+      <h3 class="text-2xl font-bold text-brand-navy font-display mb-2 group-hover:text-primary-600 transition-colors">
+        {location.town}
+      </h3>
+      
+      {location.badges && (
+        <div class="flex flex-wrap gap-2 mb-3">
+          {location.badges.map(badge => (
+            <span class="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-full">
+              {badge}
+            </span>
+          ))}
+        </div>
+      )}
+      
+      <p class="text-slate-600 text-sm leading-relaxed font-sans">
+        {location.description}
+      </p>
+    </div>
+
+    <div class="mt-auto pt-4 flex items-center text-primary-600 font-bold text-sm">
+      View Services in {location.town}
+      <svg class="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+      </svg>
+    </div>
+  </div>
+</a>

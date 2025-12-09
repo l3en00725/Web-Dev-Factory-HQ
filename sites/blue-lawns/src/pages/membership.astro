@@ -1,75 +1,78 @@
 ---
 import Base from '../layouts/Base.astro';
 import Container from '../components/layout/Container.astro';
-import Button from '../components/ui/Button.astro';
-import { generateBreadcrumbSchema } from '../lib/structured-data/Breadcrumbs';
-import settings from '../content/settings.json';
+import PricingToggle from '../components/membership/PricingToggle.astro';
+import PricingCard from '../components/membership/PricingCard.astro';
+import ComparisonTable from '../components/membership/ComparisonTable.astro';
+import membershipData from '../content/membership.json';
 
-const title = 'Membership Program';
-const description = `Join the ${settings.title} membership program for hassle-free lawn care all year round. Save money and never worry about scheduling again.`;
-
-// Structured data
-const siteUrl = settings.siteUrl;
-const breadcrumbSchema = generateBreadcrumbSchema(
-  [
-    { name: 'Home', url: '/' },
-    { name: 'Membership', url: '/membership' },
-  ],
-  siteUrl
-);
-
-const structuredData = {
-  '@graph': [breadcrumbSchema],
-};
-
-const membershipBenefits = [
-  "Priority scheduling - always first in line",
-  "Discounted rates on all services",
-  "Free seasonal cleanup included",
-  "No contracts - cancel anytime",
-  "Dedicated account manager",
-  "Emergency service availability"
-];
+const { plans, comparisonMatrix } = membershipData;
 ---
 
-<Base
-  title={title}
-  description={description}
-  structuredData={structuredData}
+<Base 
+  title="Membership Plans | Blue Lawns" 
+  description="Flexible landscaping membership plans for Cape May County homes. Comprehensive care packages with monthly and yearly options. Get professional lawn care and maintenance year-round."
   headerVariant="solid"
 >
-  <section class="py-section-mobile lg:py-section-desktop bg-background">
-    <Container class="max-w-4xl mx-auto">
-      <div class="text-center mb-12">
-        <h1 class="font-display text-4xl lg:text-5xl font-bold mb-4">{title}</h1>
-        <p class="text-xl text-foreground-secondary max-w-2xl mx-auto">
-          {description}
-        </p>
-      </div>
-
-      <div class="bg-surface rounded-2xl border border-border p-8 lg:p-12 shadow-lg">
-        <h2 class="font-display text-2xl font-bold mb-6 text-center">Membership Benefits</h2>
-        
-        <ul class="grid md:grid-cols-2 gap-4 mb-8">
-          {membershipBenefits.map((benefit) => (
-            <li class="flex items-start gap-3">
-              <svg class="w-5 h-5 text-secondary-500 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-              </svg>
-              <span class="text-foreground-secondary">{benefit}</span>
-            </li>
-          ))}
-        </ul>
-
-        <div class="text-center">
-          <Button href="/contact" variant="primary" size="lg">
-            Become a Member
-          </Button>
-          <p class="mt-4 text-sm text-foreground-muted">
-            Contact us to learn about membership pricing and plans.
+  <div id="pricing-container" data-period="monthly" class="group">
+    <section class="py-24 bg-slate-50">
+      <Container>
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <h1 class="text-4xl md:text-5xl font-bold text-brand-navy mb-6 font-display">
+            Choose Your Membership Plan
+          </h1>
+          <p class="text-lg text-slate-600">
+            Professional lawn care packages designed to keep your property looking its best year-round.
           </p>
         </div>
-      </div>
-    </Container>
-  </section>
+
+        <PricingToggle />
+
+        <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto items-start">
+          {plans.map(plan => (
+            <PricingCard plan={plan} />
+          ))}
+        </div>
+
+        <ComparisonTable matrix={comparisonMatrix} />
+        
+        <div class="mt-16 text-center">
+           <p class="text-slate-500 text-sm max-w-2xl mx-auto">
+             * All plans require an initial consultation to confirm property size and specific needs. Prices shown are starting rates for standard residential lots.
+           </p>
+        </div>
+      </Container>
+    </section>
+
+    <section class="py-24 bg-white">
+      <Container size="md">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl font-bold text-brand-navy mb-4 font-display">Frequently Asked Questions</h2>
+        </div>
+        
+        <div class="space-y-8 max-w-3xl mx-auto">
+          <div>
+             <h3 class="text-lg font-bold text-brand-navy mb-2">What are the terms of your maintenance subscription packages?</h3>
+             <p class="text-slate-600 leading-relaxed">
+               On the first of the month your card will be charged for your fixed monthly cost including sales tax. Because our subscription program has different costs at different times of the year (e.g., Spring Cleanup is expensive), you cannot cancel without paying the remainder of services provided if you leave mid-year. We will prepare a prorated amount based on work performed.
+             </p>
+          </div>
+          
+          <div>
+             <h3 class="text-lg font-bold text-brand-navy mb-2">Why am I paying for 12 months if I only get service for 9?</h3>
+             <p class="text-slate-600 leading-relaxed">
+               We are a 12-month business with fixed overhead. Spreading the cost over 12 months helps you budget with a predictable monthly fee, and helps us retain our professional crew year-round so they are ready to serve you.
+             </p>
+          </div>
+
+          <div>
+             <h3 class="text-lg font-bold text-brand-navy mb-2">Can I choose my service day?</h3>
+             <p class="text-slate-600 leading-relaxed">
+               Unfortunately, no. To operate efficiently and keep costs down, we route our crews geographically. We can let you know which day of the week we are in your neighborhood.
+             </p>
+          </div>
+        </div>
+      </Container>
+    </section>
+  </div>
 </Base>

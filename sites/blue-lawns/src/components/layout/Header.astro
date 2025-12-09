@@ -24,7 +24,7 @@ const primaryServices = servicesData.filter(s => s.type === 'primary');
     "group fixed top-0 z-50 w-full transition-all duration-300 border-b",
     variant === 'transparent' 
       ? "bg-transparent border-transparent text-white" 
-      : "bg-white/90 backdrop-blur-md border-slate-200/50 text-slate-900 shadow-sm"
+      : "bg-white/90 backdrop-blur-md border-slate-200/50 text-brand-navy shadow-sm"
   ]}
   data-variant={variant}
   data-scrolled="false"
@@ -148,11 +148,11 @@ const primaryServices = servicesData.filter(s => s.type === 'primary');
     if (isScrolled) {
       // Scrolled State (Solid/Glass)
       header.classList.remove('bg-transparent', 'border-transparent', 'text-white');
-      header.classList.add('bg-white/90', 'backdrop-blur-md', 'border-slate-200/50', 'text-slate-900', 'shadow-sm');
+      header.classList.add('bg-white/90', 'backdrop-blur-md', 'border-slate-200/50', 'text-brand-navy', 'shadow-sm');
     } else {
       // Top State (Transparent)
       header.classList.add('bg-transparent', 'border-transparent', 'text-white');
-      header.classList.remove('bg-white/90', 'backdrop-blur-md', 'border-slate-200/50', 'text-slate-900', 'shadow-sm');
+      header.classList.remove('bg-white/90', 'backdrop-blur-md', 'border-slate-200/50', 'text-brand-navy', 'shadow-sm');
     }
     
     header.setAttribute('data-scrolled', isScrolled.toString());

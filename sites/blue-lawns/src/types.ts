@@ -1,20 +1,23 @@
-export interface SEO {
-  title: string;
-  description: string;
-  keywords: string[];
-}
+/**
+ * Global type definitions for Blue Lawns site
+ */
 
 export interface Service {
   id: string;
   title: string;
   slug: string;
-  type: 'primary' | 'secondary';
   description: string;
-  fullDescription: string;
-  icon: string;
-  heroImage: string;
-  galleryImages: string[];
-  seo: SEO;
+  fullDescription?: string;
+  heroImage?: string;
+  alt?: string;
+  type?: 'primary' | 'secondary';
+  isPrimary?: boolean;
+  seo?: {
+    title?: string;
+    description?: string;
+    keywords?: string[];
+  };
+  galleryImages?: string[];
 }
 
 export interface Location {
@@ -26,6 +29,47 @@ export interface Location {
     lng: number;
   };
   description: string;
-  heroImage: string;
+  badges?: string[];
+  heroImage?: string;
 }
 
+export interface FAQ {
+  question: string;
+  answer: string;
+}
+
+export interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
+export interface Settings {
+  title: string;
+  description: string;
+  siteUrl: string;
+  logo: string;
+  contact: {
+    email: string;
+    phone: string;
+    address: {
+      street: string;
+      city: string;
+      state: string;
+      zip: string;
+    };
+  };
+  social?: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    linkedin?: string;
+  };
+  businessHours?: {
+    weekdays: string;
+    saturday?: string;
+    sunday?: string;
+  };
+  analytics?: {
+    googleAnalyticsId?: string;
+  };
+}

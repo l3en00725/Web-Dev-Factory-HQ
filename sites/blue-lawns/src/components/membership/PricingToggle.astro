@@ -1,0 +1,54 @@
+---
+---
+
+<div class="flex justify-center mb-12">
+  <div class="bg-gray-100 p-1 rounded-full inline-flex items-center relative">
+    <button 
+      id="toggle-monthly"
+      class="px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 relative z-10 text-brand-navy bg-white shadow-sm"
+      aria-pressed="true"
+    >
+      Monthly
+    </button>
+    <button 
+      id="toggle-yearly"
+      class="px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 relative z-10 text-slate-500 hover:text-brand-navy"
+      aria-pressed="false"
+    >
+      Yearly
+    </button>
+  </div>
+</div>
+
+<script>
+  const toggleMonthly = document.getElementById('toggle-monthly');
+  const toggleYearly = document.getElementById('toggle-yearly');
+  const pricingContainer = document.getElementById('pricing-container');
+
+  function setPeriod(period) {
+    if (!pricingContainer) return;
+    
+    pricingContainer.setAttribute('data-period', period);
+    
+    if (period === 'monthly') {
+      toggleMonthly?.classList.add('bg-white', 'shadow-sm', 'text-brand-navy');
+      toggleMonthly?.classList.remove('text-slate-500');
+      toggleMonthly?.setAttribute('aria-pressed', 'true');
+      
+      toggleYearly?.classList.remove('bg-white', 'shadow-sm', 'text-brand-navy');
+      toggleYearly?.classList.add('text-slate-500');
+      toggleYearly?.setAttribute('aria-pressed', 'false');
+    } else {
+      toggleYearly?.classList.add('bg-white', 'shadow-sm', 'text-brand-navy');
+      toggleYearly?.classList.remove('text-slate-500');
+      toggleYearly?.setAttribute('aria-pressed', 'true');
+      
+      toggleMonthly?.classList.remove('bg-white', 'shadow-sm', 'text-brand-navy');
+      toggleMonthly?.classList.add('text-slate-500');
+      toggleMonthly?.setAttribute('aria-pressed', 'false');
+    }
+  }
+
+  toggleMonthly?.addEventListener('click', () => setPeriod('monthly'));
+  toggleYearly?.addEventListener('click', () => setPeriod('yearly'));
+</script>

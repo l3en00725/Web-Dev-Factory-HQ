@@ -7,8 +7,12 @@
       "lat": 39.1751,
       "lng": -74.7268
     },
-    "description": "Serving the beautiful community of Ocean View with premium landscaping services. We understand the local soil conditions and coastal climate nuances specific to Ocean View properties.",
-    "heroImage": "src/assets/images/locations/ocean-view/hero.jpg"
+    "description": "Premium landscaping for spacious coastal properties.",
+    "badges": [
+      "Landscaping",
+      "Maintenance"
+    ],
+    "heroImage": "src/assets/images/services/landscaping/hero-manual.webp"
   },
   {
     "id": "cape-may",
@@ -16,10 +20,14 @@
     "slug": "cape-may",
     "geo": {
       "lat": 38.9351,
-      "lng": -74.9060
+      "lng": -74.906
     },
-    "description": "Providing expert lawn and landscape care for historic Cape May. Our team specializes in maintaining the classic charm and curb appeal of Cape May's unique Victorian and coastal homes.",
-    "heroImage": "src/assets/images/locations/cape-may/hero.jpg"
+    "description": "Expert care for historic Victorian homes and gardens.",
+    "badges": [
+      "Gardening",
+      "Lawn Care"
+    ],
+    "heroImage": "src/assets/images/services/landscape-maintenance/hero-manual.webp"
   },
   {
     "id": "avalon",
@@ -29,8 +37,12 @@
       "lat": 39.1007,
       "lng": -74.7185
     },
-    "description": "Delivering high-end landscape maintenance for Avalon's premier properties. We offer reliable service that keeps your vacation home or permanent residence looking immaculate year-round.",
-    "heroImage": "src/assets/images/locations/avalon/hero.jpg"
+    "description": "High-end maintenance for luxury vacation residences.",
+    "badges": [
+      "Hardscaping",
+      "Design"
+    ],
+    "heroImage": "src/assets/images/services/hardscaping/hero-manual.webp"
   },
   {
     "id": "stone-harbor",
@@ -40,8 +52,12 @@
       "lat": 39.0487,
       "lng": -74.7568
     },
-    "description": "Professional landscaping services for Stone Harbor. From dune grass management to luxury hardscaping, we cater to the specific needs of Stone Harbor homeowners.",
-    "heroImage": "src/assets/images/locations/stone-harbor/hero.jpg"
+    "description": "Bespoke outdoor living spaces for coastal estates.",
+    "badges": [
+      "Design",
+      "Pools"
+    ],
+    "heroImage": "src/assets/images/services/pool-service/hero.webp"
   },
   {
     "id": "sea-isle-city",
@@ -51,7 +67,86 @@
       "lat": 39.1523,
       "lng": -74.6943
     },
-    "description": "Your trusted local landscapers in Sea Isle City. We provide comprehensive outdoor care, ensuring your property stands out in this vibrant coastal community.",
-    "heroImage": "src/assets/images/locations/sea-isle-city/hero.jpg"
+    "description": "Reliable lawn care for vibrant summer properties.",
+    "badges": [
+      "Maintenance",
+      "Cleanups"
+    ],
+    "heroImage": "src/assets/images/services/lawn-care/hero.webp"
+  },
+  {
+    "id": "wildwood",
+    "town": "Wildwood",
+    "slug": "wildwood",
+    "geo": {
+      "lat": 38.9917,
+      "lng": -74.8117
+    },
+    "description": "Professional grounds keeping for commercial and residential.",
+    "badges": [
+      "Commercial",
+      "Lawn Care"
+    ],
+    "heroImage": "src/assets/images/services/commercial-services/hero-manual.webp"
+  },
+  {
+    "id": "north-wildwood",
+    "town": "North Wildwood",
+    "slug": "north-wildwood",
+    "geo": {
+      "lat": 39.0007,
+      "lng": -74.7993
+    },
+    "description": "Complete property care from the bay to the beach.",
+    "badges": [
+      "Cleanup",
+      "Pruning"
+    ],
+    "heroImage": "src/assets/images/services/seasonal-cleanup/hero-manual.webp"
+  },
+  {
+    "id": "wildwood-crest",
+    "town": "Wildwood Crest",
+    "slug": "wildwood-crest",
+    "geo": {
+      "lat": 38.9765,
+      "lng": -74.8257
+    },
+    "description": "Meticulous lawn services for quiet coastal neighborhoods.",
+    "badges": [
+      "Lawn Care",
+      "Fertilization"
+    ],
+    "heroImage": "src/assets/images/services/landscape-lighting/hero-manual.webp"
+  },
+  {
+    "id": "rio-grande",
+    "town": "Rio Grande",
+    "slug": "rio-grande",
+    "geo": {
+      "lat": 39.0194,
+      "lng": -74.8776
+    },
+    "description": "Full-service landscaping for fast-growing communities.",
+    "badges": [
+      "Installation",
+      "Maintenance"
+    ],
+    "heroImage": "src/assets/images/services/power-washing/hero-manual.webp"
+  },
+  {
+    "id": "cape-may-court-house",
+    "town": "Cape May Court House",
+    "slug": "cape-may-court-house",
+    "geo": {
+      "lat": 39.0818,
+      "lng": -74.8257
+    },
+    "description": "Comprehensive estate management and tree services.",
+    "badges": [
+      "Tree Care",
+      "Landscaping"
+    ],
+    "heroImage": "src/assets/images/services/fencing/fencing-service-hero.webp"
   }
 ]

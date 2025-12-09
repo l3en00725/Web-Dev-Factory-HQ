@@ -8,6 +8,7 @@ interface Props extends HTMLAttributes<'button'> {
   block?: boolean;
   iconLeft?: string;
   iconRight?: string;
+  track?: 'cta' | boolean; // Enable GA4 tracking
 }
 
 const {
@@ -17,9 +18,13 @@ const {
   block = false,
   iconLeft,
   iconRight,
+  track,
   class: className,
   ...rest
 } = Astro.props;
+
+// Add tracking attribute if requested
+const trackingAttr = track ? { 'data-track': track === true ? 'cta' : track } : {};
 
 const Element = href ? 'a' : 'button';
 
@@ -52,7 +57,7 @@ const baseClasses = [
 ].filter(Boolean).join(' ');
 ---
 
-<Element href={href} class={baseClasses} {...rest as any}>
+<Element href={href} class={baseClasses} {...trackingAttr} {...rest as any}>
   {iconLeft && <span class="icon shrink-0" set:html={iconLeft} />}
   <slot />
   {iconRight && <span class="icon shrink-0" set:html={iconRight} />}
