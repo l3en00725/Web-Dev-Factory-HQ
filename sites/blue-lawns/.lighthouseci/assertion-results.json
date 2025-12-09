@@ -1,0 +1,2021 @@
+[
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "bf-cache",
+    "level": "error",
+    "url": "http://localhost:4321/",
+    "auditTitle": "Page prevented back/forward cache restoration",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/bf-cache/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": null,
+    "values": [
+      null,
+      null,
+      null
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "Audit did not produce a value at all. \"minScore\" might not be a valid assertion for this audit.",
+    "auditId": "color-contrast",
+    "level": "error",
+    "url": "http://localhost:4321/",
+    "auditTitle": "Background and foreground colors have a sufficient contrast ratio",
+    "auditDocumentationLink": "https://dequeuniversity.com/rules/axe/4.6/color-contrast"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "csp-xss",
+    "level": "error",
+    "url": "http://localhost:4321/",
+    "auditTitle": "Ensure CSP is effective against XSS attacks",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/best-practices/csp-xss/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.83,
+    "values": [
+      0.83,
+      0.83,
+      0.83
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "dom-size",
+    "level": "warn",
+    "url": "http://localhost:4321/",
+    "auditTitle": "Avoid an excessive DOM size",
+    "auditDocumentationLink": "https://developers.google.com/web/fundamentals/performance/rendering/reduce-the-scope-and-complexity-of-style-calculations"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 4,
+    "values": [
+      4,
+      4,
+      4
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "duplicated-javascript",
+    "level": "warn",
+    "url": "http://localhost:4321/",
+    "auditTitle": "Remove duplicate modules in JavaScript bundles"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.54,
+    "values": [
+      0.18,
+      0.54,
+      0.54
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "first-meaningful-paint",
+    "level": "warn",
+    "url": "http://localhost:4321/",
+    "auditTitle": "First Meaningful Paint",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/first-meaningful-paint/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "heading-order",
+    "level": "error",
+    "url": "http://localhost:4321/",
+    "auditTitle": "Heading elements are not in a sequentially-descending order",
+    "auditDocumentationLink": "https://dequeuniversity.com/rules/axe/4.6/heading-order"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "link-text",
+    "level": "warn",
+    "url": "http://localhost:4321/",
+    "auditTitle": "Links do not have descriptive text",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/seo/link-text/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 1,
+    "values": [
+      1,
+      1,
+      1
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "render-blocking-resources",
+    "level": "warn",
+    "url": "http://localhost:4321/",
+    "auditTitle": "Eliminate render-blocking resources",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/render-blocking-resources/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.82,
+    "values": [
+      0.41,
+      0.82,
+      0.81
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "speed-index",
+    "level": "warn",
+    "url": "http://localhost:4321/",
+    "auditTitle": "Speed Index",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/speed-index/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.12,
+    "values": [
+      0.12,
+      0.12,
+      0.12
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "total-byte-weight",
+    "level": "error",
+    "url": "http://localhost:4321/",
+    "auditTitle": "Avoid enormous network payloads",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/total-byte-weight/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.49,
+    "values": [
+      0.49,
+      0.48,
+      0.49
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "unminified-javascript",
+    "level": "warn",
+    "url": "http://localhost:4321/",
+    "auditTitle": "Minify JavaScript",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/unminified-javascript/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 1,
+    "values": [
+      1,
+      1,
+      1
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "uses-long-cache-ttl",
+    "level": "warn",
+    "url": "http://localhost:4321/",
+    "auditTitle": "Uses efficient cache policy on static assets",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-long-cache-ttl/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.33,
+    "values": [
+      0.33,
+      0.33,
+      0.33
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "uses-responsive-images",
+    "level": "warn",
+    "url": "http://localhost:4321/",
+    "auditTitle": "Properly size images",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-responsive-images/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 44,
+    "values": [
+      44,
+      44,
+      44
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "uses-text-compression",
+    "level": "error",
+    "url": "http://localhost:4321/",
+    "auditTitle": "Enable text compression",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-text-compression/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.87,
+    "values": [
+      0.69,
+      0.87,
+      0.69
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "performance",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/"
+  },
+  {
+    "name": "minScore",
+    "expected": 1,
+    "actual": null,
+    "values": [
+      null,
+      null,
+      null
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "Audit did not produce a value at all. \"minScore\" might not be a valid assertion for this audit.",
+    "auditProperty": "accessibility",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/"
+  },
+  {
+    "name": "minScore",
+    "expected": 1,
+    "actual": 0.92,
+    "values": [
+      0.92,
+      0.92,
+      0.92
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "seo",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/"
+  },
+  {
+    "name": "auditRan",
+    "expected": 1,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "\"uses-webp-images\" is not a known audit.",
+    "auditId": "uses-webp-images",
+    "level": "warn",
+    "url": "http://localhost:4321/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "bf-cache",
+    "level": "error",
+    "url": "http://localhost:4321/services",
+    "auditTitle": "Page prevented back/forward cache restoration",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/bf-cache/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": null,
+    "values": [
+      null,
+      null,
+      null
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "Audit did not produce a value at all. \"minScore\" might not be a valid assertion for this audit.",
+    "auditId": "color-contrast",
+    "level": "error",
+    "url": "http://localhost:4321/services",
+    "auditTitle": "Background and foreground colors have a sufficient contrast ratio",
+    "auditDocumentationLink": "https://dequeuniversity.com/rules/axe/4.6/color-contrast"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "csp-xss",
+    "level": "error",
+    "url": "http://localhost:4321/services",
+    "auditTitle": "Ensure CSP is effective against XSS attacks",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/best-practices/csp-xss/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 4,
+    "values": [
+      4,
+      4,
+      4
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "duplicated-javascript",
+    "level": "warn",
+    "url": "http://localhost:4321/services",
+    "auditTitle": "Remove duplicate modules in JavaScript bundles"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.75,
+    "values": [
+      0.75,
+      0.75,
+      0.75
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "first-meaningful-paint",
+    "level": "warn",
+    "url": "http://localhost:4321/services",
+    "auditTitle": "First Meaningful Paint",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/first-meaningful-paint/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "heading-order",
+    "level": "error",
+    "url": "http://localhost:4321/services",
+    "auditTitle": "Heading elements are not in a sequentially-descending order",
+    "auditDocumentationLink": "https://dequeuniversity.com/rules/axe/4.6/heading-order"
+  },
+  {
+    "name": "maxNumericValue",
+    "expected": 2500,
+    "actual": 2640,
+    "values": [
+      2640,
+      2760,
+      2880
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "largest-contentful-paint",
+    "level": "warn",
+    "url": "http://localhost:4321/services",
+    "auditTitle": "Largest Contentful Paint",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/lighthouse-largest-contentful-paint/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "lcp-lazy-loaded",
+    "level": "error",
+    "url": "http://localhost:4321/services",
+    "auditTitle": "Largest Contentful Paint image was lazily loaded",
+    "auditDocumentationLink": "https://web.dev/lcp-lazy-loading/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "link-text",
+    "level": "warn",
+    "url": "http://localhost:4321/services",
+    "auditTitle": "Links do not have descriptive text",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/seo/link-text/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 1,
+    "values": [
+      1,
+      1,
+      1
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "render-blocking-resources",
+    "level": "warn",
+    "url": "http://localhost:4321/services",
+    "auditTitle": "Eliminate render-blocking resources",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/render-blocking-resources/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.36,
+    "values": [
+      0.36,
+      0.36,
+      0.36
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "total-byte-weight",
+    "level": "error",
+    "url": "http://localhost:4321/services",
+    "auditTitle": "Avoid enormous network payloads",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/total-byte-weight/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.49,
+    "values": [
+      0.48,
+      0.49,
+      0.49
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "unminified-javascript",
+    "level": "warn",
+    "url": "http://localhost:4321/services",
+    "auditTitle": "Minify JavaScript",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/unminified-javascript/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 1,
+    "values": [
+      1,
+      1,
+      1
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "uses-long-cache-ttl",
+    "level": "warn",
+    "url": "http://localhost:4321/services",
+    "auditTitle": "Uses efficient cache policy on static assets",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-long-cache-ttl/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.43,
+    "values": [
+      0.43,
+      0.43,
+      0.43
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "uses-responsive-images",
+    "level": "warn",
+    "url": "http://localhost:4321/services",
+    "auditTitle": "Properly size images",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-responsive-images/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 44,
+    "values": [
+      44,
+      44,
+      44
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "uses-text-compression",
+    "level": "error",
+    "url": "http://localhost:4321/services",
+    "auditTitle": "Enable text compression",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-text-compression/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.83,
+    "values": [
+      0.83,
+      0.82,
+      0.81
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "performance",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/services"
+  },
+  {
+    "name": "minScore",
+    "expected": 1,
+    "actual": null,
+    "values": [
+      null,
+      null,
+      null
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "Audit did not produce a value at all. \"minScore\" might not be a valid assertion for this audit.",
+    "auditProperty": "accessibility",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/services"
+  },
+  {
+    "name": "minScore",
+    "expected": 1,
+    "actual": 0.92,
+    "values": [
+      0.92,
+      0.92,
+      0.92
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "seo",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/services"
+  },
+  {
+    "name": "auditRan",
+    "expected": 1,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "\"uses-webp-images\" is not a known audit.",
+    "auditId": "uses-webp-images",
+    "level": "warn",
+    "url": "http://localhost:4321/services"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "bf-cache",
+    "level": "error",
+    "url": "http://localhost:4321/services/landscaping",
+    "auditTitle": "Page prevented back/forward cache restoration",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/bf-cache/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": null,
+    "values": [
+      null,
+      null,
+      null
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "Audit did not produce a value at all. \"minScore\" might not be a valid assertion for this audit.",
+    "auditId": "color-contrast",
+    "level": "error",
+    "url": "http://localhost:4321/services/landscaping",
+    "auditTitle": "Background and foreground colors have a sufficient contrast ratio",
+    "auditDocumentationLink": "https://dequeuniversity.com/rules/axe/4.6/color-contrast"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "csp-xss",
+    "level": "error",
+    "url": "http://localhost:4321/services/landscaping",
+    "auditTitle": "Ensure CSP is effective against XSS attacks",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/best-practices/csp-xss/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 4,
+    "values": [
+      4,
+      4,
+      4
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "duplicated-javascript",
+    "level": "warn",
+    "url": "http://localhost:4321/services/landscaping",
+    "auditTitle": "Remove duplicate modules in JavaScript bundles"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.75,
+    "values": [
+      0.69,
+      0.75,
+      0.56
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "first-meaningful-paint",
+    "level": "warn",
+    "url": "http://localhost:4321/services/landscaping",
+    "auditTitle": "First Meaningful Paint",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/first-meaningful-paint/"
+  },
+  {
+    "name": "maxNumericValue",
+    "expected": 2500,
+    "actual": 4361.5,
+    "values": [
+      4361.5,
+      4361.5,
+      4486.5
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "largest-contentful-paint",
+    "level": "warn",
+    "url": "http://localhost:4321/services/landscaping",
+    "auditTitle": "Largest Contentful Paint",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/lighthouse-largest-contentful-paint/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "link-text",
+    "level": "warn",
+    "url": "http://localhost:4321/services/landscaping",
+    "auditTitle": "Links do not have descriptive text",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/seo/link-text/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 1,
+    "values": [
+      1,
+      1,
+      1
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "render-blocking-resources",
+    "level": "warn",
+    "url": "http://localhost:4321/services/landscaping",
+    "auditTitle": "Eliminate render-blocking resources",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/render-blocking-resources/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.86,
+    "values": [
+      0.86,
+      0.86,
+      0.86
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "total-byte-weight",
+    "level": "error",
+    "url": "http://localhost:4321/services/landscaping",
+    "auditTitle": "Avoid enormous network payloads",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/total-byte-weight/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.49,
+    "values": [
+      0.49,
+      0.49,
+      0.49
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "unminified-javascript",
+    "level": "warn",
+    "url": "http://localhost:4321/services/landscaping",
+    "auditTitle": "Minify JavaScript",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/unminified-javascript/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 1,
+    "values": [
+      1,
+      1,
+      1
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "uses-long-cache-ttl",
+    "level": "warn",
+    "url": "http://localhost:4321/services/landscaping",
+    "auditTitle": "Uses efficient cache policy on static assets",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-long-cache-ttl/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 44,
+    "values": [
+      44,
+      44,
+      44
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "uses-text-compression",
+    "level": "error",
+    "url": "http://localhost:4321/services/landscaping",
+    "auditTitle": "Enable text compression",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-text-compression/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.75,
+    "values": [
+      0.74,
+      0.75,
+      0.72
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "performance",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/services/landscaping"
+  },
+  {
+    "name": "minScore",
+    "expected": 1,
+    "actual": null,
+    "values": [
+      null,
+      null,
+      null
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "Audit did not produce a value at all. \"minScore\" might not be a valid assertion for this audit.",
+    "auditProperty": "accessibility",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/services/landscaping"
+  },
+  {
+    "name": "minScore",
+    "expected": 1,
+    "actual": 0.92,
+    "values": [
+      0.92,
+      0.92,
+      0.92
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "seo",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/services/landscaping"
+  },
+  {
+    "name": "auditRan",
+    "expected": 1,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "\"uses-webp-images\" is not a known audit.",
+    "auditId": "uses-webp-images",
+    "level": "warn",
+    "url": "http://localhost:4321/services/landscaping"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "bf-cache",
+    "level": "error",
+    "url": "http://localhost:4321/locations",
+    "auditTitle": "Page prevented back/forward cache restoration",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/bf-cache/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": null,
+    "values": [
+      null,
+      null,
+      null
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "Audit did not produce a value at all. \"minScore\" might not be a valid assertion for this audit.",
+    "auditId": "color-contrast",
+    "level": "error",
+    "url": "http://localhost:4321/locations",
+    "auditTitle": "Background and foreground colors have a sufficient contrast ratio",
+    "auditDocumentationLink": "https://dequeuniversity.com/rules/axe/4.6/color-contrast"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "csp-xss",
+    "level": "error",
+    "url": "http://localhost:4321/locations",
+    "auditTitle": "Ensure CSP is effective against XSS attacks",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/best-practices/csp-xss/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 4,
+    "values": [
+      4,
+      4,
+      4
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "duplicated-javascript",
+    "level": "warn",
+    "url": "http://localhost:4321/locations",
+    "auditTitle": "Remove duplicate modules in JavaScript bundles"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.75,
+    "values": [
+      0.75,
+      0.75,
+      0.75
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "first-meaningful-paint",
+    "level": "warn",
+    "url": "http://localhost:4321/locations",
+    "auditTitle": "First Meaningful Paint",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/first-meaningful-paint/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "heading-order",
+    "level": "error",
+    "url": "http://localhost:4321/locations",
+    "auditTitle": "Heading elements are not in a sequentially-descending order",
+    "auditDocumentationLink": "https://dequeuniversity.com/rules/axe/4.6/heading-order"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "lcp-lazy-loaded",
+    "level": "error",
+    "url": "http://localhost:4321/locations",
+    "auditTitle": "Largest Contentful Paint image was lazily loaded",
+    "auditDocumentationLink": "https://web.dev/lcp-lazy-loading/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "link-text",
+    "level": "warn",
+    "url": "http://localhost:4321/locations",
+    "auditTitle": "Links do not have descriptive text",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/seo/link-text/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 1,
+    "values": [
+      1,
+      1,
+      1
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "render-blocking-resources",
+    "level": "warn",
+    "url": "http://localhost:4321/locations",
+    "auditTitle": "Eliminate render-blocking resources",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/render-blocking-resources/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.77,
+    "values": [
+      0.77,
+      0.77,
+      0.77
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "total-byte-weight",
+    "level": "error",
+    "url": "http://localhost:4321/locations",
+    "auditTitle": "Avoid enormous network payloads",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/total-byte-weight/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.49,
+    "values": [
+      0.49,
+      0.49,
+      0.49
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "unminified-javascript",
+    "level": "warn",
+    "url": "http://localhost:4321/locations",
+    "auditTitle": "Minify JavaScript",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/unminified-javascript/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 1,
+    "values": [
+      1,
+      1,
+      1
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "uses-long-cache-ttl",
+    "level": "warn",
+    "url": "http://localhost:4321/locations",
+    "auditTitle": "Uses efficient cache policy on static assets",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-long-cache-ttl/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.77,
+    "values": [
+      0.77,
+      0.77,
+      0.77
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "uses-responsive-images",
+    "level": "warn",
+    "url": "http://localhost:4321/locations",
+    "auditTitle": "Properly size images",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-responsive-images/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 44,
+    "values": [
+      44,
+      44,
+      44
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "uses-text-compression",
+    "level": "error",
+    "url": "http://localhost:4321/locations",
+    "auditTitle": "Enable text compression",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-text-compression/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.87,
+    "values": [
+      0.87,
+      0.87,
+      0.87
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "performance",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/locations"
+  },
+  {
+    "name": "minScore",
+    "expected": 1,
+    "actual": null,
+    "values": [
+      null,
+      null,
+      null
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "Audit did not produce a value at all. \"minScore\" might not be a valid assertion for this audit.",
+    "auditProperty": "accessibility",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/locations"
+  },
+  {
+    "name": "minScore",
+    "expected": 1,
+    "actual": 0.92,
+    "values": [
+      0.92,
+      0.92,
+      0.92
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "seo",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/locations"
+  },
+  {
+    "name": "auditRan",
+    "expected": 1,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "\"uses-webp-images\" is not a known audit.",
+    "auditId": "uses-webp-images",
+    "level": "warn",
+    "url": "http://localhost:4321/locations"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "bf-cache",
+    "level": "error",
+    "url": "http://localhost:4321/locations/avalon",
+    "auditTitle": "Page prevented back/forward cache restoration",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/bf-cache/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": null,
+    "values": [
+      null,
+      null,
+      null
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "Audit did not produce a value at all. \"minScore\" might not be a valid assertion for this audit.",
+    "auditId": "color-contrast",
+    "level": "error",
+    "url": "http://localhost:4321/locations/avalon",
+    "auditTitle": "Background and foreground colors have a sufficient contrast ratio",
+    "auditDocumentationLink": "https://dequeuniversity.com/rules/axe/4.6/color-contrast"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "csp-xss",
+    "level": "error",
+    "url": "http://localhost:4321/locations/avalon",
+    "auditTitle": "Ensure CSP is effective against XSS attacks",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/best-practices/csp-xss/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 4,
+    "values": [
+      4,
+      4,
+      4
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "duplicated-javascript",
+    "level": "warn",
+    "url": "http://localhost:4321/locations/avalon",
+    "auditTitle": "Remove duplicate modules in JavaScript bundles"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.75,
+    "values": [
+      0.75,
+      0.75,
+      0.75
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "first-meaningful-paint",
+    "level": "warn",
+    "url": "http://localhost:4321/locations/avalon",
+    "auditTitle": "First Meaningful Paint",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/first-meaningful-paint/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "link-text",
+    "level": "warn",
+    "url": "http://localhost:4321/locations/avalon",
+    "auditTitle": "Links do not have descriptive text",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/seo/link-text/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 1,
+    "values": [
+      1,
+      1,
+      1
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "render-blocking-resources",
+    "level": "warn",
+    "url": "http://localhost:4321/locations/avalon",
+    "auditTitle": "Eliminate render-blocking resources",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/render-blocking-resources/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.76,
+    "values": [
+      0.76,
+      0.76,
+      0.76
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "total-byte-weight",
+    "level": "error",
+    "url": "http://localhost:4321/locations/avalon",
+    "auditTitle": "Avoid enormous network payloads",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/total-byte-weight/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.49,
+    "values": [
+      0.49,
+      0.49,
+      0.49
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "unminified-javascript",
+    "level": "warn",
+    "url": "http://localhost:4321/locations/avalon",
+    "auditTitle": "Minify JavaScript",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/unminified-javascript/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 1,
+    "values": [
+      1,
+      1,
+      1
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "uses-long-cache-ttl",
+    "level": "warn",
+    "url": "http://localhost:4321/locations/avalon",
+    "auditTitle": "Uses efficient cache policy on static assets",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-long-cache-ttl/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.8,
+    "values": [
+      0.8,
+      0.8,
+      0.8
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "uses-responsive-images",
+    "level": "warn",
+    "url": "http://localhost:4321/locations/avalon",
+    "auditTitle": "Properly size images",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-responsive-images/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 44,
+    "values": [
+      44,
+      44,
+      44
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "uses-text-compression",
+    "level": "error",
+    "url": "http://localhost:4321/locations/avalon",
+    "auditTitle": "Enable text compression",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-text-compression/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.86,
+    "values": [
+      0.81,
+      0.86,
+      0.85
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "performance",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/locations/avalon"
+  },
+  {
+    "name": "minScore",
+    "expected": 1,
+    "actual": null,
+    "values": [
+      null,
+      null,
+      null
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "Audit did not produce a value at all. \"minScore\" might not be a valid assertion for this audit.",
+    "auditProperty": "accessibility",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/locations/avalon"
+  },
+  {
+    "name": "minScore",
+    "expected": 1,
+    "actual": 0.92,
+    "values": [
+      0.92,
+      0.92,
+      0.92
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "seo",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/locations/avalon"
+  },
+  {
+    "name": "auditRan",
+    "expected": 1,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "\"uses-webp-images\" is not a known audit.",
+    "auditId": "uses-webp-images",
+    "level": "warn",
+    "url": "http://localhost:4321/locations/avalon"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "bf-cache",
+    "level": "error",
+    "url": "http://localhost:4321/membership",
+    "auditTitle": "Page prevented back/forward cache restoration",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/bf-cache/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": null,
+    "values": [
+      null,
+      null,
+      null
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "Audit did not produce a value at all. \"minScore\" might not be a valid assertion for this audit.",
+    "auditId": "color-contrast",
+    "level": "error",
+    "url": "http://localhost:4321/membership",
+    "auditTitle": "Background and foreground colors have a sufficient contrast ratio",
+    "auditDocumentationLink": "https://dequeuniversity.com/rules/axe/4.6/color-contrast"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "csp-xss",
+    "level": "error",
+    "url": "http://localhost:4321/membership",
+    "auditTitle": "Ensure CSP is effective against XSS attacks",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/best-practices/csp-xss/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 4,
+    "values": [
+      4,
+      4,
+      4
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "duplicated-javascript",
+    "level": "warn",
+    "url": "http://localhost:4321/membership",
+    "auditTitle": "Remove duplicate modules in JavaScript bundles"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.52,
+    "values": [
+      0.35,
+      0.32,
+      0.52
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "first-meaningful-paint",
+    "level": "warn",
+    "url": "http://localhost:4321/membership",
+    "auditTitle": "First Meaningful Paint",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/first-meaningful-paint/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "heading-order",
+    "level": "error",
+    "url": "http://localhost:4321/membership",
+    "auditTitle": "Heading elements are not in a sequentially-descending order",
+    "auditDocumentationLink": "https://dequeuniversity.com/rules/axe/4.6/heading-order"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "link-text",
+    "level": "warn",
+    "url": "http://localhost:4321/membership",
+    "auditTitle": "Links do not have descriptive text",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/seo/link-text/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 1,
+    "values": [
+      1,
+      1,
+      1
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "render-blocking-resources",
+    "level": "warn",
+    "url": "http://localhost:4321/membership",
+    "auditTitle": "Eliminate render-blocking resources",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/render-blocking-resources/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.81,
+    "values": [
+      0.67,
+      0.65,
+      0.81
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "speed-index",
+    "level": "warn",
+    "url": "http://localhost:4321/membership",
+    "auditTitle": "Speed Index",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/speed-index/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.5,
+    "values": [
+      0.49,
+      0.49,
+      0.5
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "unminified-javascript",
+    "level": "warn",
+    "url": "http://localhost:4321/membership",
+    "auditTitle": "Minify JavaScript",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/unminified-javascript/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 1,
+    "values": [
+      1,
+      1,
+      1
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "uses-long-cache-ttl",
+    "level": "warn",
+    "url": "http://localhost:4321/membership",
+    "auditTitle": "Uses efficient cache policy on static assets",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-long-cache-ttl/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 45,
+    "values": [
+      45,
+      45,
+      45
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "uses-text-compression",
+    "level": "error",
+    "url": "http://localhost:4321/membership",
+    "auditTitle": "Enable text compression",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-text-compression/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.87,
+    "values": [
+      0.8,
+      0.79,
+      0.87
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "performance",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/membership"
+  },
+  {
+    "name": "minScore",
+    "expected": 1,
+    "actual": null,
+    "values": [
+      null,
+      null,
+      null
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "Audit did not produce a value at all. \"minScore\" might not be a valid assertion for this audit.",
+    "auditProperty": "accessibility",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/membership"
+  },
+  {
+    "name": "minScore",
+    "expected": 1,
+    "actual": 0.92,
+    "values": [
+      0.92,
+      0.92,
+      0.92
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "seo",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/membership"
+  },
+  {
+    "name": "auditRan",
+    "expected": 1,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "\"uses-webp-images\" is not a known audit.",
+    "auditId": "uses-webp-images",
+    "level": "warn",
+    "url": "http://localhost:4321/membership"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "bf-cache",
+    "level": "error",
+    "url": "http://localhost:4321/contact",
+    "auditTitle": "Page prevented back/forward cache restoration",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/bf-cache/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": null,
+    "values": [
+      null,
+      null,
+      null
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "Audit did not produce a value at all. \"minScore\" might not be a valid assertion for this audit.",
+    "auditId": "color-contrast",
+    "level": "error",
+    "url": "http://localhost:4321/contact",
+    "auditTitle": "Background and foreground colors have a sufficient contrast ratio",
+    "auditDocumentationLink": "https://dequeuniversity.com/rules/axe/4.6/color-contrast"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "csp-xss",
+    "level": "error",
+    "url": "http://localhost:4321/contact",
+    "auditTitle": "Ensure CSP is effective against XSS attacks",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/best-practices/csp-xss/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 4,
+    "values": [
+      4,
+      4,
+      4
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "duplicated-javascript",
+    "level": "warn",
+    "url": "http://localhost:4321/contact",
+    "auditTitle": "Remove duplicate modules in JavaScript bundles"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.51,
+    "values": [
+      0.05,
+      0.51,
+      0.42
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "first-meaningful-paint",
+    "level": "warn",
+    "url": "http://localhost:4321/contact",
+    "auditTitle": "First Meaningful Paint",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/first-meaningful-paint/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "link-text",
+    "level": "warn",
+    "url": "http://localhost:4321/contact",
+    "auditTitle": "Links do not have descriptive text",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/seo/link-text/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 1,
+    "values": [
+      1,
+      1,
+      1
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "render-blocking-resources",
+    "level": "warn",
+    "url": "http://localhost:4321/contact",
+    "auditTitle": "Eliminate render-blocking resources",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/render-blocking-resources/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.8,
+    "values": [
+      0.23,
+      0.8,
+      0.74
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "speed-index",
+    "level": "warn",
+    "url": "http://localhost:4321/contact",
+    "auditTitle": "Speed Index",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/speed-index/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.89,
+    "values": [
+      0.89,
+      0.89,
+      0.89
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "total-byte-weight",
+    "level": "error",
+    "url": "http://localhost:4321/contact",
+    "auditTitle": "Avoid enormous network payloads",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/total-byte-weight/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.48,
+    "values": [
+      0.48,
+      0.48,
+      0.48
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "unminified-javascript",
+    "level": "warn",
+    "url": "http://localhost:4321/contact",
+    "auditTitle": "Minify JavaScript",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/unminified-javascript/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 1,
+    "values": [
+      1,
+      1,
+      1
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "uses-long-cache-ttl",
+    "level": "warn",
+    "url": "http://localhost:4321/contact",
+    "auditTitle": "Uses efficient cache policy on static assets",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-long-cache-ttl/"
+  },
+  {
+    "name": "maxLength",
+    "expected": 0,
+    "actual": 45,
+    "values": [
+      45,
+      45,
+      45
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "uses-text-compression",
+    "level": "error",
+    "url": "http://localhost:4321/contact",
+    "auditTitle": "Enable text compression",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/uses-text-compression/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.86,
+    "values": [
+      0.61,
+      0.86,
+      0.84
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "performance",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/contact"
+  },
+  {
+    "name": "minScore",
+    "expected": 1,
+    "actual": null,
+    "values": [
+      null,
+      null,
+      null
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "Audit did not produce a value at all. \"minScore\" might not be a valid assertion for this audit.",
+    "auditProperty": "accessibility",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/contact"
+  },
+  {
+    "name": "minScore",
+    "expected": 1,
+    "actual": 0.92,
+    "values": [
+      0.92,
+      0.92,
+      0.92
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "seo",
+    "auditId": "categories",
+    "level": "error",
+    "url": "http://localhost:4321/contact"
+  },
+  {
+    "name": "auditRan",
+    "expected": 1,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "\"uses-webp-images\" is not a known audit.",
+    "auditId": "uses-webp-images",
+    "level": "warn",
+    "url": "http://localhost:4321/contact"
+  }
+]

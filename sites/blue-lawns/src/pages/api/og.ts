@@ -7,9 +7,9 @@ export const GET: APIRoute = async ({ request }) => {
     const { searchParams } = new URL(request.url);
 
     // Extract params
-    const title = searchParams.get('title') || 'Web Dev Factory';
-    const subtitle = searchParams.get('subtitle') || '';
-    const brandColorParam = searchParams.get('color') || '#3b82f6'; // Default blue
+    const title = searchParams.get('title') || 'Blue Quality Lawn Care';
+    const subtitle = searchParams.get('subtitle') || 'Premier Landscaping in Cape May County';
+    const brandColorParam = searchParams.get('color') || '#0284c7'; // Blue Lawns brand blue
     const logoParam = searchParams.get('logo');
 
     // Enforce absolute URLs only for logo
@@ -116,7 +116,7 @@ export const GET: APIRoute = async ({ request }) => {
               ].filter(Boolean),
             },
           },
-          // Footer Decoration
+          // Footer Decoration - Blue Lawns Green
           {
             type: 'div',
             props: {
@@ -126,7 +126,7 @@ export const GET: APIRoute = async ({ request }) => {
                 left: 0,
                 right: 0,
                 height: 16,
-                backgroundColor: brandColor,
+                backgroundColor: '#22c55e', // Blue Lawns green accent
               },
             },
           },

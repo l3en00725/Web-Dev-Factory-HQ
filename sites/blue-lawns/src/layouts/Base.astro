@@ -46,8 +46,15 @@ const canonical = buildCanonicalUrl(Astro.url.pathname, siteUrl, canonicalUrl);
 const logoSrc = settings.logo;
 const siteTitle = settings.title;
 
-// OG Image Logic
-const resolvedOgImage = pageOgImage || `${siteUrl}/assets/images/default-og.jpg`;
+// OG Image Logic - Use dynamic Vercel OG or fallback to static
+const ogTitle = encodeURIComponent(title);
+const ogSubtitle = description ? encodeURIComponent(description.substring(0, 100)) : '';
+const brandColor = encodeURIComponent('#0284c7'); // Blue Lawns brand blue
+const logoUrl = encodeURIComponent(`${siteUrl}/logo/logo.png`);
+
+// Build dynamic OG image URL
+const dynamicOgImage = `${siteUrl}/api/og?title=${ogTitle}&subtitle=${ogSubtitle}&color=${brandColor}&logo=${logoUrl}`;
+const resolvedOgImage = pageOgImage || dynamicOgImage;
 
 // Validate and clean structured data
 const cleanedStructuredData = structuredData ? validateSchemaObject(structuredData) : null;

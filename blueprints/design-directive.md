@@ -565,5 +565,130 @@ Before deploying ANY page, verify:
 
 ---
 
+## 16. NAVIGATION COLOR SAFETY RULE
+
+### 16.1 Header Mode System
+
+The Header component now supports a `headerMode` prop to ensure navigation text is always visible against any hero background.
+
+**Available Modes:**
+- `headerMode="light"` — White text (`text-white`) — Use on dark hero images
+- `headerMode="dark"` — Navy text (`text-brand-navy`) — Use on bright hero images
+
+### 16.2 Implementation Rules
+
+**Every page with a bright hero MUST set `headerMode="dark"`:**
+
+```astro
+<Layout 
+  headerVariant="transparent"
+  headerMode="dark"
+>
+```
+
+**Pages with dark heroes use `headerMode="light"` (default):**
+
+```astro
+<Layout 
+  headerVariant="transparent"
+  headerMode="light"
+>
+```
+
+### 16.3 Header.astro Behavior
+
+The Header component applies these styles based on `headerMode`:
+
+**Light Mode (default):**
+- Transparent state: `text-white`
+- Scrolled state: `text-brand-navy`
+
+**Dark Mode:**
+- Transparent state: `text-brand-navy`
+- Scrolled state: `text-brand-navy`
+
+### 16.4 Enforcement
+
+**Cursor/Sonnet may NOT:**
+- Modify nav color logic without explicit instruction
+- Change headerMode values arbitrarily
+- Remove the headerMode prop system
+
+**When adding new pages:**
+1. Examine the hero image brightness
+2. Set `headerMode="dark"` if hero is bright/light
+3. Set `headerMode="light"` if hero is dark
+4. Test navigation visibility in browser
+
+---
+
+## 17. SERVICE IMAGE ISOLATION RULE
+
+### 17.1 Image Field Hierarchy
+
+Services in `services.json` may have multiple image fields:
+
+**Homepage (ServicesGrid):**
+- Prefers: `cardImage` (optimized thumbnail for grid display)
+- Fallback: `heroImage` (if cardImage not available)
+- Final fallback: Gradient background
+
+**Service Pages (Hero Section):**
+- Uses: `heroImage` ONLY (full-size hero)
+- Must NOT use: `cardImage` for hero sections
+
+### 17.2 ServicesGrid.astro Logic
+
+The component already implements safe image resolution:
+
+```typescript
+const imageSrc = service.image || service.heroImage;
+```
+
+This ensures:
+1. Homepage uses `cardImage` if available
+2. Falls back to `heroImage` gracefully
+3. Shows gradient if no images exist
+
+### 17.3 Strict Rules for Cursor/Sonnet
+
+**Cursor MUST NEVER:**
+- Rename image files
+- Delete image files  
+- Regenerate image files
+- Change image paths in services.json without explicit user confirmation
+- Swap heroImage and cardImage usage
+
+**Before modifying any image references, Cursor MUST:**
+1. Show the user the proposed changes
+2. Explain which paths will be affected
+3. Wait for explicit approval
+4. Document the changes
+
+**Safe Operations (allowed):**
+- Reading image paths
+- Checking if images exist
+- Adding new image fields (with user approval)
+- Updating alt text (only if explicitly requested)
+
+### 17.4 Image Path Conventions
+
+**Hero Images:**
+```
+src/assets/images/services/{slug}/hero-manual.webp
+```
+
+**Card Images (when added):**
+```
+src/assets/images/services/{slug}/card.webp
+```
+
+**Location Images:**
+```
+src/assets/images/locations/{slug}/hero.webp
+```
+
+---
+
 **END OF DESIGN DIRECTIVE**
 
