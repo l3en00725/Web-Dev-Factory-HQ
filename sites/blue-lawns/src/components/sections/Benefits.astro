@@ -58,7 +58,7 @@ const {
     <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
       {benefits.map((b) => (
         <div class="bg-white rounded-xl p-8 shadow-sm border border-slate-100 hover:shadow-md transition-shadow duration-300 text-center group">
-          <div class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary-50 text-primary-600 mb-6 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300">
+          <div class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary-50 text-primary-600 mb-6 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300" aria-hidden="true">
              {/* Simple SVG Fallbacks if Lucide isn't set up directly or for reliability */}
              {b.icon === 'MapPin' && <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>}
              {b.icon === 'Clock' && <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>}

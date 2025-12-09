@@ -46,9 +46,9 @@ const gridCols: Record<GridColumnCount, string> = {
 };
 ---
 
-<section class="py-24 bg-neutral-50 relative overflow-hidden">
+<section class="py-24 bg-neutral-50 relative overflow-hidden" role="region" aria-labelledby={heading ? "services-grid-heading" : undefined}>
   {/* Ambient Background Mesh */}
-  <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none" aria-hidden="true">
     <div class="absolute top-0 left-1/4 w-[800px] h-[800px] bg-primary-100/30 rounded-full blur-[100px] -translate-y-1/2"></div>
     <div class="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-secondary-100/20 rounded-full blur-[80px] translate-y-1/2"></div>
   </div>
@@ -57,7 +57,7 @@ const gridCols: Record<GridColumnCount, string> = {
     {(heading || subheading) && (
       <div class="mb-20 text-center max-w-3xl mx-auto">
         {heading && (
-          <h2 class="font-display text-4xl font-bold tracking-tight text-primary-500 lg:text-6xl mb-6">
+          <h2 id="services-grid-heading" class="font-display text-4xl font-bold tracking-tight text-primary-500 lg:text-6xl mb-6">
             {heading}
           </h2>
         )}

@@ -48,13 +48,13 @@ const {
 } = Astro.props;
 ---
 
-<section class="py-24 bg-white relative overflow-hidden">
+<section class="py-24 bg-white relative overflow-hidden" role="region" aria-labelledby="testimonials-heading">
   {/* Background Pattern */}
-  <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#0f172a 1px, transparent 1px); background-size: 32px 32px;"></div>
+  <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#0f172a 1px, transparent 1px); background-size: 32px 32px;" aria-hidden="true"></div>
 
   <Container class="relative z-10">
     <div class="text-center max-w-3xl mx-auto mb-16">
-      <h2 class="font-display text-4xl font-bold tracking-tight text-brand-navy lg:text-5xl mb-6">
+      <h2 id="testimonials-heading" class="font-display text-4xl font-bold tracking-tight text-brand-navy lg:text-5xl mb-6">
         {title}
       </h2>
       <p class="text-xl text-slate-500 leading-relaxed font-light">
@@ -81,9 +81,9 @@ const {
             </div>
           </div>
           
-          <div class="flex text-secondary-500 mb-4">
+          <div class="flex text-secondary-500 mb-4" role="img" aria-label={`${t.rating || 5} out of 5 stars`}>
             {Array.from({ length: t.rating || 5 }).map(() => (
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-current" viewBox="0 0 24 24">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
               </svg>
             ))}
