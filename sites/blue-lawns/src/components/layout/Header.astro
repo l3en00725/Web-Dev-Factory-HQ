@@ -37,9 +37,10 @@ const phoneLink = `tel:${phoneNumber.replace(/\s/g, '')}`;
   data-variant={variant}
   data-mode={headerMode}
   data-scrolled="false"
+  style="height: 80px; min-height: 80px;"
 >
-  <Container class="flex h-20 items-center justify-between">
-    <div class="flex-shrink-0">
+  <Container class="flex h-20 items-center justify-between" style="height: 80px;">
+    <div class="flex-shrink-0" style="width: 160px; height: 45px;">
       <Logo 
         class:list={[
           "transition-all duration-300",
@@ -181,18 +182,18 @@ const phoneLink = `tel:${phoneNumber.replace(/\s/g, '')}`;
   const initialVariant = header?.getAttribute('data-variant') || 'transparent';
   const headerMode = header?.getAttribute('data-mode') || 'light';
 
-  // Handle Scroll State
+  // Handle Scroll State with RAF for better performance
+  let ticking = false;
+  
   function updateHeaderState() {
-    if (!header || initialVariant === 'solid') return; // Don't change state if forced solid
+    if (!header || initialVariant === 'solid') return;
     
     const isScrolled = window.scrollY > 20;
     
     if (isScrolled) {
-      // Scrolled State (Solid/Glass)
       header.classList.remove('bg-transparent', 'border-transparent', 'text-white', 'text-brand-navy');
       header.classList.add('bg-white/90', 'backdrop-blur-md', 'border-slate-200/50', 'text-brand-navy', 'shadow-sm');
     } else {
-      // Top State (Transparent) - respect headerMode
       header.classList.add('bg-transparent', 'border-transparent');
       header.classList.remove('bg-white/90', 'backdrop-blur-md', 'border-slate-200/50', 'shadow-sm');
       
@@ -206,10 +207,18 @@ const phoneLink = `tel:${phoneNumber.replace(/\s/g, '')}`;
     }
     
     header.setAttribute('data-scrolled', isScrolled.toString());
+    ticking = false;
+  }
+  
+  function onScroll() {
+    if (!ticking) {
+      window.requestAnimationFrame(updateHeaderState);
+      ticking = true;
+    }
   }
 
   if (initialVariant === 'transparent') {
-    window.addEventListener('scroll', updateHeaderState, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
     // Initial check
     updateHeaderState();
   }

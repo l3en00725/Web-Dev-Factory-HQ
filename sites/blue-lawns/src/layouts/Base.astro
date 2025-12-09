@@ -20,8 +20,6 @@ interface Props {
   canonicalUrl?: string;
   noIndex?: boolean;
   noFollow?: boolean;
-  heroImage?: string;
-  ogImage?: string;
   headerVariant?: 'transparent' | 'solid';
   headerMode?: 'light' | 'dark';
 }
@@ -33,8 +31,6 @@ const {
   canonicalUrl, 
   noIndex, 
   noFollow,
-  heroImage,
-  ogImage,
   headerVariant = 'transparent',
   headerMode = 'dark'  // Default to dark (navy text) since most heroes are bright
 } = Astro.props;
@@ -46,37 +42,8 @@ const canonical = buildCanonicalUrl(Astro.url.pathname, siteUrl, canonicalUrl);
 const logoSrc = settings.logo;
 const siteTitle = settings.title;
 
-// OG Image Logic - Use dynamic Vercel OG API
-// Convert asset paths to public paths for OG images
-function convertToPublicPath(imagePath: string | undefined): string {
-  if (!imagePath) return "/opengraph.jpg";
-  
-  // If already a public path (starts with /), use as-is
-  if (imagePath.startsWith('/')) return imagePath;
-  
-  // If it's an absolute URL, use as-is
-  if (imagePath.startsWith('http')) return imagePath;
-  
-  // Convert asset paths like "src/assets/images/..." to public paths
-  // For service images: "src/assets/images/services/landscaping/hero-manual.webp" 
-  // -> try "/images/services/landscaping/hero-manual.webp" or fallback
-  if (imagePath.startsWith('src/assets/images/')) {
-    const publicPath = imagePath.replace('src/assets/images/', '/images/');
-    return publicPath;
-  }
-  
-  // Default fallback
-  return "/opengraph.jpg";
-}
-
-// Determine which image to use: ogImage > heroImage > fallback
-const selectedImage = ogImage || heroImage || "/opengraph.jpg";
-const publicImagePath = convertToPublicPath(selectedImage);
-
-const currentOrigin = Astro.url.origin;
-const encodedTitle = encodeURIComponent(title);
-const encodedImage = encodeURIComponent(publicImagePath);
-const ogUrl = `${currentOrigin}/api/og?title=${encodedTitle}&image=${encodedImage}`;
+// OG Image - Use static hero image for all pages
+const ogUrl = `${Astro.url.origin}/og-image.jpg`;
 
 // Validate and clean structured data
 const cleanedStructuredData = structuredData ? validateSchemaObject(structuredData) : null;
