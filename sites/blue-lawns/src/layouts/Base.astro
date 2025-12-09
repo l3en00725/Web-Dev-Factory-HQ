@@ -9,6 +9,7 @@ import '@fontsource/outfit/500.css';
 import '@fontsource/outfit/700.css';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
+import MobileMenu from '../components/layout/MobileMenu.astro';
 import { buildCanonicalUrl } from '../lib/seo-utils';
 import { validateSchemaObject } from '../lib/schema-validator';
 import settings from '../content/settings.json';
@@ -97,6 +98,8 @@ const mappedNavItems = navigation.map((item) => ({
       variant={headerVariant}
     />
     
+    <MobileMenu items={mappedNavItems} />
+
     <main class="flex-1">
       <slot />
     </main>

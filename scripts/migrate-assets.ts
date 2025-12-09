@@ -3,14 +3,43 @@ import path from 'node:path';
 import sharp from 'sharp';
 import * as cheerio from 'cheerio';
 
+// --- CONFIGURATION ---
+
+// INSTRUCTION FOR USER: Please fill in the real URLs from your old site below.
+// If a URL is missing or incorrect, the script will skip that service.
+// We have pre-filled some based on discovery.
+const URL_MAP: Record<string, string> = {
+  // Slug : Old Site URL
+  
+  // 'landscape-maintenance': 'https://bluelawns.com/landscape-maintenance', // 404 - Please update
+  // 'landscaping': 'https://bluelawns.com/landscaping', // 404 - Please update
+  // 'hardscaping': 'https://bluelawns.com/patios-walkways', // 404 - Please update
+  // 'landscape-lighting': 'https://bluelawns.com/landscape-lighting', // 404 - Please update
+  
+  // 'pool-service': 'https://www.ecoastpoolservice.com', // Found via homepage link but images are icons/logos
+  
+  // 'commercial-services': 'https://bluelawns.com/commercial', // 404 - Please update
+  // 'lawn-care': 'https://bluelawns.com/lawn-care', // 404 - Please update
+  // 'seasonal-cleanup': 'https://bluelawns.com/seasonal-cleanup', // 404 - Please update
+  // 'power-washing': 'https://bluelawns.com/power-washing', // 404 - Please update
+  
+  'fencing': 'http://bluefencingnj.com/', // Confirmed working
+};
+
 const BASE_URL = 'https://bluelawns.com';
 const SERVICES_JSON_PATH = 'sites/blue-lawns/src/content/services.json';
 const TARGET_DIR_BASE = 'sites/blue-lawns/src/assets/images/services';
 
+// --- UTILITIES ---
+
 async function fetchHtml(url: string): Promise<string | null> {
   try {
+    console.log(`Fetching ${url}...`);
     const res = await fetch(url);
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.warn(`HTTP ${res.status} for ${url}`);
+      return null;
+    }
     return await res.text();
   } catch (e) {
     console.warn(`Failed to fetch ${url}:`, e);
@@ -42,68 +71,39 @@ async function downloadAndProcessImage(url: string, outputPath: string): Promise
   }
 }
 
-async function findServiceUrl(homepageHtml: string, keywords: string[]): Promise<string | null> {
-  const $ = cheerio.load(homepageHtml);
-  let targetUrl: string | null = null;
-
-  // Prioritize exact matches in href first
-  $('a').each((i, el) => {
-    const href = $(el).attr('href');
-    if (!href) return;
-    
-    // Clean href
-    const cleanHref = href.toLowerCase().replace(/\/$/, '');
-
-    for (const keyword of keywords) {
-      const k = keyword.toLowerCase();
-      // Check for strong match in URL
-      if (cleanHref.includes(`/${k}`) || cleanHref === k) {
-         targetUrl = href.startsWith('http') ? href : (href.startsWith('/') ? BASE_URL + href : BASE_URL + '/' + href);
-         return false;
-      }
-    }
-  });
-
-  if (targetUrl) return targetUrl;
-
-  // Fallback to text matching
-  $('a').each((i, el) => {
-    const href = $(el).attr('href');
-    const text = $(el).text().toLowerCase();
-    
-    if (!href) return;
-
-    for (const keyword of keywords) {
-      const k = keyword.toLowerCase();
-      if (text.includes(k)) {
-        targetUrl = href.startsWith('http') ? href : (href.startsWith('/') ? BASE_URL + href : BASE_URL + '/' + href);
-        return false; 
-      }
-    }
-  });
-
-  return targetUrl;
-}
-
-async function extractImageFromPage(html: string): Promise<string | null> {
+async function extractImageFromPage(html: string, baseUrl: string): Promise<string | null> {
   const $ = cheerio.load(html);
   
   // 1. OG Image
   const ogImage = $('meta[property="og:image"]').attr('content');
   if (ogImage && !ogImage.includes('placeholder') && !ogImage.includes('logo')) {
-    return ogImage.startsWith('http') ? ogImage : BASE_URL + ogImage;
+    return ogImage.startsWith('http') ? ogImage : new URL(ogImage, baseUrl).toString();
   }
 
   // 2. Main Content Image (look for large images in content areas)
   let bestImg: string | null = null;
-  const contentSelectors = ['main', 'article', '.content', '.entry-content', '#primary'];
+  // Expanded selectors to catch more potential image containers
+  const contentSelectors = ['main', 'article', '.content', '.entry-content', '#primary', 'body', '.hero', '#hero'];
   
   for (const selector of contentSelectors) {
     $(`${selector} img`).each((i, el) => {
       const src = $(el).attr('src');
-      if (src && !src.includes('icon') && !src.includes('logo') && !src.includes('avatar')) {
-         bestImg = src.startsWith('http') ? src : BASE_URL + src;
-         return false; // Take first significant image
+      if (src) {
+        const lowerSrc = src.toLowerCase();
+        if (!lowerSrc.includes('icon') && 
+            !lowerSrc.includes('logo') && 
+            !lowerSrc.includes('avatar') && 
+            !lowerSrc.includes('pixel')) {
+             // Resolve relative URLs
+             try {
+                const fullSrc = src.startsWith('http') ? src : new URL(src, baseUrl).toString();
+                // Basic size check by extension or assumption - we take the first "real" looking image
+                bestImg = fullSrc;
+                return false; // Break loop
+             } catch (e) {
+                // Invalid URL, skip
+             }
+        }
       }
     });
     if (bestImg) break;
@@ -112,52 +112,40 @@ async function extractImageFromPage(html: string): Promise<string | null> {
   return bestImg;
 }
 
+// --- MAIN ---
+
 async function main() {
-  console.log('--- Starting Smart Crawl ---');
-  
-  // 1. Load Homepage for Discovery
-  console.log(`Fetching homepage: ${BASE_URL}`);
-  const homepageHtml = await fetchHtml(BASE_URL);
-  if (!homepageHtml) {
-    console.error("Failed to load homepage. Aborting.");
-    return;
-  }
+  console.log('--- Starting Explicit Map Asset Migration ---');
 
   const servicesRaw = await fs.readFile(SERVICES_JSON_PATH, 'utf-8');
   const services = JSON.parse(servicesRaw);
   let updatedCount = 0;
 
   for (const service of services) {
-    console.log(`\nProcessing: ${service.title}`);
+    console.log(`\nProcessing: ${service.title} (${service.slug})`);
     
-    // Keywords for discovery
-    const keywords = [service.slug];
-    // Add variations
-    if (service.slug === 'landscape-maintenance') keywords.push('maintenance');
-    if (service.slug === 'hardscaping') keywords.push('paver', 'patio');
-    if (service.slug === 'commercial-services') keywords.push('commercial');
+    const targetUrl = URL_MAP[service.slug];
     
-    // Discovery
-    const serviceUrl = await findServiceUrl(homepageHtml, keywords);
-    
-    if (!serviceUrl) {
-      console.warn(`[MISS] No link found for ${service.title}`);
+    if (!targetUrl) {
+      console.log(`[SKIP] No URL mapped for ${service.slug}. (Update URL_MAP to fix)`);
       continue;
     }
-    console.log(`[FOUND] Link: ${serviceUrl}`);
 
-    // Extraction
-    const serviceHtml = await fetchHtml(serviceUrl);
-    if (!serviceHtml) continue;
+    // Fetch Page
+    const pageHtml = await fetchHtml(targetUrl);
+    if (!pageHtml) {
+      console.warn(`[FAIL] Could not load page: ${targetUrl}`);
+      continue;
+    }
 
-    const imageUrl = await extractImageFromPage(serviceHtml);
+    // Extract Image
+    const imageUrl = await extractImageFromPage(pageHtml, targetUrl);
     if (!imageUrl) {
-      console.warn(`[MISS] No suitable image found on ${serviceUrl}`);
+      console.warn(`[MISS] No suitable image found on ${targetUrl}`);
       continue;
     }
 
     // Optimization & Saving
-    // Note: Filename changed to include -service-hero as per prompt
     const outputPath = path.join(TARGET_DIR_BASE, service.slug, `${service.slug}-service-hero.webp`);
     const success = await downloadAndProcessImage(imageUrl, outputPath);
 

@@ -2,7 +2,6 @@
 import Container from './Container.astro';
 import Logo from '../ui/Logo.astro';
 import Button from '../ui/Button.astro';
-import MobileMenu from './MobileMenu.astro';
 import servicesData from '../../content/services.json';
 
 interface Props {
@@ -131,8 +130,6 @@ const primaryServices = servicesData.filter(s => s.type === 'primary');
       </Button>
     </div>
   </Container>
-
-  <MobileMenu items={navItems} />
 </header>
 
 <script>
