@@ -1,0 +1,69 @@
+---
+import Container from '../layout/Container.astro';
+
+interface Props {
+  serviceSlug: string;
+}
+
+const { serviceSlug } = Astro.props;
+
+const locations = [
+  {
+    name: 'Avalon',
+    slug: 'avalon',
+    description: 'Premium coastal lawn care and landscaping services in Avalon.',
+  },
+  {
+    name: 'Stone Harbor',
+    slug: 'stone-harbor',
+    description: 'High-end property maintenance and lawn services in Stone Harbor.',
+  },
+  {
+    name: 'Wildwood Crest',
+    slug: 'wildwood-crest',
+    description: 'Full-service lawn care and landscaping in Wildwood Crest.',
+  },
+];
+---
+
+<section class="py-16 bg-slate-50">
+  <Container>
+    <div class="text-center mb-12">
+      <h2 class="font-display text-2xl lg:text-3xl font-bold text-brand-navy mb-3">
+        We Also Serve These Locations
+      </h2>
+      <p class="text-slate-600">
+        Get the same great service in your neighborhood
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+      {locations.map((location) => (
+        <a
+          href={`/locations/${location.slug}/${serviceSlug}`}
+          class="group bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-300 border border-slate-200 hover:border-primary-300"
+        >
+          <h3 class="font-display text-xl font-bold text-brand-navy group-hover:text-primary-600 transition-colors mb-3">
+            {location.name}
+          </h3>
+          <p class="text-slate-600 text-sm mb-4 leading-relaxed">
+            {location.description}
+          </p>
+          <span class="inline-flex items-center text-sm font-semibold text-primary-600 group-hover:text-primary-700 transition-colors">
+            View Service in This Location
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 ml-1 transform group-hover:translate-x-1 transition-transform"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </span>
+        </a>
+      ))}
+    </div>
+  </Container>
+</section>
+

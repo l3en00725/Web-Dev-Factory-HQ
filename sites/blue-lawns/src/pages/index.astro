@@ -1,6 +1,8 @@
 ---
 import Layout from '../layouts/Base.astro';
 import Hero from '../components/sections/Hero.astro';
+import BrandValues from '../components/sections/BrandValues.astro';
+import ProcessSteps from '../components/sections/ProcessSteps.astro';
 import SocialProof from '../components/sections/SocialProof.astro';
 import ServicesGrid from '../components/sections/ServicesGrid.astro';
 import Benefits from '../components/sections/Benefits.astro';
@@ -28,28 +30,35 @@ const pageDescription = "Professional landscaping, lawn care, and hardscaping se
   title={pageTitle}
   description={pageDescription}
   headerVariant="transparent"
+  headerMode="dark"
 >
   <main>
     {/* 1. Hero */}
     <Hero 
-      title="Professional Landscaping in Cape May County"
-      subtitle="The most reliable crew in Cape May County. Licensed, insured, and obsessed with details."
-      primaryCta={{ label: "Get a Free Quote", href: "/contact" }}
+      title="Love Your Lawn Again."
+      subtitle="Professional landscaping for Cape May County. We handle the hard work, you handle the weekends."
+      primaryCta={{ label: "Get Quote", href: "/contact" }}
       backgroundImage={heroMain}
       alignment="left"
     />
 
-    {/* 2. Social Proof */}
+    {/* 2. Brand Values */}
+    <BrandValues />
+
+    {/* 3. Process Steps */}
+    <ProcessSteps />
+
+    {/* 4. Social Proof */}
     <SocialProof />
 
-    {/* 3. Primary Services */}
+    {/* 5. Primary Services */}
     <ServicesGrid 
-      heading="Our Core Services" 
+      heading="Complete Care for Your Coastal Home." 
       services={primaryServices}
       columns={3}
     />
 
-    {/* 4. Secondary Services */}
+    {/* 6. Secondary Services */}
     <div class="bg-gray-50">
       <ServicesGrid 
         heading="More Capabilities" 
@@ -58,19 +67,22 @@ const pageDescription = "Professional landscaping, lawn care, and hardscaping se
       />
     </div>
 
-    {/* 5. Benefits */}
-    <Benefits />
+    {/* 7. Benefits - Why Choose Us */}
+    <Benefits 
+      title="Not Your Average Landscaper."
+      subtitle="The standard for excellence in coastal landscaping"
+    />
 
-    {/* 6. Before/After */}
+    {/* 8. Before/After */}
     <BeforeAfter 
       beforeImage={beforeYard}
       afterImage={afterYard}
     />
 
-    {/* 7. Testimonials */}
+    {/* 9. Testimonials */}
     <Testimonials />
 
-    {/* 8. CTA */}
+    {/* 10. CTA */}
     <CTA />
   </main>
 </Layout>

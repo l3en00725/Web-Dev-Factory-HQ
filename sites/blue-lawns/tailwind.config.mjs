@@ -6,8 +6,9 @@ module.exports = {
       colors: {
         background: 'var(--color-bg)',
         foreground: 'var(--color-text)',
-        'brand-navy': '#0E1B2C',
-        'brand-body': '#44546A',
+        'brand-navy': '#0284c7', // Blue Lawns Brand Blue (updated from dark navy)
+        'brand-body': '#0369a1', // Darker blue for body text (updated from gray-blue)
+        'brand-blue': '#1DA1F2', // Twitter Blue / Logo Blue
         primary: {
           50: '#f0f9ff',
           100: '#e0f2fe',

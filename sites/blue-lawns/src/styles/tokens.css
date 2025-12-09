@@ -75,14 +75,15 @@
   --color-surface-subtle: var(--color-neutral-50);
   --color-surface-muted: var(--color-neutral-100);
 
-  /* Text Colors (Enhanced) */
-  --color-brand-navy: #0E1B2C;      /* Brand navy for headings (replaces black) */
-  --color-brand-body: #44546A;      /* Brand body text (gray-blue) */
+  /* Text Colors (Enhanced - Updated to Blue Lawns Brand Blue) */
+  --color-brand-navy: #0284c7;      /* Blue Lawns brand blue for headings (updated from dark navy) */
+  --color-brand-body: #0369a1;      /* Darker blue for body text (updated from gray-blue) */
+  --color-brand-blue: #1DA1F2;      /* Twitter Blue / Logo Blue */
   
   --color-text: var(--color-brand-body);
   --color-text-primary: var(--color-brand-navy);
   --color-text-secondary: var(--color-brand-body);
-  --color-text-tertiary: var(--color-neutral-500);
+  --color-text-tertiary: var(--color-neutral-600);
   --color-text-muted: var(--color-neutral-500);
   --color-text-inverse: #ffffff;
   --color-text-disabled: var(--color-neutral-400);

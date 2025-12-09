@@ -24,6 +24,7 @@ interface Props {
   noFollow?: boolean;
   ogImage?: string;
   headerVariant?: 'transparent' | 'solid';
+  headerMode?: 'light' | 'dark';
 }
 
 const { 
@@ -34,7 +35,8 @@ const {
   noIndex, 
   noFollow, 
   ogImage: pageOgImage,
-  headerVariant = 'transparent'
+  headerVariant = 'transparent',
+  headerMode = 'dark'  // Default to dark (navy text) since most heroes are bright
 } = Astro.props;
 
 const siteUrl = settings.siteUrl || Astro.url.origin;
@@ -109,11 +111,21 @@ const mappedNavItems = navigation.map((item) => ({
     
     {/* Custom Analytics Event Tracker */}
     <script is:inline src="/js/analytics.js"></script>
+    
+    {/* Google Places API (New) for Address Autocomplete */}
+    {import.meta.env.PUBLIC_GOOGLE_PLACES_API_KEY && (
+      <script 
+        src={`https://maps.googleapis.com/maps/api/js?key=${import.meta.env.PUBLIC_GOOGLE_PLACES_API_KEY}&libraries=places&loading=async`}
+        async
+        defer
+      ></script>
+    )}
   </head>
   <body class="flex min-h-screen flex-col bg-gray-50 text-brand-navy font-sans antialiased">
     <Header 
       navItems={mappedNavItems} 
       variant={headerVariant}
+      headerMode={headerMode}
     />
     
     <MobileMenu items={mappedNavItems} />

@@ -1,6 +1,7 @@
 ---
 import Container from '../layout/Container.astro';
 import Button from '../ui/Button.astro';
+import settings from '../../content/settings.json';
 
 interface Props {
   title?: string;
@@ -17,7 +18,7 @@ const {
   primaryCtaLabel = "Get a Free Quote", 
   primaryCtaLink = "/contact",
   secondaryCtaLabel = "Call Us Now",
-  secondaryCtaLink = "tel:6095550123"
+  secondaryCtaLink = `tel:${settings.contact.phone.replace(/\s/g, '')}`
 } = Astro.props;
 ---
 

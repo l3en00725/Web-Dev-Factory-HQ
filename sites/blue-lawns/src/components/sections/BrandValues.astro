@@ -1,0 +1,61 @@
+---
+import Container from '../layout/Container.astro';
+
+const values = [
+  {
+    title: 'Local Expertise',
+    description: 'Born & raised in Cape May County.',
+    icon: 'MapPin'
+  },
+  {
+    title: 'Reliability',
+    description: 'We show up on time, every time.',
+    icon: 'Clock'
+  },
+  {
+    title: 'Quality Guarantee',
+    description: 'Licensed, insured & obsessive.',
+    icon: 'Shield'
+  }
+];
+---
+
+<section class="py-16 bg-white">
+  <Container>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+      {values.map((value) => (
+        <div class="text-center">
+          <div class="flex items-center justify-center mb-4">
+            <div class="w-16 h-16 rounded-full bg-primary-50 flex items-center justify-center">
+              {value.icon === 'MapPin' && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-600">
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+              )}
+              {value.icon === 'Clock' && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-600">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              )}
+              {value.icon === 'Shield' && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-600">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+                  <path d="m9 12 2 2 4-4"/>
+                </svg>
+              )}
+            </div>
+          </div>
+          <h3 class="font-display text-xl font-bold text-brand-navy mb-2">
+            {value.title}
+          </h3>
+          <p class="text-slate-600 text-base">
+            {value.description}
+          </p>
+        </div>
+      ))}
+    </div>
+  </Container>
+</section>
+

@@ -39,8 +39,8 @@ const primaryServices = services.filter(s => s.type === 'primary');
 >
   <Hero
     variant="simple"
-    title={`Lawn Care in ${location.town}`}
-    subtitle={`Professional landscaping and lawn maintenance services for ${location.town}, NJ. Licensed, insured, and satisfaction guaranteed.`}
+    title={`Professional Landscaping & Property Care in ${location.town}`}
+    subtitle={`Trusted local experts serving ${location.town} with comprehensive lawn care, landscaping, and property maintenance services.`}
     primaryCta={{ label: "Get a Free Quote", href: "/contact" }}
     backgroundImage={location.heroImage}
     alignment="center"
@@ -48,9 +48,26 @@ const primaryServices = services.filter(s => s.type === 'primary');
 
   <section class="py-section-mobile lg:py-section-desktop bg-background">
     <Container>
-      <div class="max-w-3xl mx-auto text-center mb-12">
-        <h2 class="font-display text-3xl font-bold mb-6 text-brand-navy">Serving {location.town}, NJ</h2>
-        <p class="text-lg text-slate-600">{location.description}</p>
+      <div class="max-w-3xl mx-auto">
+        <h2 class="font-display text-3xl font-bold mb-6 text-brand-navy">Your Trusted Landscaping Partner in {location.town}</h2>
+        
+        <p class="text-lg text-slate-600 mb-6">
+          Blue Lawns has been the go-to landscaping company for {location.town} homeowners and businesses since 2010. We understand the unique challenges of maintaining beautiful outdoor spaces in Cape May County's coastal environment, from salt air exposure to sandy soils and seasonal weather patterns.
+        </p>
+
+        <p class="text-lg text-slate-600 mb-6">
+          Our team of licensed professionals brings local expertise and obsessive attention to detail to every project. Whether you need weekly lawn maintenance, custom landscape design, or seasonal cleanup services, we deliver reliable, high-quality results that enhance your property's curb appeal and value.
+        </p>
+
+        <p class="text-lg text-slate-600 mb-8">
+          {location.town} homeowners trust Blue Lawns because we show up on time, communicate clearly, and treat every property like it's our own. We're fully licensed and insured, and we stand behind our work with a satisfaction guarantee. Let us handle the hard work so you can enjoy your weekends and a beautiful outdoor space year-round.
+        </p>
+
+        <div class="bg-primary-50 border-l-4 border-primary-500 p-6">
+          <p class="text-slate-700 font-medium">
+            <strong>Local Expertise:</strong> {location.description}
+          </p>
+        </div>
       </div>
     </Container>
   </section>
