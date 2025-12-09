@@ -46,12 +46,9 @@ const canonical = buildCanonicalUrl(Astro.url.pathname, siteUrl, canonicalUrl);
 const logoSrc = settings.logo;
 const siteTitle = settings.title;
 
-// OG Image Logic - Use static fallback or page-provided image
-// The /api/og dynamic generator can be used but falls back to static for reliability
-const currentOrigin = Astro.url.origin;
-const resolvedOgImage = pageOgImage 
-  ? (pageOgImage.startsWith('http') ? pageOgImage : `${currentOrigin}${pageOgImage}`)
-  : `${currentOrigin}/opengraph.jpg`;
+// OG Image Logic - Use dynamic Vercel OG API
+const ogUrl = `${Astro.url.origin}/api/og?title=${encodeURIComponent(title)}`;
+const resolvedOgImage = ogUrl;
 
 // Validate and clean structured data
 const cleanedStructuredData = structuredData ? validateSchemaObject(structuredData) : null;
