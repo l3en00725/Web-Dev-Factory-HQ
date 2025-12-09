@@ -14,6 +14,7 @@ interface Props {
   quality?: number;
   format?: 'webp' | 'avif' | 'png' | 'jpeg';
   fit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down'; // Keep for compatibility, though explicit class preferred
+  fetchpriority?: 'high' | 'low' | 'auto';
 }
 
 const { 
@@ -24,9 +25,10 @@ const {
   sizes = "(max-width: 768px) 100vw, 50vw",
   priority = false,
   class: className,
-  quality,
-  format,
-  fit // extracted but not passed to Image directly as style, unless needed
+  quality = 80,
+  format = 'webp',
+  fit, // extracted but not passed to Image directly as style, unless needed
+  fetchpriority
 } = Astro.props;
 
 let finalSrc: ImageMetadata | string | undefined = src;
@@ -58,6 +60,7 @@ const loading = priority ? "eager" : "lazy";
     class={className}
     quality={quality}
     format={format}
+    fetchpriority={fetchpriority}
   />
 ) : (
   <div class={`bg-gray-200 flex items-center justify-center text-gray-400 text-xs ${className}`}>

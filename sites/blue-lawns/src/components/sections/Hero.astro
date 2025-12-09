@@ -73,6 +73,8 @@ const isSimple = variant === 'simple';
           alt={finalHeadline || "Blue Lawns Service"}
           class="h-full w-full object-cover"
           priority={true}
+          fetchpriority="high"
+          format="webp"
         />
         {/* White overlay to create subtle effect */}
         <div class="absolute inset-0 bg-gradient-to-b from-white/95 via-white/90 to-white/85"></div>
@@ -146,6 +148,9 @@ const isSimple = variant === 'simple';
           alt={finalHeadline || "Blue Lawns Coastal Landscape"}
           class="h-full w-full object-cover object-center opacity-90"
           priority={true}
+          fetchpriority="high"
+          format="webp"
+          quality={85}
         />
       </div>
     ) : (
@@ -224,6 +229,7 @@ const isSimple = variant === 'simple';
               class="h-full w-full object-cover"
               width={40}
               height={40}
+              format="webp"
             />
           </div>
         ))}

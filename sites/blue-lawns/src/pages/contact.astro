@@ -31,6 +31,16 @@ const structuredData = {
   structuredData={structuredData}
   headerVariant="solid"
 >
+  {/* Google Places API only on contact page */}
+  {import.meta.env.PUBLIC_GOOGLE_PLACES_API_KEY && (
+    <script 
+      slot="head"
+      src={`https://maps.googleapis.com/maps/api/js?key=${import.meta.env.PUBLIC_GOOGLE_PLACES_API_KEY}&libraries=places&loading=async`}
+      async
+      defer
+    ></script>
+  )}
+  
   <section class="bg-background py-section-mobile lg:py-section-desktop">
     <Container size="lg">
       <div class="text-center mb-12">
