@@ -114,7 +114,7 @@ export const OgTemplate: React.FC<OgTemplateProps> = ({
       {imageUrl && (
         <img
           src={imageUrl}
-          alt=""
+          alt="Blue Lawns landscaping service"
           style={{
             position: 'absolute',
             right: '60px',

@@ -27,6 +27,7 @@ const phoneLink = `tel:${phoneNumber.replace(/\s/g, '')}`;
 
 <header 
   id="site-header"
+  role="banner"
   class:list={[
     "group fixed top-0 z-50 w-full transition-all duration-300 border-b",
     variant === 'transparent' 
@@ -51,7 +52,7 @@ const phoneLink = `tel:${phoneNumber.replace(/\s/g, '')}`;
     </div>
 
     {/* Desktop Nav */}
-    <nav class="hidden items-center gap-1 md:flex ml-auto">
+    <nav class="hidden items-center gap-1 md:flex ml-auto" role="navigation" aria-label="Main navigation">
       {navItems.map((item) => {
         const isServices = item.title === 'Services';
         

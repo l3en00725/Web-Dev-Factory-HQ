@@ -38,7 +38,7 @@ const { items } = Astro.props;
       </button>
     </div>
     
-    <nav class="flex-1 overflow-y-auto px-6 py-8">
+    <nav class="flex-1 overflow-y-auto px-6 py-8" role="navigation" aria-label="Mobile navigation">
       <ul class="flex flex-col gap-2">
         {items.map((item) => (
           <li>
