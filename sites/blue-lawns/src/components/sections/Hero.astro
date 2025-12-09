@@ -19,6 +19,7 @@ interface Props {
   subtitle?: string;
   primaryCta?: { label: string; href: string };
   backgroundImage?: ImageMetadata | string;
+  backgroundImageWebp?: ImageMetadata | string; // WebP fallback for AVIF
 }
 
 const {
@@ -34,7 +35,8 @@ const {
   title,
   subtitle,
   primaryCta,
-  backgroundImage
+  backgroundImage,
+  backgroundImageWebp
 } = Astro.props;
 
 // Normalize props to support both old and new signatures
@@ -138,19 +140,21 @@ const isSimple = variant === 'simple';
 ) : (
   <!-- Original Homepage Hero -->
 
-<section class="relative flex min-h-[90vh] w-full items-center justify-center overflow-hidden bg-primary-950">
+<section class="relative flex min-h-[90vh] w-full items-center justify-center overflow-hidden bg-primary-950" style="min-height: 90vh;">
   {/* Background Image Layer */}
   <div class="absolute inset-0 z-0 select-none">
     {finalImage ? (
-      <div class="relative h-full w-full">
+      <div class="relative h-full w-full" style="aspect-ratio: 1400/933;">
         <Image
           src={finalImage}
           alt={finalHeadline || "Blue Lawns Coastal Landscape"}
           class="h-full w-full object-cover object-center opacity-90"
           priority={true}
           fetchpriority="high"
-          format="webp"
-          quality={85}
+          format="avif"
+          quality={50}
+          width={1400}
+          height={933}
         />
       </div>
     ) : (
@@ -219,10 +223,10 @@ const isSimple = variant === 'simple';
     </div>
 
     {/* Social Proof */}
-    <div class="mt-10 flex items-center gap-4 rounded-2xl border border-white/10 bg-primary-950/30 px-6 py-3 backdrop-blur-sm">
+    <div class="mt-10 flex items-center gap-4 rounded-2xl border border-white/10 bg-primary-950/30 px-6 py-3 backdrop-blur-sm" style="min-height: 70px;">
        <div class="flex -space-x-3">
         {avatars.map((src, i) => (
-          <div class="h-10 w-10 rounded-full border-2 border-primary-900 bg-slate-200 overflow-hidden relative">
+          <div class="h-10 w-10 rounded-full border-2 border-primary-900 bg-slate-200 overflow-hidden relative" style="width: 40px; height: 40px;">
             <Image 
               src={src} 
               alt={`Trusted neighbor ${i + 1}`}
@@ -230,12 +234,13 @@ const isSimple = variant === 'simple';
               width={40}
               height={40}
               format="webp"
+              loading="eager"
             />
           </div>
         ))}
       </div>
       <div class="flex flex-col">
-        <div class="flex text-secondary-400 text-sm">
+        <div class="flex text-secondary-400 text-sm" style="height: 20px;">
           {'★★★★★'.split('').map(star => <span>{star}</span>)}
         </div>
         <span class="text-sm font-medium text-white/90">Trusted by 500+ Neighbors</span>

@@ -113,6 +113,22 @@ const mappedNavItems = navigation.map((item) => ({
       </>
     )}
     
+    {/* Preload hero image for LCP optimization */}
+    <link 
+      rel="preload" 
+      as="image" 
+      href="/_astro/hero-main.D0OZzk_t.avif"
+      type="image/avif"
+      fetchpriority="high"
+    />
+    <link 
+      rel="preload" 
+      as="image" 
+      href="/_astro/hero-main-optimized.nuOsPrLl.webp"
+      type="image/webp"
+      fetchpriority="high"
+    />
+    
     {/* Default robots meta - allow indexing unless explicitly disabled */}
     {noIndex && noFollow ? (
       <meta name="robots" content="noindex, nofollow" />
@@ -163,8 +179,8 @@ const mappedNavItems = navigation.map((item) => ({
       </>
     )}
     
-    {/* Custom Analytics Event Tracker */}
-    <script is:inline src="/js/analytics.js"></script>
+    {/* Custom Analytics Event Tracker - Deferred for better TBT */}
+    <script defer src="/js/analytics.js"></script>
   </head>
   <body class="flex min-h-screen flex-col bg-gray-50 text-brand-navy font-sans antialiased">
     <!-- Skip to main content link for keyboard/screen reader users -->
