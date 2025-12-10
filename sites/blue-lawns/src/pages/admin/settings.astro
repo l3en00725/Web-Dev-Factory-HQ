@@ -131,6 +131,22 @@ const title = "Settings";
       </div>
     </section>
 
+    <!-- Google Integration -->
+    <section class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Google Integration</h2>
+      <p class="text-sm text-gray-600 mb-4">
+        Connect your Google account to access Google Analytics 4 and Search Console data in the Analytics dashboard.
+      </p>
+      
+      <div id="oauth-status" class="space-y-4">
+        <!-- Status will be loaded here -->
+        <div class="flex items-center gap-2 text-gray-500">
+          <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500"></div>
+          <span>Loading connection status...</span>
+        </div>
+      </div>
+    </section>
+
     <!-- Form Destination -->
     <section class="bg-white rounded-lg shadow p-6">
       <h2 class="text-xl font-semibold text-gray-900 mb-4">Form Destination</h2>
@@ -323,9 +339,146 @@ const title = "Settings";
     }
   }
 
+  // Load OAuth status
+  async function loadOAuthStatus() {
+    const statusEl = document.getElementById('oauth-status');
+    if (!statusEl) return;
+
+    try {
+      const response = await fetch('/api/admin/oauth/google/status');
+      if (!response.ok) {
+        throw new Error('Failed to load OAuth status');
+      }
+      const data = await response.json();
+
+      if (data.connected) {
+        const connectedDate = data.connectedAt ? new Date(data.connectedAt).toLocaleDateString() : 'Unknown';
+        const needsRefreshBadge = data.needsRefresh 
+          ? '<span class="ml-2 px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded">Needs Refresh</span>'
+          : '';
+
+        statusEl.innerHTML = `
+          <div class="border border-green-200 bg-green-50 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span class="font-medium text-green-900">Connected to Google</span>
+                ${needsRefreshBadge}
+              </div>
+              <button 
+                id="disconnect-btn" 
+                class="px-4 py-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 transition-colors"
+              >
+                Disconnect
+              </button>
+            </div>
+            <div class="text-sm text-gray-700 space-y-1">
+              <p><span class="font-medium">Email:</span> ${data.email || 'Not available'}</p>
+              <p><span class="font-medium">Connected:</span> ${connectedDate}</p>
+              ${data.ga4PropertyId ? `<p><span class="font-medium">GA4 Property:</span> ${data.ga4PropertyId}</p>` : ''}
+              ${data.gscSiteUrl ? `<p><span class="font-medium">Search Console:</span> ${data.gscSiteUrl}</p>` : ''}
+            </div>
+          </div>
+        `;
+
+        // Add disconnect handler
+        const disconnectBtn = document.getElementById('disconnect-btn');
+        if (disconnectBtn) {
+          disconnectBtn.addEventListener('click', handleDisconnect);
+        }
+      } else {
+        statusEl.innerHTML = `
+          <div class="border border-gray-200 bg-gray-50 rounded-lg p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-gray-700 mb-2">Not connected to Google</p>
+                <p class="text-sm text-gray-500">Connect to access Google Analytics 4 and Search Console data.</p>
+              </div>
+              <a 
+                href="/api/admin/oauth/google/connect"
+                class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Connect Google
+              </a>
+            </div>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('Error loading OAuth status:', error);
+      statusEl.innerHTML = `
+        <div class="border border-red-200 bg-red-50 rounded-lg p-4">
+          <p class="text-red-700">Failed to load connection status. Please refresh the page.</p>
+        </div>
+      `;
+    }
+  }
+
+  // Handle disconnect
+  async function handleDisconnect() {
+    if (!confirm('Are you sure you want to disconnect Google? You will lose access to Analytics and Search Console data.')) {
+      return;
+    }
+
+    const disconnectBtn = document.getElementById('disconnect-btn') as HTMLButtonElement;
+    if (disconnectBtn) {
+      disconnectBtn.disabled = true;
+      disconnectBtn.textContent = 'Disconnecting...';
+    }
+
+    try {
+      const response = await fetch('/api/admin/oauth/google/disconnect', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to disconnect');
+      }
+
+      showStatus('Disconnected successfully', 'success');
+      // Reload OAuth status
+      setTimeout(() => {
+        loadOAuthStatus();
+      }, 1000);
+    } catch (error: any) {
+      console.error('Error disconnecting:', error);
+      showStatus(error.message || 'Failed to disconnect', 'error');
+      if (disconnectBtn) {
+        disconnectBtn.disabled = false;
+        disconnectBtn.textContent = 'Disconnect';
+      }
+    }
+  }
+
+  // Check for OAuth success/error messages in URL
+  function checkOAuthMessages() {
+    const url = new URL(window.location.href);
+    const oauthParam = url.searchParams.get('oauth');
+    const errorParam = url.searchParams.get('error');
+
+    if (oauthParam === 'connected') {
+      showStatus('Successfully connected to Google!', 'success');
+      // Clean URL
+      url.searchParams.delete('oauth');
+      window.history.replaceState({}, '', url.toString());
+    } else if (errorParam) {
+      const errorMessage = url.searchParams.get('message') || 'OAuth connection failed';
+      showStatus(`OAuth Error: ${errorMessage}`, 'error');
+      // Clean URL
+      url.searchParams.delete('error');
+      url.searchParams.delete('message');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }
+
   // Initialize
   document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
+    loadOAuthStatus();
+    checkOAuthMessages();
     
     const form = document.getElementById('settings-form');
     const resetBtn = document.getElementById('reset-btn');
