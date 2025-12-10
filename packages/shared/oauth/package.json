@@ -1,0 +1,19 @@
+{
+  "name": "@virgo/shared-oauth",
+  "version": "1.0.0",
+  "description": "Shared OAuth implementation for VIRGO Web Factory",
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
+
