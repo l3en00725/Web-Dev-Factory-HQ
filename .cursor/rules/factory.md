@@ -131,6 +131,8 @@ Analytics integration
 
 Dashboard system
 
+Build configuration & dependency management (Vite/SSR bundling)
+
 🔥 NEW RULE (ADDED)
 13. You must generate Service × Location pages (Phase 5b)
 
@@ -155,12 +157,40 @@ Generate only pages included in location.services[] array
 
 You may NOT skip Phase 5b under any condition.
 
+⚙️ Build Configuration Rules (CRITICAL)
+14. Server-Side Package Bundling
+
+When adding server-side packages (Supabase, Resend, etc.):
+
+MUST add to `vite.ssr.noExternal` in `astro.config.mjs`
+
+This prevents "Rollup failed to resolve import" errors on Vercel/Netlify
+
+Example:
+```javascript
+vite: {
+  ssr: {
+    noExternal: ['@supabase/ssr', '@supabase/supabase-js', 'resend'],
+  },
+}
+```
+
+15. Environment Variables
+
+MUST create/update `.env.example` documenting ALL variables
+
+Mark REQUIRED vs OPTIONAL clearly
+
+Use `PUBLIC_` prefix for client-side variables
+
+Test build locally (`npm run build`) before committing
+
 ❗ Final Operating Rules
-14. Output Discipline
+16. Output Discipline
 
 Only output content directly related to the current phase.
 Do NOT jump ahead or provide full-build summaries.
 
-15. Stop If Uncertain
+17. Stop If Uncertain
 
 If anything is unclear, you must STOP and ask Benjamin for clarification.
