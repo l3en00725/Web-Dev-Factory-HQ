@@ -1,6 +1,4 @@
 ---
-import { Image } from 'astro:assets';
-
 interface Props {
   class?: string;
   variant?: 'default' | 'light' | 'dark'; // Kept for API compatibility
@@ -14,14 +12,13 @@ const {
 ---
 
 <a href="/" class:list={["block relative transition-opacity hover:opacity-90", className]} aria-label="Blue Lawns Home">
-  <Image 
+  <img 
     src="/logo/logo.png" 
     alt="Blue Lawns – Coastal Lawn Care & Landscaping" 
     class="h-auto w-full object-contain block"
-    width={160}
-    height={45}
+    width="160"
+    height="45"
     loading={loading}
-    format="webp"
-    quality={90}
+    decoding="async"
   />
 </a>

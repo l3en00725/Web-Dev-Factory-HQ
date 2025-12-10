@@ -62,6 +62,14 @@ const avatars = [
 
 // Conditional rendering based on variant
 const isSimple = variant === 'simple';
+
+// Check if this is the hero-main image (for responsive optimization)
+// Handles both string paths and ImageMetadata objects
+const isHeroMain = typeof finalImage === 'string' 
+  ? finalImage.includes('hero-main')
+  : (finalImage && typeof finalImage === 'object' && 'src' in finalImage 
+      ? String(finalImage.src).includes('hero-main')
+      : false);
 ---
 
 {isSimple ? (
@@ -145,17 +153,48 @@ const isSimple = variant === 'simple';
   <div class="absolute inset-0 z-0 select-none">
     {finalImage ? (
       <div class="relative h-full w-full" style="aspect-ratio: 1400/933;">
-        <Image
-          src={finalImage}
-          alt={finalHeadline || "Blue Lawns Coastal Landscape"}
-          class="h-full w-full object-cover object-center opacity-90"
-          priority={true}
-          fetchpriority="high"
-          format="avif"
-          quality={50}
-          width={1400}
-          height={933}
-        />
+        {isHeroMain ? (
+          <!-- Responsive hero image with srcset for mobile optimization -->
+          <picture>
+            <!-- Mobile: 600px, Tablet: 1000px, Desktop: 1400px -->
+            <source
+              type="image/avif"
+              srcset="/images/general/hero-main-600.avif 600w, /images/general/hero-main-1000.avif 1000w, /images/general/hero-main-1400.avif 1400w"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+            <source
+              type="image/webp"
+              srcset="/images/general/hero-main-600.webp 600w, /images/general/hero-main-1000.webp 1000w, /images/general/hero-main-1400.webp 1400w"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+            <!-- Fallback -->
+            <img
+              src="/images/general/hero-main-600.webp"
+              alt={finalHeadline || "Blue Lawns Coastal Landscape"}
+              class="h-full w-full object-cover object-center opacity-90"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+              width="1400"
+              height="933"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </picture>
+        ) : (
+          <!-- Fallback to Astro Image component for other images -->
+          <Image
+            src={finalImage}
+            alt={finalHeadline || "Blue Lawns Coastal Landscape"}
+            class="h-full w-full object-cover object-center opacity-90"
+            priority={true}
+            fetchpriority="high"
+            format="avif"
+            quality={50}
+            width={1400}
+            height={933}
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
+        )}
       </div>
     ) : (
       <div class="h-full w-full bg-gradient-to-br from-primary-900 to-slate-900"></div>

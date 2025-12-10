@@ -48,10 +48,34 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const { location, service } = Astro.props as {
-  location: Location;
-  service: Service;
+// Get props, with fallback to params if props are missing (client-side navigation)
+const props = Astro.props as {
+  location?: Location;
+  service?: Service;
+  params?: {
+    town?: string;
+    service?: string;
+  };
 };
+
+// If props are missing, fetch from params (handles client-side navigation)
+let location: Location | undefined = props.location;
+let service: Service | undefined = props.service;
+
+if (!location || !service) {
+  const { town, service: serviceSlug } = Astro.params;
+  if (town) {
+    location = locations.find((l: Location) => l.slug === town);
+  }
+  if (serviceSlug) {
+    service = services.find((s: Service) => s.slug === serviceSlug);
+  }
+}
+
+// Validate that we have both location and service
+if (!location || !service) {
+  return Astro.redirect('/404');
+}
 
 // Generate unique SEO content
 const seoContent = generateLocationServiceSEO(service, location);

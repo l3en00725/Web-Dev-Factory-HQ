@@ -665,6 +665,55 @@ validate meta tags
 validate that no architectural rules were broken
 
 
+🧪 MANDATORY TESTING & VALIDATION PROTOCOL
+
+Before marking any task as complete, Cursor MUST perform comprehensive testing:
+
+1. **Build Validation**
+   - Run `npm run build` and verify zero errors
+   - Check for TypeScript/ESLint errors
+   - Verify all imports resolve correctly
+
+2. **Dynamic Route Testing**
+   - Test ALL dynamic routes (e.g., `[town]/[service]`, `[slug]`)
+   - Verify props are available both from `getStaticPaths` AND client-side navigation
+   - Add defensive checks: if props are missing, fetch from `Astro.params`
+   - Never assume props exist - always validate or provide fallbacks
+   - Example: `const location = props.location || locations.find(l => l.slug === Astro.params.town)`
+
+3. **Component Integration Testing**
+   - Test components with both string paths AND ImageMetadata objects
+   - Verify public folder assets work (use `<img>` not Astro `<Image>` for public assets)
+   - Test all prop combinations (required + optional)
+   - Verify error boundaries and fallbacks
+
+4. **Navigation Testing**
+   - Test client-side navigation (clicking links)
+   - Test direct URL access (browser refresh)
+   - Test back/forward browser navigation
+   - Verify no 404s or undefined prop errors
+
+5. **Asset Validation**
+   - Verify all image paths exist (check both `src/assets/` and `public/`)
+   - Test logo/icon components render correctly
+   - Verify responsive images work on mobile/tablet/desktop
+   - Check console for 404s or broken asset errors
+
+6. **Error Prevention Rules**
+   - NEVER access object properties without null/undefined checks
+   - Always provide fallbacks for optional props
+   - Use optional chaining (`?.`) for nested properties
+   - Add type guards for runtime validation
+
+7. **Local Dev Server Testing**
+   - Start dev server and manually test affected pages
+   - Check browser console for errors
+   - Test responsive breakpoints
+   - Verify all interactive elements work
+
+**Failure to complete ALL validation steps results in incomplete work.**
+
+
 provide a summary of:
 
 
