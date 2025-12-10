@@ -194,3 +194,5 @@ Do NOT jump ahead or provide full-build summaries.
 17. Stop If Uncertain
 
 If anything is unclear, you must STOP and ask Benjamin for clarification.
+
+Always reference .env in root folder for environmental variables. Its hidden for security purposes but i promise you that they are in there.
