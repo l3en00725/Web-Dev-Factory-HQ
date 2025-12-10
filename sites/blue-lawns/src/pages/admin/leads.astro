@@ -1,0 +1,15 @@
+---
+import AdminLayout from '../../admin-components/AdminLayout.astro';
+import LeadTable from '../../admin-components/LeadTable.astro';
+
+const title = "Leads";
+---
+
+<AdminLayout title={title} activePath="/admin/leads">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">{title}</h1>
+    <p class="text-gray-600">View and manage contact form submissions</p>
+  </div>
+
+  <LeadTable />
+</AdminLayout>

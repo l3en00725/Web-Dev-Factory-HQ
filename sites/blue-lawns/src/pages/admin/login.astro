@@ -1,0 +1,115 @@
+---
+import Base from '../../layouts/Base.astro';
+import Container from '../../components/layout/Container.astro';
+
+// Check for error query param
+const errorParam = Astro.url.searchParams.get('error');
+let errorMessage = '';
+if (errorParam) {
+  errorMessage = decodeURIComponent(errorParam);
+}
+---
+
+<Base 
+  title="Admin Login - Blue Lawns" 
+  description="Login to Blue Lawns admin dashboard"
+  noIndex={true}
+  headerVariant="solid"
+>
+  <section class="min-h-[calc(100vh-200px)] flex items-center justify-center bg-gray-50">
+    <Container>
+      <div class="max-w-md w-full mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+          <h1 class="text-3xl font-bold text-brand-navy mb-2">Admin Login</h1>
+          <p class="text-gray-600 mb-6">Sign in to access the Blue Lawns dashboard</p>
+          
+          <form id="login-form" class="space-y-4">
+            <div>
+              <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="your@email.com"
+              />
+            </div>
+            
+            <div>
+              <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="••••••••"
+              />
+            </div>
+            
+            {errorMessage && (
+              <div class="text-red-600 text-sm bg-red-50 p-3 rounded">
+                {errorMessage}
+              </div>
+            )}
+            <div id="error-message" class="hidden text-red-600 text-sm bg-red-50 p-3 rounded"></div>
+            
+            <button
+              type="submit"
+              class="w-full bg-secondary-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-secondary-600 transition-colors"
+            >
+              Sign In
+            </button>
+          </form>
+        </div>
+      </div>
+    </Container>
+  </section>
+</Base>
+
+<script>
+  // Show error message if present
+  const errorParam = new URLSearchParams(window.location.search).get('error');
+  if (errorParam) {
+    const errorEl = document.getElementById('error-message')!;
+    errorEl.textContent = decodeURIComponent(errorParam);
+    errorEl.classList.remove('hidden');
+  }
+
+  // Handle form submission
+  document.getElementById('login-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    
+    const errorEl = document.getElementById('error-message')!;
+    errorEl.classList.add('hidden');
+    
+    const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Signing in...';
+    
+    // Submit to server-side API route
+    const response = await fetch('/api/admin/login', {
+      method: 'POST',
+      body: formData,
+    });
+    
+    // The API route handles redirect, but if there's an error, we'll see it in the URL
+    if (response.redirected) {
+      window.location.href = response.url;
+    } else {
+      const data = await response.json();
+      errorEl.textContent = data.error || 'An error occurred. Please try again.';
+      errorEl.classList.remove('hidden');
+      submitButton.disabled = false;
+      submitButton.textContent = 'Sign In';
+    }
+  });
+</script>

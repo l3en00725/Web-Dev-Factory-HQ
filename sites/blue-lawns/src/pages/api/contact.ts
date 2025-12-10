@@ -1,6 +1,10 @@
 // Contact form handler with Resend email delivery
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
+import { createClient } from '@supabase/supabase-js';
+
+// Hardcoded Blue Lawns company_id for MVP
+const BLUE_LAWNS_COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -123,10 +127,77 @@ export const POST: APIRoute = async ({ request }) => {
       `,
     });
     
+    // Extract UTM and click ID parameters
+    const utm_source = data.utm_source || null;
+    const utm_medium = data.utm_medium || null;
+    const utm_campaign = data.utm_campaign || null;
+    const utm_term = data.utm_term || null;
+    const utm_content = data.utm_content || null;
+    const gclid = data.gclid || null;
+    const fbclid = data.fbclid || null;
+
+    // Save lead to Supabase with tracking data
+    const supabaseUrl = import.meta.env.SUPABASE_URL;
+    const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY;
+    
+    if (supabaseUrl && supabaseAnonKey) {
+      try {
+        const supabase = createClient(supabaseUrl, supabaseAnonKey);
+        await supabase.from('website_leads').insert({
+          company_id: BLUE_LAWNS_COMPANY_ID,
+          name,
+          email,
+          phone: phone || null,
+          address: address || null,
+          message: message || null,
+          reviewed: false,
+          utm_source,
+          utm_medium,
+          utm_campaign,
+          utm_term,
+          utm_content,
+          gclid,
+          fbclid,
+        });
+      } catch (supabaseError) {
+        // Log error but don't fail the request if email was sent
+        console.error('Failed to save lead to Supabase:', supabaseError);
+      }
+    }
+
+    // Get tracking settings for conversion event response
+    let googleAdsId = null;
+    let googleAdsConversionLabel = null;
+    
+    if (supabaseUrl && supabaseAnonKey) {
+      try {
+        const supabase = createClient(supabaseUrl, supabaseAnonKey);
+        const { data: settingsData } = await supabase
+          .from('website_settings')
+          .select('settings')
+          .eq('company_id', BLUE_LAWNS_COMPANY_ID)
+          .single();
+        
+        if (settingsData?.settings?.tracking) {
+          googleAdsId = settingsData.settings.tracking.google_ads_id;
+          googleAdsConversionLabel = settingsData.settings.tracking.google_ads_conversion_label;
+        }
+      } catch (error) {
+        // Silently fail - conversion tracking is optional
+        console.warn('Could not load tracking settings for conversion:', error);
+      }
+    }
+
+    // Build Google Ads conversion ID if both ID and label are present
+    const googleAdsConversionId = googleAdsId && googleAdsConversionLabel 
+      ? `${googleAdsId}/${googleAdsConversionLabel}`
+      : null;
+    
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Message sent successfully! We will get back to you soon.' 
+        message: 'Message sent successfully! We will get back to you soon.',
+        googleAdsConversionId // Pass to client for conversion event
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );

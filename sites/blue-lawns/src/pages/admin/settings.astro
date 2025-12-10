@@ -1,0 +1,341 @@
+---
+import AdminLayout from '../../admin-components/AdminLayout.astro';
+
+const title = "Settings";
+---
+
+<AdminLayout title={title} activePath="/admin/settings">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">{title}</h1>
+    <p class="text-gray-600">Manage business information and integrations</p>
+  </div>
+
+  <form id="settings-form" class="space-y-8">
+    <!-- Basic Information -->
+    <section class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Basic Information</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+          <input type="text" id="title" name="title" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label for="tagline" class="block text-sm font-medium text-gray-700 mb-1">Tagline</label>
+          <input type="text" id="tagline" name="tagline" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div class="md:col-span-2">
+          <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+        </div>
+        <div>
+          <label for="logo" class="block text-sm font-medium text-gray-700 mb-1">Logo Path</label>
+          <input type="text" id="logo" name="logo" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label for="siteUrl" class="block text-sm font-medium text-gray-700 mb-1">Site URL</label>
+          <input type="url" id="siteUrl" name="siteUrl" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Information -->
+    <section class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Contact Information</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="contact-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input type="email" id="contact-email" name="contact.email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label for="contact-phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+          <input type="tel" id="contact-phone" name="contact.phone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label for="address-street" class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+          <input type="text" id="address-street" name="contact.address.street" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label for="address-city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
+          <input type="text" id="address-city" name="contact.address.city" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label for="address-state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
+          <input type="text" id="address-state" name="contact.address.state" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label for="address-zip" class="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+          <input type="text" id="address-zip" name="contact.address.zip" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Social Media -->
+    <section class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Social Media</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="social-facebook" class="block text-sm font-medium text-gray-700 mb-1">Facebook URL</label>
+          <input type="url" id="social-facebook" name="social.facebook" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label for="social-instagram" class="block text-sm font-medium text-gray-700 mb-1">Instagram URL</label>
+          <input type="url" id="social-instagram" name="social.instagram" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Business Hours -->
+    <section class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Business Hours</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label for="hours-weekdays" class="block text-sm font-medium text-gray-700 mb-1">Weekdays</label>
+          <input type="text" id="hours-weekdays" name="businessHours.weekdays" placeholder="7:00 AM - 6:00 PM" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label for="hours-saturday" class="block text-sm font-medium text-gray-700 mb-1">Saturday</label>
+          <input type="text" id="hours-saturday" name="businessHours.saturday" placeholder="8:00 AM - 4:00 PM" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label for="hours-sunday" class="block text-sm font-medium text-gray-700 mb-1">Sunday</label>
+          <input type="text" id="hours-sunday" name="businessHours.sunday" placeholder="Closed" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Brand Colors -->
+    <section class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Brand Colors</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label for="color-primary" class="block text-sm font-medium text-gray-700 mb-1">Primary Color</label>
+          <input type="color" id="color-primary" name="brandColors.primary" class="w-full h-10 border border-gray-300 rounded-md cursor-pointer" />
+        </div>
+        <div>
+          <label for="color-secondary" class="block text-sm font-medium text-gray-700 mb-1">Secondary Color</label>
+          <input type="color" id="color-secondary" name="brandColors.secondary" class="w-full h-10 border border-gray-300 rounded-md cursor-pointer" />
+        </div>
+        <div>
+          <label for="color-accent" class="block text-sm font-medium text-gray-700 mb-1">Accent Color</label>
+          <input type="color" id="color-accent" name="brandColors.accent" class="w-full h-10 border border-gray-300 rounded-md cursor-pointer" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Analytics -->
+    <section class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Analytics</h2>
+      <div>
+        <label for="analytics-ga-id" class="block text-sm font-medium text-gray-700 mb-1">Google Analytics ID</label>
+        <input type="text" id="analytics-ga-id" name="analytics.googleAnalyticsId" placeholder="G-XXXXXXXXXX" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+    </section>
+
+    <!-- Form Destination -->
+    <section class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Form Destination</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="form-fallback-email" class="block text-sm font-medium text-gray-700 mb-1">Fallback Email</label>
+          <input type="email" id="form-fallback-email" name="formDestination.fallbackEmail" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Tracking & Pixels -->
+    <section class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Tracking & Pixels</h2>
+      <p class="text-sm text-gray-600 mb-4">Configure conversion tracking for Google Ads and Meta (Facebook) Pixel</p>
+      <div class="space-y-4">
+        <div>
+          <label for="tracking-google-ads-id" class="block text-sm font-medium text-gray-700 mb-1">Google Ads ID</label>
+          <input type="text" id="tracking-google-ads-id" name="tracking.google_ads_id" placeholder="AW-XXXXXXXXX" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <p class="text-xs text-gray-500 mt-1">Your Google Ads conversion ID (format: AW-XXXXXXXXX)</p>
+        </div>
+        <div>
+          <label for="tracking-google-ads-label" class="block text-sm font-medium text-gray-700 mb-1">Google Ads Conversion Label</label>
+          <input type="text" id="tracking-google-ads-label" name="tracking.google_ads_conversion_label" placeholder="XXXXXXXXXX" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <p class="text-xs text-gray-500 mt-1">Conversion label from your Google Ads conversion action</p>
+        </div>
+        <div>
+          <label for="tracking-meta-pixel-id" class="block text-sm font-medium text-gray-700 mb-1">Meta Pixel ID</label>
+          <input type="text" id="tracking-meta-pixel-id" name="tracking.meta_pixel_id" placeholder="123456789012345" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <p class="text-xs text-gray-500 mt-1">Your Meta (Facebook) Pixel ID</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEO -->
+    <section class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">SEO Settings</h2>
+      <div class="space-y-4">
+        <div>
+          <label for="seo-default-title" class="block text-sm font-medium text-gray-700 mb-1">Default Title</label>
+          <input type="text" id="seo-default-title" name="seo.defaultTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label for="seo-title-template" class="block text-sm font-medium text-gray-700 mb-1">Title Template</label>
+          <input type="text" id="seo-title-template" name="seo.titleTemplate" placeholder="%s | Blue Lawns" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label for="seo-default-description" class="block text-sm font-medium text-gray-700 mb-1">Default Description</label>
+          <textarea id="seo-default-description" name="seo.defaultDescription" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Submit Button -->
+    <div class="flex justify-end gap-4">
+      <button type="button" id="reset-btn" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+        Reset
+      </button>
+      <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+        Save Settings
+      </button>
+    </div>
+
+    <!-- Status Message -->
+    <div id="status-message" class="hidden fixed top-4 right-4 px-6 py-3 rounded-md shadow-lg z-50"></div>
+  </form>
+</AdminLayout>
+
+<script>
+  // Helper function to set nested object value
+  function setNestedValue(obj: any, path: string, value: any) {
+    const keys = path.split('.');
+    let current = obj;
+    for (let i = 0; i < keys.length - 1; i++) {
+      if (!current[keys[i]]) {
+        current[keys[i]] = {};
+      }
+      current = current[keys[i]];
+    }
+    current[keys[keys.length - 1]] = value;
+  }
+
+  // Helper function to get nested object value
+  function getNestedValue(obj: any, path: string) {
+    return path.split('.').reduce((current, key) => current?.[key], obj);
+  }
+
+  // Load settings on page load
+  async function loadSettings() {
+    try {
+      const response = await fetch('/api/admin/get-settings');
+      if (!response.ok) {
+        throw new Error('Failed to load settings');
+      }
+      const data = await response.json();
+      const settings = data.settings || {};
+
+      // Populate form fields
+      const form = document.getElementById('settings-form') as HTMLFormElement;
+      const inputs = form.querySelectorAll('input, textarea');
+      
+      inputs.forEach((input: any) => {
+        const name = input.name;
+        if (!name) return;
+
+        const value = getNestedValue(settings, name);
+        if (value !== undefined && value !== null) {
+          if (input.type === 'color') {
+            input.value = value;
+          } else {
+            input.value = value;
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Error loading settings:', error);
+      showStatus('Failed to load settings', 'error');
+    }
+  }
+
+  // Save settings
+  async function saveSettings(event: Event) {
+    event.preventDefault();
+    
+    const form = document.getElementById('settings-form') as HTMLFormElement;
+    const formData = new FormData(form);
+    const settings: any = {};
+
+    // Build nested settings object from form data
+    formData.forEach((value, key) => {
+      if (key.includes('.')) {
+        setNestedValue(settings, key, value);
+      } else {
+        settings[key] = value;
+      }
+    });
+
+    // Handle nested structures explicitly
+    if (!settings.contact) settings.contact = {};
+    if (!settings.contact.address) settings.contact.address = {};
+    if (!settings.social) settings.social = {};
+    if (!settings.businessHours) settings.businessHours = {};
+    if (!settings.brandColors) settings.brandColors = {};
+    if (!settings.analytics) settings.analytics = {};
+    if (!settings.formDestination) settings.formDestination = {};
+    if (!settings.tracking) settings.tracking = {};
+    if (!settings.seo) settings.seo = {};
+
+    try {
+      const response = await fetch('/api/admin/update-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ settings }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to save settings');
+      }
+
+      showStatus('Settings saved successfully!', 'success');
+    } catch (error: any) {
+      console.error('Error saving settings:', error);
+      showStatus(error.message || 'Failed to save settings', 'error');
+    }
+  }
+
+  // Show status message
+  function showStatus(message: string, type: 'success' | 'error') {
+    const statusEl = document.getElementById('status-message');
+    if (!statusEl) return;
+
+    statusEl.textContent = message;
+    statusEl.className = `fixed top-4 right-4 px-6 py-3 rounded-md shadow-lg z-50 ${
+      type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+    }`;
+    statusEl.classList.remove('hidden');
+
+    setTimeout(() => {
+      statusEl.classList.add('hidden');
+    }, 3000);
+  }
+
+  // Reset form
+  function resetForm() {
+    if (confirm('Are you sure you want to reset all changes?')) {
+      loadSettings();
+    }
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    loadSettings();
+    
+    const form = document.getElementById('settings-form');
+    const resetBtn = document.getElementById('reset-btn');
+    
+    if (form) {
+      form.addEventListener('submit', saveSettings);
+    }
+    
+    if (resetBtn) {
+      resetBtn.addEventListener('click', resetForm);
+    }
+  });
+</script>
