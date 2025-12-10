@@ -16,8 +16,7 @@ export default defineConfig({
     }
   }),
   server: {
-    host: "0.0.0.0",
-    port: 4321
+    port: 3000
   },
   integrations: [react(), sitemap(), mdx()],
   markdown: {
@@ -37,5 +36,13 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      rollupOptions: {
+        external: ['@supabase/ssr', '@supabase/supabase-js'],
+      },
+    },
+    ssr: {
+      noExternal: ['@supabase/ssr', '@supabase/supabase-js'],
+    },
   },
 });
