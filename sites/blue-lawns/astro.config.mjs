@@ -16,7 +16,7 @@ export default defineConfig({
     }
   }),
   server: {
-    port: 3000
+    port: 4321  // Matches Google OAuth redirect URI: http://localhost:4321/api/admin/oauth/google/callback
   },
   integrations: [react(), sitemap(), mdx()],
   markdown: {

@@ -19,7 +19,7 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
   const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    return redirect('/admin/settings?error=supabase_not_configured', 302);
+    return redirect('/admin/settings?oauth=error&message=supabase_not_configured', 302);
   }
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
@@ -51,11 +51,11 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
   // Handle OAuth errors
   if (error) {
     console.error('OAuth error:', error);
-    return redirect(`/admin/settings?error=oauth_${error}`, 302);
+    return redirect(`/admin/settings?oauth=error&message=${encodeURIComponent(error)}`, 302);
   }
 
   if (!code || !state) {
-    return redirect('/admin/settings?error=missing_code_or_state', 302);
+    return redirect('/admin/settings?oauth=error&message=missing_code_or_state', 302);
   }
 
   try {
@@ -99,15 +99,15 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
 
     if (dbError) {
       console.error('Error storing tokens:', dbError);
-      return redirect('/admin/settings?error=token_storage_failed', 302);
+      return redirect('/admin/settings?oauth=error&message=token_storage_failed', 302);
     }
 
     // Success! Redirect back to settings page
-    return redirect('/admin/settings?oauth=connected', 302);
+    return redirect('/admin/settings?oauth=success', 302);
   } catch (error) {
     console.error('OAuth callback error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return redirect(`/admin/settings?error=oauth_callback_failed&message=${encodeURIComponent(errorMessage)}`, 302);
+    return redirect(`/admin/settings?oauth=error&message=${encodeURIComponent(errorMessage)}`, 302);
   }
 };
 

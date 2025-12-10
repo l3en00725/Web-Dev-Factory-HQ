@@ -2,13 +2,13 @@ import type { APIRoute } from 'astro';
 import { createServerClient } from '@supabase/ssr';
 import { isTokenExpired } from '../../../../../../packages/shared/oauth';
 
-const BLUE_LAWNS_COMPANY_ID = '00000000-0000-0000-0000-000000000001';
+const BLUE_LAWNS_COMPANY_ID = '00000000-0000-0000-0000-000000000001'; // Fallback
 
 /**
  * OAuth Status Route
  * Returns connection status for current company
  * 
- * GET /api/admin/oauth/google/status
+ * GET /api/admin/oauth/google/status?company_id=xxx (optional)
  */
 export const GET: APIRoute = async ({ request, cookies }) => {
   const supabaseUrl = import.meta.env.SUPABASE_URL;
@@ -44,12 +44,17 @@ export const GET: APIRoute = async ({ request, cookies }) => {
     );
   }
 
+  // Get company_id from query param or use fallback
+  // TODO: In future, get company_id from session user metadata
+  const url = new URL(request.url);
+  const companyId = url.searchParams.get('company_id') || BLUE_LAWNS_COMPANY_ID;
+
   try {
     // Get OAuth token from database
     const { data: token, error } = await supabase
       .from('website_oauth_tokens')
       .select('*')
-      .eq('company_id', BLUE_LAWNS_COMPANY_ID)
+      .eq('company_id', companyId)
       .eq('provider', 'google')
       .single();
 
@@ -72,14 +77,8 @@ export const GET: APIRoute = async ({ request, cookies }) => {
       JSON.stringify({
         connected: true,
         provider: 'google',
-        email: token.connected_email || null,
-        connectedAt: token.connected_at,
-        expiresAt: token.token_expiry,
-        needsRefresh,
-        scopes: token.scopes || '',
-        ga4PropertyId: token.ga4_property_id || null,
-        ga4MeasurementId: token.ga4_measurement_id || null,
-        gscSiteUrl: token.gsc_site_url || null,
+        email: token.connected_email || undefined,
+        connectedAt: token.connected_at || undefined,
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );

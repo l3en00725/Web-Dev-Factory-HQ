@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { createServerClient } from '@supabase/ssr';
 import { revokeToken } from '../../../../../../packages/shared/oauth';
 
-const BLUE_LAWNS_COMPANY_ID = '00000000-0000-0000-0000-000000000001';
+const BLUE_LAWNS_COMPANY_ID = '00000000-0000-0000-0000-000000000001'; // Fallback
 
 /**
  * OAuth Disconnect Route
@@ -44,12 +44,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     );
   }
 
+  // Get company_id from query param or use fallback
+  // TODO: In future, get company_id from session user metadata
+  const url = new URL(request.url);
+  const companyId = url.searchParams.get('company_id') || BLUE_LAWNS_COMPANY_ID;
+
   try {
     // Get current token from database
     const { data: token, error: fetchError } = await supabase
       .from('website_oauth_tokens')
       .select('*')
-      .eq('company_id', BLUE_LAWNS_COMPANY_ID)
+      .eq('company_id', companyId)
       .eq('provider', 'google')
       .single();
 
@@ -72,7 +77,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const { error: deleteError } = await supabase
       .from('website_oauth_tokens')
       .delete()
-      .eq('company_id', BLUE_LAWNS_COMPANY_ID)
+      .eq('company_id', companyId)
       .eq('provider', 'google');
 
     if (deleteError) {
