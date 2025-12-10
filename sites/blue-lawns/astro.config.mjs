@@ -5,6 +5,8 @@ import vercel from "@astrojs/vercel";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import rehypeExternalLinks from "rehype-external-links";
+import { fileURLToPath } from 'url';
+import { resolve } from 'path';
 
 export default defineConfig({
   site: "https://www.bluelawns.com",
@@ -16,7 +18,7 @@ export default defineConfig({
     }
   }),
   server: {
-    port: 4321  // Matches Google OAuth redirect URI: http://localhost:4321/api/admin/oauth/google/callback
+    port: 3000  // Blue Lawns dev server - update Google OAuth redirect URI to: http://localhost:3000/api/admin/oauth/google/callback
   },
   integrations: [react(), sitemap(), mdx()],
   markdown: {
@@ -36,5 +38,10 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    resolve: {
+      alias: {
+        '@virgo/shared-oauth': resolve(fileURLToPath(new URL('.', import.meta.url)), '../../packages/shared/oauth'),
+      },
+    },
   },
 });

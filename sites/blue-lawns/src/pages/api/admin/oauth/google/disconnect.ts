@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { createServerClient } from '@supabase/ssr';
-import { revokeToken } from '../../../../../../packages/shared/oauth';
+import { revokeToken } from '@virgo/shared-oauth';
 
 const BLUE_LAWNS_COMPANY_ID = '00000000-0000-0000-0000-000000000001'; // Fallback
 

@@ -4,7 +4,7 @@ import {
   decodeState, 
   exchangeCodeForTokens, 
   getUserInfo 
-} from '../../../../../../packages/shared/oauth';
+} from '@virgo/shared-oauth';
 
 const BLUE_LAWNS_COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
