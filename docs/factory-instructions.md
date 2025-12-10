@@ -673,6 +673,8 @@ Before marking any task as complete, Cursor MUST perform comprehensive testing:
    - Run `npm run build` and verify zero errors
    - Check for TypeScript/ESLint errors
    - Verify all imports resolve correctly
+   - **CRITICAL**: If adding server-side packages (Supabase, Resend, etc.), verify build succeeds
+   - Check for "Rollup failed to resolve import" errors - these indicate missing Vite SSR config
 
 2. **Dynamic Route Testing**
    - Test ALL dynamic routes (e.g., `[town]/[service]`, `[slug]`)
@@ -712,6 +714,63 @@ Before marking any task as complete, Cursor MUST perform comprehensive testing:
    - Verify all interactive elements work
 
 **Failure to complete ALL validation steps results in incomplete work.**
+
+
+⚙️ BUILD CONFIGURATION & DEPENDENCY MANAGEMENT
+
+When adding server-side packages or API routes, Cursor MUST:
+
+1. **Vite/SSR Package Bundling**
+   - Server-side packages (e.g., `@supabase/ssr`, `@supabase/supabase-js`) MUST be added to `vite.ssr.noExternal` in `astro.config.mjs`
+   - This ensures packages are bundled for serverless/edge environments (Vercel, Netlify)
+   - Example:
+     ```javascript
+     vite: {
+       ssr: {
+         noExternal: ['@supabase/ssr', '@supabase/supabase-js', 'resend'],
+       },
+     }
+     ```
+   - If build fails with "Rollup failed to resolve import", check if package needs to be in `noExternal`
+
+2. **Environment Variable Requirements**
+   - MUST create/update `.env.example` file documenting ALL environment variables
+   - Mark variables as REQUIRED vs OPTIONAL with clear comments
+   - For client-side access, use `PUBLIC_` prefix (e.g., `PUBLIC_GOOGLE_PLACES_API_KEY`)
+   - Server-side only variables should NOT have `PUBLIC_` prefix
+   - Always provide fallbacks for optional variables: `import.meta.env.VAR || 'default'`
+   - Include instructions on where to get each API key/value
+   - Document which features require which variables
+
+3. **Package Installation Verification**
+   - After adding dependencies, run `npm install` to update `package-lock.json`
+   - Verify package is in `dependencies` (not `devDependencies`) if used in production
+   - Test build locally: `npm run build` must succeed before committing
+   - If package exists in `package.json` but build fails, check Vite SSR configuration
+
+4. **API Route Dependencies**
+   - All API routes in `src/pages/api/` are server-side only
+   - Packages used in API routes must be in `vite.ssr.noExternal` if build fails
+   - Verify API routes work in both dev and production builds
+   - Test API routes with actual HTTP requests, not just type checking
+
+5. **Build Error Prevention**
+   - If build works locally but fails on Vercel/Netlify, check:
+     - Package bundling configuration (`vite.ssr.noExternal`)
+     - Environment variables are set in deployment platform
+     - `package-lock.json` is committed and up-to-date
+     - No missing dependencies in `package.json`
+   - **Common Error**: "Rollup failed to resolve import @package/name"
+     - Solution: Add package to `vite.ssr.noExternal` in `astro.config.mjs`
+     - This happens when Vite tries to externalize server-side packages
+     - Serverless/Edge environments need packages bundled, not externalized
+
+6. **Environment Variable Checklist**
+   - Create/update `.env.example` with ALL variables (required + optional)
+   - Document where to obtain each API key
+   - Mark REQUIRED vs OPTIONAL clearly
+   - Use `PUBLIC_` prefix for client-side variables
+   - Test that site works with missing optional variables (graceful degradation)
 
 
 provide a summary of:
