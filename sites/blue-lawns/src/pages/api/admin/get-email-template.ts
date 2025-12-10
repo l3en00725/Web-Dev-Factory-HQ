@@ -44,15 +44,20 @@ export const GET: APIRoute = async ({ request, cookies }) => {
       .single();
 
     if (error) {
-      console.error('Error fetching settings:', error);
+      console.error('Error fetching email template:', error);
       return new Response(
-        JSON.stringify({ error: 'Failed to fetch settings', details: error.message }),
+        JSON.stringify({ error: 'Failed to fetch email template', details: error.message }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
+    const emailTemplate = data?.settings?.emailTemplate || {
+      subject: 'Thank you for contacting Blue Lawns',
+      htmlBody: '<h1>Thank you for your inquiry!</h1><p>We have received your message and will get back to you soon.</p>'
+    };
+
     return new Response(
-      JSON.stringify({ settings: data?.settings || {} }),
+      JSON.stringify({ emailTemplate }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
   } catch (err: any) {

@@ -11,7 +11,9 @@
  * 3. Replace placeholder values below with actual credentials
  */
 
-window.addEventListener("load", function () {
+// Defer Botpress initialization to reduce TBT
+// Load after user interaction or after page is idle
+function initBotpress() {
   console.log("🤖 Initializing Botpress webchat...");
   
   // Create script element for Botpress CDN
@@ -97,6 +99,34 @@ window.addEventListener("load", function () {
   
   // Append script to body
   document.body.appendChild(s);
+}
+
+// Initialize after a delay to not block critical rendering
+if (document.readyState === 'complete') {
+  setTimeout(initBotpress, 3000); // 3 second delay
+} else {
+  window.addEventListener('load', () => {
+    setTimeout(initBotpress, 3000);
+  });
+}
+
+// Or initialize on first user interaction
+const interactionEvents = ['mousemove', 'touchstart', 'keydown', 'scroll'];
+let hasInitialized = false;
+
+function initOnInteraction() {
+  if (!hasInitialized) {
+    hasInitialized = true;
+    initBotpress();
+    // Remove event listeners after first init
+    interactionEvents.forEach(event => {
+      document.removeEventListener(event, initOnInteraction);
+    });
+  }
+}
+
+interactionEvents.forEach(event => {
+  document.addEventListener(event, initOnInteraction, { once: true, passive: true });
 });
 
 /**

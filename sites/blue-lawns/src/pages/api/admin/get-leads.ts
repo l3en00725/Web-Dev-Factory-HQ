@@ -97,3 +97,4 @@ export const GET: APIRoute = async ({ request, cookies }) => {
     headers: { 'Content-Type': 'application/json' },
   });
 };
+

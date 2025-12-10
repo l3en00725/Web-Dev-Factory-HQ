@@ -49,3 +49,4 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
 
   return redirect('/admin/login?error=authentication_failed');
 };
+

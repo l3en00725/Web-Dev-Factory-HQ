@@ -23,6 +23,8 @@
     "@astrojs/vercel": "^9.0.2",
     "@fontsource/dm-sans": "^5.2.8",
     "@fontsource/outfit": "^5.2.8",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.87.1",
     "@tailwindcss/vite": "^4.1.17",
     "@vercel/og": "^0.8.5",
     "ai": "^3.4.33",

@@ -1,0 +1,346 @@
+---
+// LeadTable component - displays leads with pagination and actions
+---
+
+<div id="leads-container">
+  <div class="leads-header">
+    <div class="leads-filters">
+      <select id="status-filter" class="filter-select">
+        <option value="all">All Leads</option>
+        <option value="new">New Only</option>
+        <option value="reviewed">Reviewed</option>
+      </select>
+    </div>
+    <a href="/api/admin/export-leads" class="export-btn" download>
+      Export CSV
+    </a>
+  </div>
+
+  <div id="leads-loading" class="loading-state">Loading leads...</div>
+  <div id="leads-error" class="error-state" style="display: none;"></div>
+  
+  <div id="leads-table-container" style="display: none;">
+    <table class="leads-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Address</th>
+          <th>Message</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="leads-tbody">
+        <!-- Populated by JavaScript -->
+      </tbody>
+    </table>
+    
+    <div class="pagination">
+      <button id="prev-page" class="page-btn" disabled>Previous</button>
+      <span id="page-info" class="page-info">Page 1 of 1</span>
+      <button id="next-page" class="page-btn" disabled>Next</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .leads-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .filter-select {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    background: white;
+    font-size: 0.875rem;
+  }
+  
+  .export-btn {
+    padding: 0.5rem 1rem;
+    background: #22c55e;
+    color: white;
+    text-decoration: none;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background 0.2s;
+  }
+  
+  .export-btn:hover {
+    background: #16a34a;
+  }
+  
+  .loading-state,
+  .error-state {
+    padding: 2rem;
+    text-align: center;
+    color: #6b7280;
+  }
+  
+  .error-state {
+    color: #ef4444;
+  }
+  
+  .leads-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .leads-table thead {
+    background: #f9fafb;
+  }
+  
+  .leads-table th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .leads-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .leads-table tbody tr:hover {
+    background: #f9fafb;
+  }
+  
+  .leads-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  
+  .status-badge.new {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  
+  .status-badge.reviewed {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  
+  .toggle-btn {
+    padding: 0.25rem 0.75rem;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .toggle-btn:hover {
+    background: #2563eb;
+  }
+  
+  .toggle-btn.reviewed {
+    background: #6b7280;
+  }
+  
+  .toggle-btn.reviewed:hover {
+    background: #4b5563;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .page-btn {
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+  }
+  
+  .page-btn:hover:not(:disabled) {
+    background: #f9fafb;
+    border-color: #9ca3af;
+  }
+  
+  .page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .page-info {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .message-cell {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+</style>
+
+<script>
+  let currentPage = 1;
+  let currentStatus = 'all';
+  const limit = 10;
+
+  async function loadLeads(page = 1, status = 'all') {
+    const loadingEl = document.getElementById('leads-loading');
+    const errorEl = document.getElementById('leads-error');
+    const tableContainer = document.getElementById('leads-table-container');
+    const tbody = document.getElementById('leads-tbody');
+    
+    loadingEl!.style.display = 'block';
+    errorEl!.style.display = 'none';
+    tableContainer!.style.display = 'none';
+
+    try {
+      const response = await fetch(`/api/admin/get-leads?page=${page}&limit=${limit}&status=${status}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load leads');
+      }
+
+      // Clear table
+      tbody!.innerHTML = '';
+
+      if (data.leads.length === 0) {
+        tbody!.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: #6b7280;">No leads found</td></tr>';
+      } else {
+        data.leads.forEach((lead: any) => {
+          const row = document.createElement('tr');
+          const date = new Date(lead.created_at).toLocaleDateString();
+          
+          row.innerHTML = `
+            <td>${escapeHtml(lead.name || '')}</td>
+            <td>${escapeHtml(lead.email || '')}</td>
+            <td>${escapeHtml(lead.phone || '—')}</td>
+            <td>${escapeHtml(lead.address || '—')}</td>
+            <td class="message-cell" title="${escapeHtml(lead.message || '')}">${escapeHtml(lead.message || '—')}</td>
+            <td>
+              <span class="status-badge ${lead.reviewed ? 'reviewed' : 'new'}">
+                ${lead.reviewed ? 'Reviewed' : 'New'}
+              </span>
+            </td>
+            <td>${date}</td>
+            <td>
+              <button 
+                class="toggle-btn ${lead.reviewed ? 'reviewed' : ''}"
+                data-id="${lead.id}"
+                data-reviewed="${lead.reviewed}"
+                onclick="toggleReviewed('${lead.id}', ${!lead.reviewed})"
+              >
+                ${lead.reviewed ? 'Mark New' : 'Mark Reviewed'}
+              </button>
+            </td>
+          `;
+          tbody!.appendChild(row);
+        });
+      }
+
+      // Update pagination
+      updatePagination(data.page, data.pages);
+
+      loadingEl!.style.display = 'none';
+      tableContainer!.style.display = 'block';
+      currentPage = data.page;
+    } catch (error: any) {
+      loadingEl!.style.display = 'none';
+      errorEl!.textContent = error.message || 'Failed to load leads';
+      errorEl!.style.display = 'block';
+    }
+  }
+
+  function updatePagination(page: number, pages: number) {
+    const prevBtn = document.getElementById('prev-page') as HTMLButtonElement;
+    const nextBtn = document.getElementById('next-page') as HTMLButtonElement;
+    const pageInfo = document.getElementById('page-info');
+
+    prevBtn.disabled = page <= 1;
+    nextBtn.disabled = page >= pages;
+    pageInfo!.textContent = `Page ${page} of ${pages}`;
+  }
+
+  async function toggleReviewed(id: string, reviewed: boolean) {
+    try {
+      const response = await fetch('/api/admin/update-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, reviewed }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update lead');
+      }
+
+      // Reload leads
+      loadLeads(currentPage, currentStatus);
+    } catch (error: any) {
+      alert(error.message || 'Failed to update lead');
+    }
+  }
+
+  function escapeHtml(text: string) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Make toggleReviewed available globally
+  (window as any).toggleReviewed = toggleReviewed;
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    loadLeads(1, 'all');
+
+    // Status filter
+    const statusFilter = document.getElementById('status-filter') as HTMLSelectElement;
+    statusFilter.addEventListener('change', (e) => {
+      currentStatus = (e.target as HTMLSelectElement).value;
+      loadLeads(1, currentStatus);
+    });
+
+    // Pagination
+    document.getElementById('prev-page')?.addEventListener('click', () => {
+      if (currentPage > 1) {
+        loadLeads(currentPage - 1, currentStatus);
+      }
+    });
+
+    document.getElementById('next-page')?.addEventListener('click', () => {
+      loadLeads(currentPage + 1, currentStatus);
+    });
+  });
+</script>
+

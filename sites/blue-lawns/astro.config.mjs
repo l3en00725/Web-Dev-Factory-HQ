@@ -36,13 +36,5 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
-    build: {
-      rollupOptions: {
-        external: ['@supabase/ssr', '@supabase/supabase-js'],
-      },
-    },
-    ssr: {
-      noExternal: ['@supabase/ssr', '@supabase/supabase-js'],
-    },
   },
 });

@@ -1,0 +1,253 @@
+---
+interface Props {
+  activePath?: string;
+}
+
+const { activePath = '' } = Astro.props;
+
+const navItems = [
+  { label: 'Dashboard', href: '/admin', icon: 'home' },
+  { label: 'Leads', href: '/admin/leads', icon: 'users' },
+  { label: 'Settings', href: '/admin/settings', icon: 'settings' },
+  { label: 'Email Templates', href: '/admin/email-template', icon: 'mail' },
+  { label: 'Analytics', href: '/admin/analytics', icon: 'chart' },
+];
+---
+
+<nav id="admin-nav" class="admin-nav">
+  <div class="nav-header">
+    <h2 class="nav-title">Admin</h2>
+    <button id="nav-toggle" class="nav-toggle" aria-label="Collapse sidebar">
+      <svg id="collapse-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+      <svg id="expand-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+  </div>
+  
+  <ul class="nav-list">
+    {navItems.map((item) => {
+      const isActive = activePath === item.href || (item.href === '/admin' && activePath === '/admin');
+      return (
+        <li>
+          <a 
+            href={item.href} 
+            class:list={['nav-link', { 'nav-link-active': isActive }]}
+          >
+            <span class="nav-icon">{item.label.charAt(0)}</span>
+            <span class="nav-label">{item.label}</span>
+          </a>
+        </li>
+      );
+    })}
+  </ul>
+  
+  <div class="nav-footer">
+    <form action="/api/admin/logout" method="POST">
+      <button type="submit" class="nav-logout">
+        <span class="nav-icon">L</span>
+        <span class="nav-label">Logout</span>
+      </button>
+    </form>
+  </div>
+</nav>
+
+<style>
+  .admin-nav {
+    width: 280px;
+    min-width: 280px;
+    height: 100vh;
+    background: #1f2937;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
+  }
+  
+  .admin-nav.collapsed {
+    width: 80px;
+    min-width: 80px;
+  }
+  
+  .nav-header {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  
+  .nav-toggle {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.25rem;
+    transition: background 0.2s;
+  }
+  
+  .nav-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .nav-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  
+  .admin-nav.collapsed .nav-title {
+    display: none;
+  }
+  
+  .admin-nav.collapsed #collapse-icon {
+    display: none;
+  }
+  
+  .admin-nav.collapsed #expand-icon {
+    display: block !important;
+  }
+  
+  .admin-nav:not(.collapsed) #expand-icon {
+    display: none !important;
+  }
+  
+  .nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+  }
+  
+  .nav-link:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+  }
+  
+  .nav-link-active {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-left-color: #22c55e;
+  }
+  
+  .nav-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+  }
+  
+  .nav-label {
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  
+  .admin-nav.collapsed .nav-label {
+    display: none;
+  }
+  
+  .nav-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.5rem;
+  }
+  
+  .nav-logout {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: none;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    transition: background 0.2s;
+    font-size: 0.875rem;
+  }
+  
+  .nav-logout:hover {
+    background: rgba(239, 68, 68, 0.2);
+  }
+  
+  .admin-nav.collapsed .nav-logout {
+    justify-content: center;
+    padding: 0.75rem;
+  }
+  
+  @media (max-width: 768px) {
+    .admin-nav {
+      transform: translateX(-100%);
+    }
+    
+    .admin-nav.open {
+      transform: translateX(0);
+    }
+  }
+</style>
+
+<script>
+  const nav = document.getElementById('admin-nav');
+  const toggle = document.getElementById('nav-toggle');
+  
+  // Check localStorage for saved state
+  const isCollapsed = localStorage.getItem('admin-nav-collapsed') === 'true';
+  if (isCollapsed) {
+    nav?.classList.add('collapsed');
+  }
+  
+  toggle?.addEventListener('click', () => {
+    nav?.classList.toggle('collapsed');
+    const isCollapsed = nav?.classList.contains('collapsed');
+    localStorage.setItem('admin-nav-collapsed', isCollapsed ? 'true' : 'false');
+    
+    // Update icon visibility
+    const collapseIcon = document.getElementById('collapse-icon');
+    const expandIcon = document.getElementById('expand-icon');
+    if (isCollapsed) {
+      collapseIcon?.setAttribute('style', 'display: none;');
+      expandIcon?.setAttribute('style', 'display: block;');
+    } else {
+      collapseIcon?.setAttribute('style', 'display: block;');
+      expandIcon?.setAttribute('style', 'display: none;');
+    }
+  });
+  
+  // Set initial icon state
+  if (isCollapsed) {
+    const collapseIcon = document.getElementById('collapse-icon');
+    const expandIcon = document.getElementById('expand-icon');
+    collapseIcon?.setAttribute('style', 'display: none;');
+    expandIcon?.setAttribute('style', 'display: block;');
+  }
+</script>
+

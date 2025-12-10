@@ -1,0 +1,69 @@
+---
+// Server-side component to inject tracking scripts
+// This fetches settings from Supabase and conditionally loads tracking pixels
+import { createClient } from '@supabase/supabase-js';
+
+const BLUE_LAWNS_COMPANY_ID = '00000000-0000-0000-0000-000000000001';
+
+let trackingSettings: {
+  google_ads_id?: string | null;
+  google_ads_conversion_label?: string | null;
+  meta_pixel_id?: string | null;
+} = {};
+
+try {
+  const supabaseUrl = import.meta.env.SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY;
+  
+  if (supabaseUrl && supabaseAnonKey) {
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const { data } = await supabase
+      .from('website_settings')
+      .select('settings')
+      .eq('company_id', BLUE_LAWNS_COMPANY_ID)
+      .single();
+    
+    if (data?.settings?.tracking) {
+      trackingSettings = data.settings.tracking;
+    }
+  }
+} catch (error) {
+  // Silently fail - tracking is optional
+  console.warn('Could not load tracking settings:', error);
+}
+---
+
+{trackingSettings.google_ads_id && (
+  <>
+    <script async src={`https://www.googletagmanager.com/gtag/js?id=${trackingSettings.google_ads_id}`}></script>
+    <script is:inline define:vars={{ googleAdsId: trackingSettings.google_ads_id }}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', googleAdsId);
+    </script>
+  </>
+)}
+
+{trackingSettings.meta_pixel_id && (
+  <>
+    <script is:inline define:vars={{ metaPixelId: trackingSettings.meta_pixel_id }}>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', metaPixelId);
+      fbq('track', 'PageView');
+    </script>
+    <noscript>
+      <img height="1" width="1" style="display:none"
+        src={`https://www.facebook.com/tr?id=${trackingSettings.meta_pixel_id}&ev=PageView&noscript=1`}
+      />
+    </noscript>
+  </>
+)}
+

@@ -8,6 +8,7 @@ import '@fontsource/outfit/700.css';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
 import MobileMenu from '../components/layout/MobileMenu.astro';
+import Tracking from '../components/Tracking.astro';
 import { buildCanonicalUrl } from '../lib/seo-utils';
 import { validateSchemaObject } from '../lib/schema-validator';
 import settings from '../content/settings.json';
@@ -145,6 +146,9 @@ const mappedNavItems = navigation.map((item) => ({
         </script>
       </>
     )}
+    
+    {/* Conversion Tracking Pixels (Google Ads & Meta Pixel) */}
+    <Tracking />
     
     {/* Custom Analytics Event Tracker - Deferred for better TBT */}
     <script defer src="/js/analytics.js"></script>

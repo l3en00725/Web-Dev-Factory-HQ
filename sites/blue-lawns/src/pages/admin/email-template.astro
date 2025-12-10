@@ -7,10 +7,363 @@ const title = "Email Templates";
 <AdminLayout title={title} activePath="/admin/email-template">
   <div class="mb-8">
     <h1 class="text-3xl font-bold text-gray-900 mb-2">{title}</h1>
-    <p class="text-gray-600">Edit thank-you email templates</p>
+    <p class="text-gray-600">Edit and test your contact form email template</p>
   </div>
 
-  <div class="bg-white rounded-lg shadow p-6">
-    <p class="text-gray-500">Email template editor coming soon...</p>
+  <!-- Resend Status -->
+  <div id="resend-status" class="mb-6 bg-white rounded-lg shadow p-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-sm font-medium text-gray-900">Resend Configuration</h3>
+        <p id="resend-status-text" class="text-sm text-gray-600">Checking status...</p>
+      </div>
+      <div id="resend-status-indicator" class="flex items-center">
+        <div class="w-3 h-3 rounded-full bg-gray-300 mr-2"></div>
+        <span class="text-sm text-gray-600">Loading...</span>
+      </div>
+    </div>
   </div>
+
+  <form id="email-template-form" class="space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Editor Panel -->
+      <div class="space-y-4">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Email Template</h2>
+          
+          <div class="space-y-4">
+            <div>
+              <label for="email-subject" class="block text-sm font-medium text-gray-700 mb-1">
+                Subject Line
+              </label>
+              <input 
+                type="text" 
+                id="email-subject" 
+                name="subject" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Thank you for contacting Blue Lawns"
+              />
+            </div>
+
+            <div>
+              <label for="email-html-body" class="block text-sm font-medium text-gray-700 mb-1">
+                HTML Body
+              </label>
+              <textarea 
+                id="email-html-body" 
+                name="htmlBody" 
+                rows="20"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                placeholder="<h1>Thank you for your inquiry!</h1>&#10;<p>We have received your message and will get back to you soon.</p>"
+              ></textarea>
+              <p class="text-xs text-gray-500 mt-1">
+                Enter HTML content. Use standard HTML tags like &lt;h1&gt;, &lt;p&gt;, &lt;strong&gt;, etc.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-4">
+          <button 
+            type="submit" 
+            class="flex-1 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Save Template
+          </button>
+          <button 
+            type="button" 
+            id="send-test-btn"
+            class="flex-1 px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+          >
+            Send Test Email
+          </button>
+        </div>
+      </div>
+
+      <!-- Preview Panel -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Preview</h2>
+        <div class="border border-gray-200 rounded-md p-4 bg-gray-50 min-h-[400px]">
+          <div id="email-preview" class="prose max-w-none">
+            <p class="text-gray-500 text-sm">Preview will appear here as you type...</p>
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">
+          This is a visual preview. Actual email may render slightly differently in email clients.
+        </p>
+      </div>
+    </div>
+  </form>
+
+  <!-- Status Message -->
+  <div id="status-message" class="hidden fixed top-4 right-4 px-6 py-3 rounded-md shadow-lg z-50"></div>
 </AdminLayout>
+
+<script>
+  let resendStatus: { configured: boolean; message: string } | null = null;
+
+  // Load Resend status
+  async function loadResendStatus() {
+    try {
+      const response = await fetch('/api/admin/get-resend-status');
+      const data = await response.json();
+      resendStatus = data;
+      
+      const statusEl = document.getElementById('resend-status-indicator');
+      const textEl = document.getElementById('resend-status-text');
+      
+      if (statusEl && textEl) {
+        if (data.configured) {
+          statusEl.innerHTML = `
+            <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+            <span class="text-sm text-green-700">Configured</span>
+          `;
+          textEl.textContent = data.message || 'Resend API key is configured';
+          textEl.className = 'text-sm text-green-600';
+        } else {
+          statusEl.innerHTML = `
+            <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+            <span class="text-sm text-red-700">Not Configured</span>
+          `;
+          textEl.textContent = data.message || 'Resend API key not configured';
+          textEl.className = 'text-sm text-red-600';
+        }
+      }
+    } catch (error) {
+      console.error('Error loading Resend status:', error);
+    }
+  }
+
+  // Load email template
+  async function loadEmailTemplate() {
+    try {
+      const response = await fetch('/api/admin/get-email-template');
+      if (!response.ok) {
+        throw new Error('Failed to load email template');
+      }
+      const data = await response.json();
+      const template = data.emailTemplate || {};
+
+      const subjectInput = document.getElementById('email-subject') as HTMLInputElement;
+      const htmlBodyTextarea = document.getElementById('email-html-body') as HTMLTextAreaElement;
+
+      if (subjectInput) {
+        subjectInput.value = template.subject || '';
+      }
+      if (htmlBodyTextarea) {
+        htmlBodyTextarea.value = template.htmlBody || '';
+      }
+
+      updatePreview();
+    } catch (error) {
+      console.error('Error loading email template:', error);
+      showStatus('Failed to load email template', 'error');
+    }
+  }
+
+  // Update preview
+  function updatePreview() {
+    const subjectInput = document.getElementById('email-subject') as HTMLInputElement;
+    const htmlBodyTextarea = document.getElementById('email-html-body') as HTMLTextAreaElement;
+    const previewEl = document.getElementById('email-preview');
+
+    if (!previewEl) return;
+
+    const subject = subjectInput?.value || '';
+    const htmlBody = htmlBodyTextarea?.value || '';
+
+    if (!htmlBody) {
+      previewEl.innerHTML = '<p class="text-gray-500 text-sm">Preview will appear here as you type...</p>';
+      return;
+    }
+
+    previewEl.innerHTML = `
+      <div class="email-preview">
+        <div class="mb-4 pb-4 border-b border-gray-200">
+          <div class="text-xs text-gray-500 mb-1">Subject:</div>
+          <div class="font-semibold text-gray-900">${subject || '(No subject)'}</div>
+        </div>
+        <div class="email-content">
+          ${htmlBody}
+        </div>
+      </div>
+    `;
+  }
+
+  // Save email template
+  async function saveEmailTemplate(event: Event) {
+    event.preventDefault();
+
+    const subjectInput = document.getElementById('email-subject') as HTMLInputElement;
+    const htmlBodyTextarea = document.getElementById('email-html-body') as HTMLTextAreaElement;
+
+    const subject = subjectInput?.value || '';
+    const htmlBody = htmlBodyTextarea?.value || '';
+
+    if (!subject || !htmlBody) {
+      showStatus('Subject and HTML body are required', 'error');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/admin/update-email-template', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ subject, htmlBody }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to save email template');
+      }
+
+      showStatus('Email template saved successfully!', 'success');
+    } catch (error: any) {
+      console.error('Error saving email template:', error);
+      showStatus(error.message || 'Failed to save email template', 'error');
+    }
+  }
+
+  // Send test email
+  async function sendTestEmail() {
+    const subjectInput = document.getElementById('email-subject') as HTMLInputElement;
+    const htmlBodyTextarea = document.getElementById('email-html-body') as HTMLTextAreaElement;
+    const sendBtn = document.getElementById('send-test-btn') as HTMLButtonElement;
+
+    const subject = subjectInput?.value || '';
+    const htmlBody = htmlBodyTextarea?.value || '';
+
+    if (!subject || !htmlBody) {
+      showStatus('Please fill in both subject and HTML body before sending a test', 'error');
+      return;
+    }
+
+    if (!resendStatus?.configured) {
+      showStatus('Resend is not configured. Please set RESEND_API_KEY in your environment.', 'error');
+      return;
+    }
+
+    if (sendBtn) {
+      sendBtn.disabled = true;
+      sendBtn.textContent = 'Sending...';
+    }
+
+    try {
+      const response = await fetch('/api/admin/send-test-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ subject, htmlBody }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to send test email');
+      }
+
+      const data = await response.json();
+      showStatus(`Test email sent successfully to your account! (${data.emailId || 'sent'})`, 'success');
+    } catch (error: any) {
+      console.error('Error sending test email:', error);
+      showStatus(error.message || 'Failed to send test email', 'error');
+    } finally {
+      if (sendBtn) {
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Send Test Email';
+      }
+    }
+  }
+
+  // Show status message
+  function showStatus(message: string, type: 'success' | 'error') {
+    const statusEl = document.getElementById('status-message');
+    if (!statusEl) return;
+
+    statusEl.textContent = message;
+    statusEl.className = `fixed top-4 right-4 px-6 py-3 rounded-md shadow-lg z-50 ${
+      type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+    }`;
+    statusEl.classList.remove('hidden');
+
+    setTimeout(() => {
+      statusEl.classList.add('hidden');
+    }, 5000);
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    loadResendStatus();
+    loadEmailTemplate();
+
+    const form = document.getElementById('email-template-form');
+    const subjectInput = document.getElementById('email-subject');
+    const htmlBodyTextarea = document.getElementById('email-html-body');
+    const sendTestBtn = document.getElementById('send-test-btn');
+
+    if (form) {
+      form.addEventListener('submit', saveEmailTemplate);
+    }
+
+    if (subjectInput) {
+      subjectInput.addEventListener('input', updatePreview);
+    }
+
+    if (htmlBodyTextarea) {
+      htmlBodyTextarea.addEventListener('input', updatePreview);
+    }
+
+    if (sendTestBtn) {
+      sendTestBtn.addEventListener('click', sendTestEmail);
+    }
+  });
+</script>
+
+<style>
+  .email-preview {
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
+  .email-preview h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #111827;
+  }
+
+  .email-preview h2 {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 0.75rem;
+    color: #111827;
+  }
+
+  .email-preview p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: #374151;
+  }
+
+  .email-preview strong {
+    font-weight: 600;
+  }
+
+  .email-preview a {
+    color: #2563eb;
+    text-decoration: underline;
+  }
+
+  .email-preview ul,
+  .email-preview ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+
+  .email-preview li {
+    margin-bottom: 0.5rem;
+  }
+</style>
+

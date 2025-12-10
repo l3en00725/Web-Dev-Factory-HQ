@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
 import { createServerClient } from '@supabase/ssr';
-
-const BLUE_LAWNS_COMPANY_ID = '00000000-0000-0000-0000-000000000001';
+import { Resend } from 'resend';
 
 export const GET: APIRoute = async ({ request, cookies }) => {
   const supabaseUrl = import.meta.env.SUPABASE_URL;
@@ -36,30 +35,42 @@ export const GET: APIRoute = async ({ request, cookies }) => {
     );
   }
 
-  try {
-    const { data, error } = await supabase
-      .from('website_settings')
-      .select('settings')
-      .eq('company_id', BLUE_LAWNS_COMPANY_ID)
-      .single();
-
-    if (error) {
-      console.error('Error fetching settings:', error);
-      return new Response(
-        JSON.stringify({ error: 'Failed to fetch settings', details: error.message }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-
+  const RESEND_API_KEY = import.meta.env.RESEND_API_KEY;
+  if (!RESEND_API_KEY) {
     return new Response(
-      JSON.stringify({ settings: data?.settings || {} }),
+      JSON.stringify({ 
+        configured: false,
+        message: 'Resend API key not configured'
+      }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
+  try {
+    const resend = new Resend(RESEND_API_KEY);
+    
+    // Try to get domains (this will fail if API key doesn't have permissions)
+    // For now, we'll just verify the API key is valid by checking if we can create a client
+    // Resend doesn't have a simple "verify" endpoint, so we'll return basic status
+    
+    return new Response(
+      JSON.stringify({ 
+        configured: true,
+        message: 'Resend API key is configured',
+        // Note: Domain verification status would require additional API calls
+        // that may need specific permissions. For now, we'll just confirm the key exists.
+      }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
   } catch (err: any) {
-    console.error('Unexpected error:', err);
+    console.error('Resend status check error:', err);
     return new Response(
-      JSON.stringify({ error: 'Internal server error', details: err.message }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({ 
+        configured: false,
+        message: 'Error checking Resend status',
+        error: err.message 
+      }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
   }
 };

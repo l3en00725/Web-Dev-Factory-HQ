@@ -1,0 +1,81 @@
+---
+import AdminNav from './AdminNav.astro';
+import '../styles/tokens.css';
+import '../styles/design-system.css';
+import '@fontsource/dm-sans/400.css';
+import '@fontsource/dm-sans/700.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  activePath?: string;
+}
+
+const { title, description, activePath = Astro.url.pathname } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="robots" content="noindex, nofollow" />
+    {description && <meta name="description" content={description} />}
+    <title>{title} - Admin | Blue Lawns</title>
+  </head>
+  <body class="admin-body">
+    <div class="admin-wrapper">
+      <AdminNav activePath={activePath} />
+      
+      <main class="admin-main">
+        <div class="admin-content">
+          <slot />
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
+
+<style>
+  .admin-body {
+    margin: 0;
+    padding: 0;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: #f9fafb;
+  }
+  
+  .admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background: #f9fafb;
+  }
+  
+  .admin-main {
+    flex: 1;
+    margin-left: 280px;
+    transition: margin-left 0.3s ease;
+    min-height: 100vh;
+  }
+  
+  .admin-nav.collapsed ~ .admin-main {
+    margin-left: 80px;
+  }
+  
+  .admin-content {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  @media (max-width: 768px) {
+    .admin-main {
+      margin-left: 0;
+    }
+    
+    .admin-nav.collapsed ~ .admin-main {
+      margin-left: 0;
+    }
+  }
+</style>
+

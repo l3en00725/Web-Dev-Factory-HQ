@@ -36,7 +36,7 @@ If anything in this document conflicts with prior rules, this document wins.
 
 
 
-🚀 HIGH-LEVEL FACTORY PHASES (0 → 12)
+🚀 HIGH-LEVEL FACTORY PHASES (0 → 12 + 11b)
 Every site must follow these phases in order:
 
 
@@ -80,6 +80,9 @@ Phase 10 — SEO Infrastructure
 
 
 Phase 11 — Dashboard Registration
+
+
+Phase 11b — Owner Control Board (OCB) Implementation
 
 
 Phase 12 — Deploy + Optimize Images
@@ -732,6 +735,12 @@ When adding server-side packages or API routes, Cursor MUST:
      }
      ```
    - If build fails with "Rollup failed to resolve import", check if package needs to be in `noExternal`
+   - **CRITICAL**: NEVER use conflicting configurations:
+     - ❌ DO NOT set `build.rollupOptions.external` AND `ssr.noExternal` for the same packages
+     - ❌ DO NOT mark packages as external in build but not external in SSR
+     - ✅ DO use only `vite.ssr.noExternal` for server-side packages
+     - **Error to watch for**: "MiddlewareCantBeLoaded: Can't load the middleware" - this indicates conflicting Vite config
+     - If middleware fails to load, check `astro.config.mjs` for conflicting `external`/`noExternal` settings
 
 2. **Environment Variable Requirements**
    - MUST create/update `.env.example` file documenting ALL environment variables
@@ -764,6 +773,10 @@ When adding server-side packages or API routes, Cursor MUST:
      - Solution: Add package to `vite.ssr.noExternal` in `astro.config.mjs`
      - This happens when Vite tries to externalize server-side packages
      - Serverless/Edge environments need packages bundled, not externalized
+   - **Common Error**: "MiddlewareCantBeLoaded: Can't load the middleware"
+     - Cause: Conflicting Vite configuration (e.g., `build.rollupOptions.external` AND `ssr.noExternal` for same packages)
+     - Solution: Remove conflicting `external` settings, use only `vite.ssr.noExternal` for server-side packages
+     - Check `astro.config.mjs` for any `build.rollupOptions.external` that conflicts with `ssr.noExternal`
 
 6. **Environment Variable Checklist**
    - Create/update `.env.example` with ALL variables (required + optional)
@@ -1109,6 +1122,243 @@ template structure changes
 factory process changes
 
 
+
+📊 OWNER CONTROL BOARD (OCB) REQUIREMENTS (Phase 11b - Standard for All Sites)
+
+Every Factory site MUST include an Owner Control Board (OCB) - an admin dashboard for managing leads, settings, email templates, and tracking.
+
+**Database Setup (Supabase)**
+
+1. **Create Required Tables**
+   - `website_leads` - Contact form submissions with tracking data
+   - `website_settings` - Business settings and email templates
+   - `companies` - Company records (if multi-tenant)
+
+2. **Table Schema: website_leads**
+   ```sql
+   CREATE TABLE website_leads (
+     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+     company_id UUID NOT NULL,
+     name TEXT NOT NULL,
+     email TEXT NOT NULL,
+     phone TEXT,
+     address TEXT,
+     message TEXT,
+     reviewed BOOLEAN DEFAULT false,
+     created_at TIMESTAMPTZ DEFAULT now(),
+     -- UTM tracking fields
+     utm_source TEXT,
+     utm_medium TEXT,
+     utm_campaign TEXT,
+     utm_term TEXT,
+     utm_content TEXT,
+     gclid TEXT,
+     fbclid TEXT
+   );
+   ```
+
+3. **Table Schema: website_settings**
+   ```sql
+   CREATE TABLE website_settings (
+     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+     company_id UUID NOT NULL UNIQUE,
+     settings JSONB NOT NULL DEFAULT '{}'::jsonb,
+     created_at TIMESTAMPTZ DEFAULT now(),
+     updated_at TIMESTAMPTZ DEFAULT now()
+   );
+   ```
+
+4. **Table Naming Convention**
+   - ALL OCB-related tables MUST use `website_*` prefix (not `ocb_*`)
+   - Examples: `website_leads`, `website_settings`, `website_email_templates` (if separate table)
+   - This ensures consistency across all Factory sites
+
+**OCB Implementation Modules (Build in Order)**
+
+Module 1: Supabase Auth Guard + Login Page
+- Create `/admin/login` page
+- Implement middleware (`src/middleware.ts`) to protect `/admin/*` routes
+- Use `@supabase/ssr` for session management
+- Create admin user in Supabase Auth (email/password)
+- Required files:
+  - `src/middleware.ts`
+  - `src/pages/admin/login.astro`
+  - `src/pages/api/admin/login.ts`
+  - `src/pages/api/admin/logout.ts`
+  - `src/env.d.ts` (for TypeScript locals)
+
+Module 2: Admin Layout Shell
+- Create collapsible left navigation
+- Create `AdminLayout.astro` component
+- Create `AdminNav.astro` component
+- Navigation items: Dashboard, Leads, Settings, Email Templates, Analytics (placeholder)
+- Required files:
+  - `src/admin-components/AdminLayout.astro`
+  - `src/admin-components/AdminNav.astro`
+  - `src/pages/admin/index.astro`
+
+Module 3: Leads Viewer
+- Display leads from `website_leads` table
+- Features: pagination (10 per page), status filter (all/new/reviewed), "Mark as Reviewed" toggle, CSV export
+- Required files:
+  - `src/pages/admin/leads.astro`
+  - `src/admin-components/LeadTable.astro`
+  - `src/pages/api/admin/get-leads.ts`
+  - `src/pages/api/admin/update-lead.ts`
+  - `src/pages/api/admin/export-leads.ts`
+- Update `src/pages/api/contact.ts` to save leads to `website_leads` table
+
+Module 4: Settings Page
+- Business information form (title, tagline, description, contact info, social media, business hours, brand colors, analytics, SEO)
+- Tracking & Pixels section (Google Ads ID, Google Ads Conversion Label, Meta Pixel ID)
+- Save to `website_settings.settings` JSONB field
+- Required files:
+  - `src/pages/admin/settings.astro`
+  - `src/pages/api/admin/get-settings.ts`
+  - `src/pages/api/admin/update-settings.ts`
+
+Module 5: Email Template Editor
+- Subject line and HTML body editor
+- Live preview pane
+- Save template to `website_settings.settings.emailTemplate`
+- "Send Test Email" button (uses Resend, sends to logged-in user's email)
+- Resend status indicator
+- Required files:
+  - `src/pages/admin/email-template.astro`
+  - `src/pages/api/admin/get-email-template.ts`
+  - `src/pages/api/admin/update-email-template.ts`
+  - `src/pages/api/admin/send-test-email.ts`
+  - `src/pages/api/admin/get-resend-status.ts`
+
+**Conversion Tracking Setup (Required Before Module 5)**
+
+1. **Add Tracking Fields to website_settings**
+   - Update `website_settings.settings.tracking` JSONB structure:
+     ```json
+     {
+       "tracking": {
+         "google_ads_id": null,
+         "google_ads_conversion_label": null,
+         "meta_pixel_id": null
+       }
+     }
+     ```
+
+2. **Create Tracking Component**
+   - `src/components/Tracking.astro` - Fetches settings and conditionally injects:
+     - Google Ads gtag.js script (if `google_ads_id` is set)
+     - Meta Pixel script (if `meta_pixel_id` is set)
+   - Import in `src/layouts/Base.astro`
+
+3. **Update Contact Form**
+   - Capture UTM parameters and gclid/fbclid from URL
+   - Store in localStorage (30-day expiry)
+   - Fire conversion events on successful submission:
+     - Google Ads: `gtag('event', 'conversion', {...})`
+     - Meta Pixel: `fbq('track', 'Lead', {...})`
+   - Save all tracking data to `website_leads` table
+
+4. **Update Contact API**
+   - Extract UTM/gclid/fbclid from request
+   - Save to `website_leads` table with lead record
+   - Fetch tracking settings and return Google Ads conversion ID to client
+
+**Environment Variables Required**
+
+```env
+# Supabase (Required for OCB)
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key  # For admin user creation
+
+# Resend (Required for email templates)
+RESEND_API_KEY=re_xxxxxxxxxxxxx
+CONTACT_TO_EMAIL=info@example.com
+```
+
+**Supabase Auth Setup**
+
+1. Create admin user in Supabase Auth (email/password)
+2. User must have access to the Supabase project
+3. Login credentials stored securely in Supabase Auth
+
+**Middleware Configuration (CRITICAL)**
+
+- DO NOT use conflicting Vite configurations
+- DO NOT set `build.rollupOptions.external` AND `ssr.noExternal` for same packages
+- For Supabase packages, use ONLY `vite.ssr.noExternal` if needed
+- Example (if build fails):
+  ```javascript
+  vite: {
+    ssr: {
+      noExternal: ['@supabase/ssr', '@supabase/supabase-js'],
+    },
+  }
+  ```
+- If middleware fails to load ("MiddlewareCantBeLoaded"), check for conflicting `external`/`noExternal` settings
+
+**OCB File Structure**
+
+```
+sites/<site-name>/
+  src/
+    admin-components/
+      AdminLayout.astro
+      AdminNav.astro
+      LeadTable.astro
+    pages/
+      admin/
+        index.astro
+        login.astro
+        leads.astro
+        settings.astro
+        email-template.astro
+        analytics.astro (placeholder)
+      api/
+        admin/
+          login.ts
+          logout.ts
+          get-leads.ts
+          update-lead.ts
+          export-leads.ts
+          get-settings.ts
+          update-settings.ts
+          get-email-template.ts
+          update-email-template.ts
+          send-test-email.ts
+          get-resend-status.ts
+    middleware.ts
+    components/
+      Tracking.astro
+    env.d.ts
+```
+
+**Testing Checklist**
+
+Before marking OCB complete, verify:
+- [ ] Admin login works (`/admin/login`)
+- [ ] Middleware protects `/admin/*` routes
+- [ ] Leads page displays data from `website_leads`
+- [ ] Settings page loads and saves to `website_settings`
+- [ ] Email template editor loads, saves, and sends test emails
+- [ ] Conversion tracking pixels load when configured
+- [ ] Contact form saves leads with UTM/gclid/fbclid data
+- [ ] Conversion events fire on form submission
+- [ ] All API routes require authentication
+- [ ] Build succeeds (`npm run build`)
+
+**OCB Execution Order**
+
+1. Set up Supabase database (tables, company record)
+2. Create admin user in Supabase Auth
+3. Build Module 1 (Auth + Login)
+4. Build Module 2 (Admin Layout)
+5. Build Module 3 (Leads Viewer)
+6. Build Module 4 (Settings Page)
+7. Set up conversion tracking (before Module 5)
+8. Build Module 5 (Email Template Editor)
+9. Test all modules
+10. Verify build succeeds
 
 🚫 ABSOLUTE RULES
 

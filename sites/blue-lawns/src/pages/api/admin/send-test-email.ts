@@ -1,9 +1,10 @@
 import type { APIRoute } from 'astro';
 import { createServerClient } from '@supabase/ssr';
+import { Resend } from 'resend';
 
 const BLUE_LAWNS_COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
-export const GET: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   const supabaseUrl = import.meta.env.SUPABASE_URL;
   const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY;
 
@@ -29,30 +30,55 @@ export const GET: APIRoute = async ({ request, cookies }) => {
   });
 
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
+  if (!session || !session.user?.email) {
     return new Response(
       JSON.stringify({ error: 'Unauthorized' }),
       { status: 401, headers: { 'Content-Type': 'application/json' } }
     );
   }
 
-  try {
-    const { data, error } = await supabase
-      .from('website_settings')
-      .select('settings')
-      .eq('company_id', BLUE_LAWNS_COMPANY_ID)
-      .single();
+  const RESEND_API_KEY = import.meta.env.RESEND_API_KEY;
+  if (!RESEND_API_KEY) {
+    return new Response(
+      JSON.stringify({ error: 'Resend API key not configured' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
 
-    if (error) {
-      console.error('Error fetching settings:', error);
+  try {
+    const body = await request.json();
+    const { subject, htmlBody } = body;
+
+    if (!subject || !htmlBody) {
       return new Response(
-        JSON.stringify({ error: 'Failed to fetch settings', details: error.message }),
+        JSON.stringify({ error: 'Subject and HTML body are required' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const resend = new Resend(RESEND_API_KEY);
+
+    const { data: emailData, error: emailError } = await resend.emails.send({
+      from: 'Blue Lawns Website <no-reply@bluelawns.com>',
+      to: session.user.email,
+      subject: `[TEST] ${subject}`,
+      html: htmlBody,
+    });
+
+    if (emailError) {
+      console.error('Resend error:', emailError);
+      return new Response(
+        JSON.stringify({ error: 'Failed to send test email', details: emailError.message }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
     return new Response(
-      JSON.stringify({ settings: data?.settings || {} }),
+      JSON.stringify({ 
+        success: true, 
+        message: 'Test email sent successfully',
+        emailId: emailData?.id 
+      }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
   } catch (err: any) {
