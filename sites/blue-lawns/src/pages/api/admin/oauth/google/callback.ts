@@ -63,8 +63,14 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
     const stateData = decodeState(state);
     const companyId = stateData.companyId || BLUE_LAWNS_COMPANY_ID;
 
+    console.log('OAuth callback - companyId:', companyId);
+    console.log('OAuth callback - code received:', code ? 'yes' : 'no');
+    console.log('OAuth callback - state received:', state ? 'yes' : 'no');
+
     // Exchange authorization code for tokens
+    console.log('OAuth callback - exchanging code for tokens...');
     const tokens = await exchangeCodeForTokens(code);
+    console.log('OAuth callback - tokens received:', tokens ? 'yes' : 'no');
 
     // Get user info (email) from Google
     let userEmail: string | undefined;
@@ -106,7 +112,10 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
     return redirect('/admin/settings?oauth=success', 302);
   } catch (error) {
     console.error('OAuth callback error:', error);
+    console.error('OAuth callback error stack:', error instanceof Error ? error.stack : 'No stack');
+    console.error('OAuth callback error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('OAuth callback - redirecting with error:', errorMessage);
     return redirect(`/admin/settings?oauth=error&message=${encodeURIComponent(errorMessage)}`, 302);
   }
 };

@@ -6,15 +6,53 @@
 import type { OAuthConfig, OAuthProvider } from './types';
 
 /**
+ * Get environment variable from either import.meta.env (Astro) or process.env (Node.js)
+ */
+function getEnvVar(key: string): string {
+  // Check import.meta.env first (Astro/Vite)
+  if (typeof import.meta !== 'undefined' && import.meta.env) {
+    const value = (import.meta.env as any)[key];
+    if (value) {
+      console.log(`[OAuth] Found ${key} in import.meta.env`);
+      return value;
+    }
+    console.log(`[OAuth] ${key} not found in import.meta.env`);
+  }
+  
+  // Fallback to process.env (Node.js)
+  if (typeof process !== 'undefined' && process.env) {
+    const value = process.env[key];
+    if (value) {
+      console.log(`[OAuth] Found ${key} in process.env`);
+      return value;
+    }
+    console.log(`[OAuth] ${key} not found in process.env`);
+  }
+  
+  console.warn(`[OAuth] ${key} not found in any environment`);
+  return '';
+}
+
+/**
  * Get OAuth configuration for a provider
  */
 export function getOAuthConfig(provider: OAuthProvider): OAuthConfig {
   switch (provider) {
     case 'google':
+      const clientId = getEnvVar('GOOGLE_OAUTH_CLIENT_ID');
+      const clientSecret = getEnvVar('GOOGLE_OAUTH_CLIENT_SECRET');
+      const redirectUri = getEnvVar('GOOGLE_OAUTH_REDIRECT_URI');
+      
+      console.log('[OAuth] Google config loaded:', {
+        clientId: clientId ? `${clientId.substring(0, 10)}...` : 'MISSING',
+        clientSecret: clientSecret ? '***' : 'MISSING',
+        redirectUri: redirectUri || 'MISSING',
+      });
+      
       return {
-        clientId: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
-        clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET || '',
-        redirectUri: process.env.GOOGLE_OAUTH_REDIRECT_URI || '',
+        clientId,
+        clientSecret,
+        redirectUri,
         scopes: [
           'https://www.googleapis.com/auth/analytics.readonly', // GA4
           'https://www.googleapis.com/auth/webmasters.readonly', // Search Console

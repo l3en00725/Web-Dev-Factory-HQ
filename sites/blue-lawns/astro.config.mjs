@@ -38,6 +38,7 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    envDir: resolve(fileURLToPath(new URL('.', import.meta.url)), '../..'), // Load .env from monorepo root
     resolve: {
       alias: {
         '@virgo/shared-oauth': resolve(fileURLToPath(new URL('.', import.meta.url)), '../../packages/shared/oauth'),
