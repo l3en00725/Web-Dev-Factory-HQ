@@ -1,13 +1,15 @@
 import { defineMiddleware } from 'astro:middleware';
 import { createServerClient } from '@supabase/ssr';
+import { getEnv } from './lib/env-loader';
 
 export const onRequest = defineMiddleware(async (context, next) => {
   // Only protect /admin routes (except /admin/login)
   if (context.url.pathname.startsWith('/admin') && 
       context.url.pathname !== '/admin/login') {
     
-    const supabaseUrl = import.meta.env.SUPABASE_URL;
-    const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY;
+    // Use env-loader which checks both process.env and import.meta.env
+    const supabaseUrl = getEnv('SUPABASE_URL');
+    const supabaseAnonKey = getEnv('SUPABASE_ANON_KEY');
 
     if (!supabaseUrl || !supabaseAnonKey) {
       // If Supabase not configured, allow access but show warning
@@ -45,4 +47,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   return next();
 });
+
+
 

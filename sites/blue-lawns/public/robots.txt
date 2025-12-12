@@ -9,6 +9,7 @@ Sitemap: https://www.bluelawns.com/sitemap.xml
 
 # Disallow admin/internal areas
 Disallow: /api/
+Disallow: /admin/
 Disallow: /dashboard/
 Disallow: /_*
 

@@ -126,6 +126,54 @@ export const POST: APIRoute = async ({ request }) => {
         </html>
       `,
     });
+
+    // Send user confirmation email
+    try {
+      await resend.emails.send({
+        from: 'Blue Lawns <no-reply@bluelawns.com>',
+        to: email,
+        subject: 'We received your message - Blue Lawns',
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { border-bottom: 2px solid #0ea5e9; padding-bottom: 10px; margin-bottom: 20px; }
+                h2 { color: #0ea5e9; margin: 0; }
+                .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #6b7280; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h2>Blue Lawns</h2>
+                </div>
+                
+                <p>Hi ${name.split(' ')[0]},</p>
+                
+                <p>Thanks for contacting us. We've received your message and will get back to you shortly.</p>
+                
+                <p><strong>Your details:</strong><br>
+                Phone: ${phone}<br>
+                Address: ${address}</p>
+                
+                <p>If you need immediate assistance, please call us at <a href="tel:609-425-2954">609-425-2954</a>.</p>
+                
+                <div class="footer">
+                  <p>Blue Lawns - Coastal Lawn Care & Landscaping<br>
+                  Serving Cape May County</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `
+      });
+    } catch (userEmailError) {
+      console.error('Failed to send user confirmation email:', userEmailError);
+      // We don't fail the request here because the internal notification was successful
+    }
     
     // Extract UTM and click ID parameters
     const utm_source = data.utm_source || null;

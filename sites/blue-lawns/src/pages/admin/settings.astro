@@ -122,6 +122,45 @@ const title = "Settings";
       </div>
     </section>
 
+    <!-- Team Management -->
+    <section class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Team Management</h2>
+      <p class="text-sm text-gray-600 mb-4">
+        Invite team members to access the admin dashboard. They'll receive an email with a link to set up their account.
+      </p>
+      
+      <!-- Invite Form -->
+      <div class="flex gap-3 mb-6">
+        <input 
+          type="email" 
+          id="invite-email" 
+          placeholder="colleague@example.com" 
+          class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <select id="invite-role" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="admin">Admin (full access)</option>
+          <option value="viewer">Viewer (read only)</option>
+        </select>
+        <button 
+          id="send-invite-btn"
+          type="button"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+        >
+          Send Invite
+        </button>
+      </div>
+      
+      <!-- Team Members List -->
+      <div id="team-members" class="border border-gray-200 rounded-lg divide-y divide-gray-200">
+        <div class="p-4 text-center text-gray-500">
+          <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-500 mx-auto mb-2"></div>
+          Loading team members...
+        </div>
+      </div>
+      
+      <div id="invite-status" class="hidden mt-3 text-sm"></div>
+    </section>
+
     <!-- Google Integration -->
     <section class="bg-white rounded-lg shadow p-6">
       <h2 class="text-xl font-semibold text-gray-900 mb-4">Google Integration</h2>
@@ -473,14 +512,156 @@ const title = "Settings";
     }
   }
 
+  // Load team members
+  async function loadTeamMembers() {
+    const container = document.getElementById('team-members');
+    if (!container) return;
+
+    try {
+      const response = await fetch('/api/admin/users/list');
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
+        container.innerHTML = `
+          <div class="p-4 text-center text-red-600">
+            Failed to load team members: ${data.error || 'Unknown error'}
+          </div>
+        `;
+        return;
+      }
+
+      const users = data.users || [];
+      
+      if (users.length === 0) {
+        container.innerHTML = `
+          <div class="p-4 text-center text-gray-500">
+            No team members yet. Send an invite above.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = users.map((user: any) => {
+        const lastSignIn = user.last_sign_in 
+          ? new Date(user.last_sign_in).toLocaleDateString()
+          : 'Never';
+        const roleLabel = user.role === 'admin' ? 'Admin' : 'Viewer';
+        const roleBadgeClass = user.role === 'admin' 
+          ? 'bg-blue-100 text-blue-800' 
+          : 'bg-gray-100 text-gray-800';
+
+        return `
+          <div class="p-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-medium">
+                ${(user.email || '?')[0].toUpperCase()}
+              </div>
+              <div>
+                <div class="font-medium text-gray-900">
+                  ${user.email}
+                  ${user.is_current ? '<span class="text-xs text-gray-500 ml-2">(you)</span>' : ''}
+                </div>
+                <div class="text-xs text-gray-500">
+                  Last sign in: ${lastSignIn}
+                  ${user.invited_by ? ` • Invited by ${user.invited_by}` : ''}
+                </div>
+              </div>
+            </div>
+            <span class="px-2 py-1 text-xs font-medium rounded-full ${roleBadgeClass}">
+              ${roleLabel}
+            </span>
+          </div>
+        `;
+      }).join('');
+    } catch (error) {
+      console.error('Error loading team members:', error);
+      container.innerHTML = `
+        <div class="p-4 text-center text-red-600">
+          Failed to load team members. Please refresh the page.
+        </div>
+      `;
+    }
+  }
+
+  // Send invite
+  async function sendInvite() {
+    const emailInput = document.getElementById('invite-email') as HTMLInputElement;
+    const roleSelect = document.getElementById('invite-role') as HTMLSelectElement;
+    const sendBtn = document.getElementById('send-invite-btn') as HTMLButtonElement;
+    const statusEl = document.getElementById('invite-status');
+
+    const email = emailInput?.value?.trim();
+    const role = roleSelect?.value || 'viewer';
+
+    if (!email || !email.includes('@')) {
+      if (statusEl) {
+        statusEl.textContent = 'Please enter a valid email address';
+        statusEl.className = 'mt-3 text-sm text-red-600';
+        statusEl.classList.remove('hidden');
+      }
+      return;
+    }
+
+    if (sendBtn) {
+      sendBtn.disabled = true;
+      sendBtn.textContent = 'Sending...';
+    }
+
+    try {
+      const response = await fetch('/api/admin/users/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, role }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
+        throw new Error(data.error || 'Failed to send invite');
+      }
+
+      // Success
+      if (statusEl) {
+        statusEl.textContent = `✓ Invite sent to ${email}`;
+        statusEl.className = 'mt-3 text-sm text-green-600';
+        statusEl.classList.remove('hidden');
+      }
+
+      // Clear input
+      if (emailInput) emailInput.value = '';
+
+      // Reload team members
+      loadTeamMembers();
+
+      // Hide status after 5 seconds
+      setTimeout(() => {
+        if (statusEl) statusEl.classList.add('hidden');
+      }, 5000);
+    } catch (error: any) {
+      console.error('Error sending invite:', error);
+      if (statusEl) {
+        statusEl.textContent = `✗ ${error.message || 'Failed to send invite'}`;
+        statusEl.className = 'mt-3 text-sm text-red-600';
+        statusEl.classList.remove('hidden');
+      }
+    } finally {
+      if (sendBtn) {
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Send Invite';
+      }
+    }
+  }
+
   // Initialize
   document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
     loadOAuthStatus();
+    loadTeamMembers();
     checkOAuthMessages();
     
     const form = document.getElementById('settings-form');
     const resetBtn = document.getElementById('reset-btn');
+    const sendInviteBtn = document.getElementById('send-invite-btn');
     
     if (form) {
       form.addEventListener('submit', saveSettings);
@@ -488,6 +669,21 @@ const title = "Settings";
     
     if (resetBtn) {
       resetBtn.addEventListener('click', resetForm);
+    }
+
+    if (sendInviteBtn) {
+      sendInviteBtn.addEventListener('click', sendInvite);
+    }
+
+    // Allow Enter key to send invite
+    const inviteEmailInput = document.getElementById('invite-email');
+    if (inviteEmailInput) {
+      inviteEmailInput.addEventListener('keypress', (e: KeyboardEvent) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          sendInvite();
+        }
+      });
     }
   });
 </script>

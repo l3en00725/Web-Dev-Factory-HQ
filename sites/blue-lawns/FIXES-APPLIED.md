@@ -260,3 +260,5 @@ Added `role="region"` with `aria-labelledby` to:
 **Build Status:** ✅ SUCCESS  
 **Ready for:** Lighthouse audit + deployment
 
+
+

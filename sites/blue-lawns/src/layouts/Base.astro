@@ -150,6 +150,14 @@ const mappedNavItems = navigation.map((item) => ({
     {/* Conversion Tracking Pixels (Google Ads & Meta Pixel) */}
     <Tracking />
     
+    {/* Google Places API - Required for Contact Form Autocomplete */}
+    {import.meta.env.PUBLIC_GOOGLE_PLACES_API_KEY && (
+      <script 
+        src={`https://maps.googleapis.com/maps/api/js?key=${import.meta.env.PUBLIC_GOOGLE_PLACES_API_KEY}&libraries=places`}
+        defer
+      ></script>
+    )}
+
     {/* Custom Analytics Event Tracker - Deferred for better TBT */}
     <script defer src="/js/analytics.js"></script>
   </head>

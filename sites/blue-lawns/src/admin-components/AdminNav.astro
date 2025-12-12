@@ -6,7 +6,7 @@ interface Props {
 const { activePath = '' } = Astro.props;
 
 const navItems = [
-  { label: 'Dashboard', href: '/admin', icon: 'home' },
+  { label: 'Dashboard', href: '/admin', icon: 'dashboard' },
   { label: 'Leads', href: '/admin/leads', icon: 'users' },
   { label: 'Settings', href: '/admin/settings', icon: 'settings' },
   { label: 'Email Templates', href: '/admin/email-template', icon: 'mail' },
@@ -36,7 +36,23 @@ const navItems = [
             href={item.href} 
             class:list={['nav-link', { 'nav-link-active': isActive }]}
           >
-            <span class="nav-icon">{item.label.charAt(0)}</span>
+            <span class="nav-icon-wrapper">
+              {item.icon === 'dashboard' && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+              )}
+              {item.icon === 'users' && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              )}
+              {item.icon === 'settings' && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+              )}
+              {item.icon === 'mail' && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              )}
+              {item.icon === 'chart' && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+              )}
+            </span>
             <span class="nav-label">{item.label}</span>
           </a>
         </li>
@@ -47,7 +63,9 @@ const navItems = [
   <div class="nav-footer">
     <form action="/api/admin/logout" method="POST">
       <button type="submit" class="nav-logout">
-        <span class="nav-icon">L</span>
+        <span class="nav-icon-wrapper">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        </span>
         <span class="nav-label">Logout</span>
       </button>
     </form>
@@ -56,14 +74,17 @@ const navItems = [
 
 <style>
   .admin-nav {
-    width: 280px;
-    min-width: 280px;
+    width: 260px;
+    min-width: 260px;
     height: 100vh;
-    background: #1f2937;
-    color: white;
+    background: rgba(30, 41, 59, 0.7); /* Dark glass */
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
     display: flex;
     flex-direction: column;
-    transition: transform 0.3s ease;
+    transition: width 0.3s cubic-bezier(0.2, 0, 0, 1);
     position: fixed;
     left: 0;
     top: 0;
@@ -71,113 +92,123 @@ const navItems = [
   }
   
   .admin-nav.collapsed {
-    width: 80px;
-    min-width: 80px;
+    width: 72px;
+    min-width: 72px;
   }
   
   .nav-header {
-    padding: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem 1.25rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
+    height: 70px;
   }
   
   .nav-toggle {
-    background: none;
+    background: transparent;
     border: none;
-    color: white;
+    color: rgba(255, 255, 255, 0.6);
     cursor: pointer;
     padding: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0.25rem;
-    transition: background 0.2s;
+    border-radius: 8px;
+    transition: all 0.2s;
   }
   
   .nav-toggle:hover {
     background: rgba(255, 255, 255, 0.1);
+    color: white;
   }
   
   .nav-title {
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: 600;
+    letter-spacing: -0.01em;
     margin: 0;
     white-space: nowrap;
-    overflow: hidden;
+    opacity: 1;
+    transition: opacity 0.2s;
   }
   
   .admin-nav.collapsed .nav-title {
+    opacity: 0;
+    pointer-events: none;
     display: none;
   }
   
-  .admin-nav.collapsed #collapse-icon {
-    display: none;
-  }
-  
-  .admin-nav.collapsed #expand-icon {
-    display: block !important;
-  }
-  
-  .admin-nav:not(.collapsed) #expand-icon {
-    display: none !important;
+  .admin-nav.collapsed .nav-header {
+    justify-content: center;
+    padding: 1.5rem 0;
   }
   
   .nav-list {
     list-style: none;
-    padding: 0;
+    padding: 1rem 0.75rem;
     margin: 0;
     flex: 1;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
   }
   
   .nav-link {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    color: rgba(255, 255, 255, 0.7);
+    padding: 0.65rem 0.75rem;
+    color: rgba(255, 255, 255, 0.65);
     text-decoration: none;
-    transition: all 0.2s;
-    border-left: 3px solid transparent;
+    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+    border-radius: 10px;
+    position: relative;
+    font-size: 0.9rem;
+    font-weight: 500;
   }
   
   .nav-link:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.08);
     color: white;
   }
   
   .nav-link-active {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     color: white;
-    border-left-color: #22c55e;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
   
-  .nav-icon {
-    width: 24px;
-    height: 24px;
+  /* Icon wrapper ensures consistent size */
+  .nav-icon-wrapper {
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
-    font-size: 0.875rem;
     flex-shrink: 0;
   }
   
   .nav-label {
     white-space: nowrap;
-    overflow: hidden;
+    opacity: 1;
+    transition: opacity 0.2s;
   }
   
   .admin-nav.collapsed .nav-label {
+    opacity: 0;
+    width: 0;
     display: none;
   }
   
+  .admin-nav.collapsed .nav-link {
+    justify-content: center;
+    padding: 0.65rem;
+  }
+  
   .nav-footer {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 0.5rem;
+    padding: 1rem 0.75rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
   
   .nav-logout {
@@ -185,28 +216,31 @@ const navItems = [
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
+    padding: 0.65rem 0.75rem;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
     border: none;
     cursor: pointer;
-    border-radius: 0.25rem;
-    transition: background 0.2s;
-    font-size: 0.875rem;
+    border-radius: 10px;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    font-weight: 500;
   }
   
   .nav-logout:hover {
-    background: rgba(239, 68, 68, 0.2);
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
   }
   
   .admin-nav.collapsed .nav-logout {
     justify-content: center;
-    padding: 0.75rem;
+    padding: 0.65rem;
   }
   
   @media (max-width: 768px) {
     .admin-nav {
       transform: translateX(-100%);
+      background: #1e293b; /* Solid background on mobile for performance */
     }
     
     .admin-nav.open {
@@ -215,39 +249,73 @@ const navItems = [
   }
 </style>
 
-<script>
-  const nav = document.getElementById('admin-nav');
-  const toggle = document.getElementById('nav-toggle');
-  
-  // Check localStorage for saved state
-  const isCollapsed = localStorage.getItem('admin-nav-collapsed') === 'true';
-  if (isCollapsed) {
-    nav?.classList.add('collapsed');
+<script is:inline>
+  function initNavToggle() {
+    const nav = document.getElementById('admin-nav');
+    const toggle = document.getElementById('nav-toggle');
+    const mainContent = document.querySelector('.admin-main');
+    
+    if (!nav || !toggle) {
+      // Retry if elements aren't ready yet
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initNavToggle);
+        return;
+      }
+      console.warn('Admin nav elements not found');
+      return;
+    }
+    
+    // Check localStorage for saved state
+    const isCollapsed = localStorage.getItem('admin-nav-collapsed') === 'true';
+    if (isCollapsed) {
+      nav.classList.add('collapsed');
+      if (mainContent) mainContent.classList.add('nav-collapsed');
+    }
+    
+    toggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      nav.classList.toggle('collapsed');
+      const isNowCollapsed = nav.classList.contains('collapsed');
+      localStorage.setItem('admin-nav-collapsed', isNowCollapsed ? 'true' : 'false');
+      
+      // Toggle main content class
+      if (mainContent) {
+        if (isNowCollapsed) {
+          mainContent.classList.add('nav-collapsed');
+        } else {
+          mainContent.classList.remove('nav-collapsed');
+        }
+      }
+      
+      // Update icon visibility
+      const collapseIcon = document.getElementById('collapse-icon');
+      const expandIcon = document.getElementById('expand-icon');
+      if (isNowCollapsed) {
+        if (collapseIcon) collapseIcon.style.display = 'none';
+        if (expandIcon) expandIcon.style.display = 'block';
+      } else {
+        if (collapseIcon) collapseIcon.style.display = 'block';
+        if (expandIcon) expandIcon.style.display = 'none';
+      }
+    });
+    
+    // Set initial icon state
+    if (isCollapsed) {
+      const collapseIcon = document.getElementById('collapse-icon');
+      const expandIcon = document.getElementById('expand-icon');
+      if (collapseIcon) collapseIcon.style.display = 'none';
+      if (expandIcon) expandIcon.style.display = 'block';
+    }
   }
   
-  toggle?.addEventListener('click', () => {
-    nav?.classList.toggle('collapsed');
-    const isCollapsed = nav?.classList.contains('collapsed');
-    localStorage.setItem('admin-nav-collapsed', isCollapsed ? 'true' : 'false');
-    
-    // Update icon visibility
-    const collapseIcon = document.getElementById('collapse-icon');
-    const expandIcon = document.getElementById('expand-icon');
-    if (isCollapsed) {
-      collapseIcon?.setAttribute('style', 'display: none;');
-      expandIcon?.setAttribute('style', 'display: block;');
-    } else {
-      collapseIcon?.setAttribute('style', 'display: block;');
-      expandIcon?.setAttribute('style', 'display: none;');
-    }
-  });
-  
-  // Set initial icon state
-  if (isCollapsed) {
-    const collapseIcon = document.getElementById('collapse-icon');
-    const expandIcon = document.getElementById('expand-icon');
-    collapseIcon?.setAttribute('style', 'display: none;');
-    expandIcon?.setAttribute('style', 'display: block;');
+  // Run immediately if DOM is ready, otherwise wait
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNavToggle);
+  } else {
+    initNavToggle();
   }
 </script>
+
+
 

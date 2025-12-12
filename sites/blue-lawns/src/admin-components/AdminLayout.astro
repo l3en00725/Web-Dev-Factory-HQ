@@ -38,44 +38,69 @@ const { title, description, activePath = Astro.url.pathname } = Astro.props;
 </html>
 
 <style>
+  :root {
+    --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+    --glass-bg: rgba(255, 255, 255, 0.65);
+  }
+
   .admin-body {
     margin: 0;
     padding: 0;
-    font-family: 'DM Sans', system-ui, sans-serif;
-    background: #f9fafb;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f3f4f6;
+    /* Subtle mesh gradient background */
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.1) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.05) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(34, 197, 94, 0.05) 0px, transparent 50%);
+    background-attachment: fixed;
+    color: #1e293b;
   }
   
   .admin-wrapper {
     display: flex;
     min-height: 100vh;
-    background: #f9fafb;
   }
   
   .admin-main {
     flex: 1;
-    margin-left: 280px;
-    transition: margin-left 0.3s ease;
+    margin-left: 260px; /* Slightly narrower sidebar */
+    transition: margin-left 0.3s cubic-bezier(0.2, 0, 0, 1), width 0.3s cubic-bezier(0.2, 0, 0, 1);
     min-height: 100vh;
+    width: calc(100% - 260px);
   }
   
-  .admin-nav.collapsed ~ .admin-main {
-    margin-left: 80px;
+  /* When nav is collapsed, adjust main content */
+  .admin-main.nav-collapsed {
+    margin-left: 72px;
+    width: calc(100% - 72px);
   }
   
   .admin-content {
-    padding: 2rem;
-    max-width: 1400px;
+    padding: 2.5rem;
+    max-width: 1600px; /* Wider for analytics */
     margin: 0 auto;
+    transition: padding 0.3s cubic-bezier(0.2, 0, 0, 1);
   }
   
   @media (max-width: 768px) {
     .admin-main {
       margin-left: 0;
+      width: 100%;
     }
     
-    .admin-nav.collapsed ~ .admin-main {
+    .admin-main.nav-collapsed {
       margin-left: 0;
+      width: 100%;
+    }
+    
+    .admin-content {
+      padding: 1.5rem;
     }
   }
 </style>
+
+
 

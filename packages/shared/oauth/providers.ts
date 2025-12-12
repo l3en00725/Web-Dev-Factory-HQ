@@ -6,30 +6,30 @@
 import type { OAuthConfig, OAuthProvider } from './types';
 
 /**
- * Get environment variable from either import.meta.env (Astro) or process.env (Node.js)
+ * Get environment variable - checks process.env first (populated by dotenv),
+ * then falls back to import.meta.env (Vite/Astro).
+ * 
+ * IMPORTANT: process.env MUST be populated by the caller before using this module.
+ * In Astro, this is done in astro.config.mjs before any imports.
  */
 function getEnvVar(key: string): string {
-  // Check import.meta.env first (Astro/Vite)
-  if (typeof import.meta !== 'undefined' && import.meta.env) {
-    const value = (import.meta.env as any)[key];
-    if (value) {
-      console.log(`[OAuth] Found ${key} in import.meta.env`);
-      return value;
-    }
-    console.log(`[OAuth] ${key} not found in import.meta.env`);
-  }
-  
-  // Fallback to process.env (Node.js)
+  // Check process.env first (Node.js / dotenv)
+  // This is the primary source when dotenv has loaded the .env file
   if (typeof process !== 'undefined' && process.env) {
     const value = process.env[key];
     if (value) {
-      console.log(`[OAuth] Found ${key} in process.env`);
       return value;
     }
-    console.log(`[OAuth] ${key} not found in process.env`);
   }
   
-  console.warn(`[OAuth] ${key} not found in any environment`);
+  // Fallback to import.meta.env (Vite/Astro build-time)
+  if (typeof import.meta !== 'undefined' && import.meta.env) {
+    const value = (import.meta.env as any)[key];
+    if (value) {
+      return value;
+    }
+  }
+  
   return '';
 }
 
@@ -43,19 +43,22 @@ export function getOAuthConfig(provider: OAuthProvider): OAuthConfig {
       const clientSecret = getEnvVar('GOOGLE_OAUTH_CLIENT_SECRET');
       const redirectUri = getEnvVar('GOOGLE_OAUTH_REDIRECT_URI');
       
-      console.log('[OAuth] Google config loaded:', {
-        clientId: clientId ? `${clientId.substring(0, 10)}...` : 'MISSING',
-        clientSecret: clientSecret ? '***' : 'MISSING',
-        redirectUri: redirectUri || 'MISSING',
-      });
+      // Log once for debugging (minimal)
+      console.log('[OAuth] Google config:', 
+        clientId ? '✓ clientId' : '✗ clientId',
+        clientSecret ? '✓ secret' : '✗ secret',
+        redirectUri ? '✓ redirect' : '✗ redirect'
+      );
       
       return {
         clientId,
         clientSecret,
         redirectUri,
         scopes: [
-          'https://www.googleapis.com/auth/analytics.readonly', // GA4
+          'https://www.googleapis.com/auth/analytics.readonly', // GA4 Data API
+          'https://www.googleapis.com/auth/analytics.edit', // GA4 Admin API (list properties)
           'https://www.googleapis.com/auth/webmasters.readonly', // Search Console
+          'https://www.googleapis.com/auth/userinfo.email', // User email
         ],
         authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
         tokenUrl: 'https://oauth2.googleapis.com/token',

@@ -4,14 +4,1429 @@ import AdminLayout from '../../admin-components/AdminLayout.astro';
 const title = "Analytics";
 ---
 
+<style>
+  .glass-card {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+    border-radius: 1.25rem; /* 20px */
+  }
+  
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 1rem;
+  }
+
+  .metric-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  .metric-value {
+    font-feature-settings: "tnum";
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
+  /* Broken links styling - ensure red color is preserved */
+  #ai-summary-text strong[style*="color: #dc2626"],
+  #ai-summary-text span[style*="color: #dc2626"],
+  #ai-summary-text strong[style*="color:#dc2626"],
+  #ai-summary-text span[style*="color:#dc2626"] {
+    color: #dc2626 !important;
+    font-weight: 600;
+  }
+
+  /* Warning emoji and broken link indicators */
+  #ai-summary-text li:has(strong[style*="dc2626"]) {
+    border-left: 3px solid #dc2626;
+    padding-left: 0.75rem;
+    margin-left: -0.75rem;
+  }
+</style>
+
 <AdminLayout title={title} activePath="/admin/analytics">
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-2">{title}</h1>
-    <p class="text-gray-600">View GA4 and Search Console data</p>
+  <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900 tracking-tight mb-1">{title}</h1>
+      <p class="text-slate-500 font-medium">Performance overview & insights</p>
+    </div>
+    
+    <!-- Global Actions (hidden by default, shown when dashboard loads) -->
+    <div id="dashboard-actions" class="hidden flex items-center gap-3 bg-white/50 backdrop-blur-md p-1.5 rounded-full border border-white/40 shadow-sm">
+      <select id="date-range" class="bg-transparent border-none text-sm font-medium text-slate-700 focus:ring-0 cursor-pointer pl-3 pr-8 py-1.5">
+        <option value="7">Last 7 days</option>
+        <option value="30" selected>Last 30 days</option>
+        <option value="90">Last 90 days</option>
+      </select>
+      <div class="w-px h-4 bg-slate-300/50"></div>
+      <button id="refresh-btn" class="p-1.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-white/50 transition-all">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+      </button>
+    </div>
   </div>
 
-  <div class="bg-white rounded-lg shadow p-6">
-    <p class="text-gray-500">Analytics dashboard coming soon...</p>
+  <!-- Loading State -->
+  <div id="loading" class="flex flex-col items-center justify-center py-24">
+    <div class="relative w-12 h-12 mb-4">
+      <div class="absolute inset-0 rounded-full border-4 border-slate-200"></div>
+      <div class="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
+    </div>
+    <p class="text-slate-400 font-medium animate-pulse">Loading analytics...</p>
+  </div>
+
+  <!-- Not Connected State -->
+  <div id="not-connected" class="hidden glass-card p-8 mb-8 text-center max-w-lg mx-auto">
+    <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-600">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <h3 class="text-lg font-semibold text-slate-900 mb-2">Google Account Not Connected</h3>
+    <p class="text-slate-500 mb-2">You need to connect your Google account to access Google Analytics 4 and Search Console data.</p>
+    <p class="text-xs text-slate-400 mb-6">Go to Settings → Google Integration to connect your account.</p>
+    <a href="/admin/settings#google-integration" class="inline-flex items-center px-6 py-2.5 bg-slate-900 text-white rounded-full hover:bg-slate-800 transition-all font-medium text-sm gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      Go to Settings
+    </a>
+  </div>
+
+  <!-- Property Selection -->
+  <div id="property-selection" class="hidden glass-card p-8 mb-8 max-w-2xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h3 class="text-lg font-semibold text-slate-900">Data Sources</h3>
+        <p id="connection-status" class="text-xs text-slate-500 mt-1"></p>
+      </div>
+      <a href="/admin/settings#google-integration" class="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-medium hover:bg-blue-100 transition-colors">Configuration</a>
+    </div>
+    
+    <div class="space-y-5">
+      <!-- GA4 Property -->
+      <div class="group">
+        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2 pl-1">GA4 Property</label>
+        <div class="relative">
+          <select id="ga4-property-select" class="w-full pl-4 pr-10 py-3 bg-white/50 border border-slate-200 rounded-xl appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700">
+            <option value="">Select a property...</option>
+          </select>
+          <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Search Console Site -->
+      <div class="group">
+        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2 pl-1">Search Console Site</label>
+        <div class="relative">
+          <select id="gsc-site-select" class="w-full pl-4 pr-10 py-3 bg-white/50 border border-slate-200 rounded-xl appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700">
+            <option value="">Select a site...</option>
+          </select>
+          <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-8 flex items-center justify-end gap-3">
+      <span id="save-status" class="text-sm text-slate-500 transition-opacity opacity-0">Saved</span>
+      <button id="save-selection-btn" class="px-6 py-2.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium text-sm shadow-lg shadow-blue-500/20">
+        Save Changes
+      </button>
+    </div>
+  </div>
+
+  <!-- Analytics Dashboard -->
+  <div id="analytics-dashboard" class="hidden space-y-8">
+    
+    <!-- AI Summary -->
+    <div class="glass-card p-1 relative overflow-hidden group">
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-70"></div>
+      <div class="p-7">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/><path d="M8.5 8.5v.01"/><path d="M16 15.5v.01"/><path d="M12 12v.01"/><path d="M11 17v.01"/><path d="M7 14v.01"/></svg>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-slate-900">AI Analysis</h4>
+              <p class="text-xs text-slate-500 font-medium">Weekly performance insights</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span id="ai-summary-timestamp" class="text-xs text-slate-400 font-medium bg-slate-100/50 px-2 py-1 rounded-md"></span>
+            <button id="generate-ai-summary-btn" class="px-5 py-2 bg-slate-900 text-white rounded-full hover:bg-slate-800 text-xs font-medium tracking-wide transition-all shadow-lg shadow-slate-900/10 hover:shadow-slate-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              Generate
+            </button>
+          </div>
+        </div>
+        
+        <div id="ai-summary-content" class="hidden">
+          <div class="glass-panel p-6">
+            <div id="ai-summary-text" class="prose prose-sm max-w-none text-slate-600 prose-headings:text-slate-800 prose-p:leading-relaxed prose-li:marker:text-indigo-400"></div>
+          </div>
+        </div>
+        
+        <div id="ai-summary-loading" class="hidden text-center py-12">
+          <div class="inline-block relative w-12 h-12 mb-4">
+             <div class="absolute inset-0 rounded-full border-4 border-indigo-100"></div>
+             <div class="absolute inset-0 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin"></div>
+          </div>
+          <p class="text-sm text-indigo-600 font-medium animate-pulse">Analyzing data points...</p>
+        </div>
+        
+        <div id="ai-summary-empty" class="text-center py-10 px-4">
+          <p class="text-sm text-slate-500">Click "Generate" to receive a comprehensive AI audit of your current performance metrics.</p>
+        </div>
+        
+        <div id="ai-summary-error" class="hidden mt-4 p-4 bg-red-50/50 border border-red-100 rounded-xl text-red-600 text-sm flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="ai-error-text"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lighthouse Metrics -->
+    <div class="glass-card p-8">
+      <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </span>
+          <h4 class="text-lg font-bold text-slate-900">Lighthouse Performance</h4>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="lighthouse-timestamp" class="text-xs text-slate-400 font-medium"></span>
+          <button id="run-lighthouse-btn" class="px-4 py-1.5 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-full text-xs font-semibold transition-colors">
+            Run Audit
+          </button>
+        </div>
+      </div>
+      
+      <div id="lighthouse-stats" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="text-center p-6 bg-white/40 rounded-2xl border border-white/50 shadow-sm backdrop-blur-sm">
+          <div id="lh-performance" class="text-4xl font-light text-slate-900 mb-2">-</div>
+          <div class="metric-label">Performance</div>
+        </div>
+        <div class="text-center p-6 bg-white/40 rounded-2xl border border-white/50 shadow-sm backdrop-blur-sm">
+          <div id="lh-accessibility" class="text-4xl font-light text-slate-900 mb-2">-</div>
+          <div class="metric-label">Accessibility</div>
+        </div>
+        <div class="text-center p-6 bg-white/40 rounded-2xl border border-white/50 shadow-sm backdrop-blur-sm">
+          <div id="lh-best-practices" class="text-4xl font-light text-slate-900 mb-2">-</div>
+          <div class="metric-label">Best Practices</div>
+        </div>
+        <div class="text-center p-6 bg-white/40 rounded-2xl border border-white/50 shadow-sm backdrop-blur-sm">
+          <div id="lh-seo" class="text-4xl font-light text-slate-900 mb-2">-</div>
+          <div class="metric-label">SEO</div>
+        </div>
+      </div>
+      <div id="lighthouse-loading" class="hidden text-center py-8">
+        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500 mx-auto mb-3"></div>
+        <p class="text-sm text-purple-600 font-medium">Running audit...</p>
+      </div>
+      <div id="lighthouse-error" class="hidden text-red-600 text-sm mt-4 bg-red-50 p-3 rounded-lg border border-red-100"></div>
+    </div>
+
+    <!-- Keywords Section -->
+    <div class="glass-card p-8">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-6-6m6 6v-4.8m0 4.8h-4.8"/><circle cx="10" cy="10" r="8"/></svg>
+          </span>
+          <h4 class="text-lg font-bold text-slate-900">Keyword Research</h4>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="keywords-last-updated" class="text-xs text-slate-400 font-medium"></span>
+          <button id="refresh-keywords-btn" class="px-4 py-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-full text-xs font-semibold transition-colors">
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Section Explanation -->
+      <div class="bg-slate-50/50 border border-slate-200/50 rounded-xl p-5 mb-6 backdrop-blur-sm">
+        <p class="text-sm text-slate-600 mb-3 leading-relaxed">
+          <strong>What is this?</strong> Keywords your website <strong>currently targets</strong>. Use this to monitor how your existing content aligns with search demand.
+        </p>
+        <div class="pt-3 border-t border-slate-200/50 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Monthly Volume</p>
+            <p class="text-xs text-slate-600">Avg. searches/mo</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">CPC</p>
+            <p class="text-xs text-slate-600">Ad cost per click</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Competition</p>
+            <p class="text-xs text-slate-600">Ranking difficulty</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Intent</p>
+            <p class="text-xs text-slate-600">Searcher goal</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stale Warning -->
+      <div id="keywords-stale-warning" class="hidden bg-amber-50/80 border border-amber-100 rounded-xl p-4 mb-6">
+        <p class="text-sm text-amber-800 font-medium flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Data is stale. Refresh to update.
+        </p>
+      </div>
+
+      <!-- Loading State -->
+      <div id="keywords-loading" class="hidden text-center py-12">
+        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-500 mx-auto mb-3"></div>
+        <p class="text-sm text-amber-600 font-medium">Updating keywords...</p>
+      </div>
+
+      <!-- Keywords Table -->
+      <div id="keywords-content" class="hidden">
+        <!-- Filter Toggle -->
+        <div class="flex items-center justify-between mb-4 px-1">
+          <div class="text-sm text-slate-500 font-medium">
+            <span id="keywords-count" class="text-slate-900 font-bold"></span> tracked keywords • 
+            <span id="keywords-hidden-count" class="text-slate-400 font-normal"></span>
+          </div>
+          <label class="flex items-center gap-2 text-xs font-medium text-slate-600 cursor-pointer select-none hover:text-slate-900 transition-colors">
+            <input type="checkbox" id="show-zero-volume" class="rounded border-slate-300 text-amber-500 focus:ring-amber-500/20">
+            <span>Show zero-volume</span>
+          </label>
+        </div>
+        <div class="overflow-hidden rounded-xl border border-slate-200/60 bg-white/30 backdrop-blur-sm">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="border-b border-slate-200/60 bg-slate-50/50 text-xs uppercase tracking-wider font-semibold text-slate-500">
+                <th class="text-left py-3 px-4">Keyword</th>
+                <th class="text-right py-3 px-4 cursor-pointer hover:bg-slate-100/50 transition-colors select-none group" data-sort="volume" title="Average monthly searches in the US">
+                  Monthly Vol <span class="sort-indicator group-hover:text-slate-700">↓</span>
+                </th>
+                <th class="text-right py-3 px-4" title="Cost Per Click - what advertisers pay on Google Ads">CPC</th>
+                <th class="text-right py-3 px-4 cursor-pointer hover:bg-slate-100/50 transition-colors select-none group" data-sort="competition" title="How hard it is to rank for this keyword">
+                  Comp <span class="sort-indicator group-hover:text-slate-700"></span>
+                </th>
+                <th class="text-left py-3 px-4" title="What the searcher is looking for">Intent</th>
+              </tr>
+            </thead>
+            <tbody id="keywords-table-body" class="divide-y divide-slate-100">
+              <!-- Populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div id="keywords-empty" class="text-center py-12 px-4">
+        <p class="text-slate-400 mb-4">No keyword data available yet.</p>
+        <button id="keywords-empty-refresh-btn" class="px-5 py-2 bg-slate-900 text-white rounded-full hover:bg-slate-800 transition-all text-sm font-medium">
+          Start Tracking
+        </button>
+      </div>
+
+      <div id="keywords-error" class="hidden text-red-600 text-sm mt-4 bg-red-50 p-3 rounded-lg border border-red-100"></div>
+      
+      <!-- Keyword Opportunities Section -->
+      <div id="opportunities-section" class="hidden mt-8 pt-8 border-t border-slate-200/50">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m19 9-3 3"/><path d="M22 12h-4"/><path d="m19 15-3-3"/><path d="M12 22v-4"/><path d="m5 15 3-3"/><path d="M2 12h4"/><path d="m5 9 3 3"/></svg>
+            </span>
+            <div>
+              <h5 class="text-lg font-bold text-slate-900">Keyword Opportunities</h5>
+              <p class="text-xs text-slate-500 font-medium">Untapped potential</p>
+            </div>
+          </div>
+          <span id="opportunities-count" class="text-xs font-semibold px-2 py-1 bg-emerald-100 text-emerald-700 rounded-md"></span>
+        </div>
+        
+        <!-- Opportunities Explanation -->
+        <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4 mb-6 backdrop-blur-sm">
+          <p class="text-sm text-emerald-800">
+            <strong>Content gap alert!</strong> These are keywords people search for that your website does <strong>NOT</strong> currently target.
+          </p>
+          <p class="text-xs text-emerald-700 mt-1 font-medium">
+            💡 Check the AI Analysis for recommendations on where to add these.
+          </p>
+        </div>
+        
+        <div class="overflow-hidden rounded-xl border border-emerald-100 bg-white/40 backdrop-blur-sm">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-emerald-100 bg-emerald-50/30 text-xs uppercase tracking-wider font-semibold text-emerald-700/70">
+                <th class="text-left py-3 px-4">Keyword</th>
+                <th class="text-right py-3 px-4" title="Average monthly searches in the US">Monthly Vol</th>
+                <th class="text-right py-3 px-4" title="Cost Per Click on Google Ads">CPC</th>
+                <th class="text-right py-3 px-4" title="How hard to rank for this keyword">Comp</th>
+                <th class="text-left py-3 px-4" title="What the searcher wants">Intent</th>
+              </tr>
+            </thead>
+            <tbody id="opportunities-table-body" class="divide-y divide-emerald-50">
+              <!-- Populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- GA4 Stats -->
+    <div class="glass-card p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        </span>
+        <h4 class="text-lg font-bold text-slate-900">Google Analytics (GA4)</h4>
+      </div>
+      <div id="ga4-stats" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="text-center p-4 bg-white/40 rounded-2xl border border-white/50 shadow-sm backdrop-blur-sm">
+          <div id="ga4-sessions" class="text-2xl font-light text-slate-900 mb-1">-</div>
+          <div class="metric-label">Sessions</div>
+        </div>
+        <div class="text-center p-4 bg-white/40 rounded-2xl border border-white/50 shadow-sm backdrop-blur-sm">
+          <div id="ga4-users" class="text-2xl font-light text-slate-900 mb-1">-</div>
+          <div class="metric-label">Users</div>
+        </div>
+        <div class="text-center p-4 bg-white/40 rounded-2xl border border-white/50 shadow-sm backdrop-blur-sm">
+          <div id="ga4-pageviews" class="text-2xl font-light text-slate-900 mb-1">-</div>
+          <div class="metric-label">Pageviews</div>
+        </div>
+        <div class="text-center p-4 bg-white/40 rounded-2xl border border-white/50 shadow-sm backdrop-blur-sm">
+          <div id="ga4-new-users" class="text-2xl font-light text-slate-900 mb-1">-</div>
+          <div class="metric-label">New Users</div>
+        </div>
+        <div class="text-center p-4 bg-white/40 rounded-2xl border border-white/50 shadow-sm backdrop-blur-sm">
+          <div id="ga4-bounce-rate" class="text-2xl font-light text-slate-900 mb-1">-</div>
+          <div class="metric-label">Bounce Rate</div>
+        </div>
+        <div class="text-center p-4 bg-white/40 rounded-2xl border border-white/50 shadow-sm backdrop-blur-sm">
+          <div id="ga4-avg-duration" class="text-2xl font-light text-slate-900 mb-1">-</div>
+          <div class="metric-label">Avg Duration</div>
+        </div>
+      </div>
+      <div id="ga4-error" class="hidden text-red-600 text-sm mt-4 bg-red-50 p-3 rounded-lg border border-red-100"></div>
+    </div>
+
+    <!-- Search Console Stats -->
+    <div class="glass-card p-8">
+      <div class="flex items-center gap-3 mb-8">
+        <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </span>
+        <h4 class="text-lg font-bold text-slate-900">Search Console</h4>
+      </div>
+      <div id="gsc-stats" class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+        <div class="text-center p-6 bg-white/40 rounded-2xl border border-white/50 shadow-sm backdrop-blur-sm">
+          <div id="gsc-clicks" class="text-3xl font-light text-slate-900 mb-2">-</div>
+          <div class="metric-label">Total Clicks</div>
+        </div>
+        <div class="text-center p-6 bg-white/40 rounded-2xl border border-white/50 shadow-sm backdrop-blur-sm">
+          <div id="gsc-impressions" class="text-3xl font-light text-slate-900 mb-2">-</div>
+          <div class="metric-label">Impressions</div>
+        </div>
+        <div class="text-center p-6 bg-white/40 rounded-2xl border border-white/50 shadow-sm backdrop-blur-sm">
+          <div id="gsc-ctr" class="text-3xl font-light text-slate-900 mb-2">-</div>
+          <div class="metric-label">Avg CTR</div>
+        </div>
+        <div class="text-center p-6 bg-white/40 rounded-2xl border border-white/50 shadow-sm backdrop-blur-sm">
+          <div id="gsc-position" class="text-3xl font-light text-slate-900 mb-2">-</div>
+          <div class="metric-label">Avg Position</div>
+        </div>
+      </div>
+      <div id="gsc-error" class="hidden text-red-600 text-sm mt-4 bg-red-50 p-3 rounded-lg border border-red-100"></div>
+
+      <!-- Top Queries -->
+      <div class="mt-8">
+        <h5 class="text-sm font-bold uppercase tracking-wide text-slate-500 mb-4 pl-1">Top Search Queries</h5>
+        <div id="gsc-queries" class="overflow-hidden rounded-xl border border-slate-200/60 bg-white/30 backdrop-blur-sm">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="border-b border-slate-200/60 bg-slate-50/50 text-xs uppercase tracking-wider font-semibold text-slate-500">
+                <th class="text-left py-3 px-4">Query</th>
+                <th class="text-right py-3 px-4 cursor-pointer hover:bg-slate-100/50 transition-colors select-none group" data-sort="clicks" data-table="queries">
+                  Clicks <span class="sort-indicator group-hover:text-slate-700">↓</span>
+                </th>
+                <th class="text-right py-3 px-4 cursor-pointer hover:bg-slate-100/50 transition-colors select-none group" data-sort="impressions" data-table="queries">
+                  Impressions <span class="sort-indicator group-hover:text-slate-700"></span>
+                </th>
+                <th class="text-right py-3 px-4 cursor-pointer hover:bg-slate-100/50 transition-colors select-none group" data-sort="ctr" data-table="queries">
+                  CTR <span class="sort-indicator group-hover:text-slate-700"></span>
+                </th>
+                <th class="text-right py-3 px-4 cursor-pointer hover:bg-slate-100/50 transition-colors select-none group" data-sort="position" data-table="queries">
+                  Position <span class="sort-indicator group-hover:text-slate-700"></span>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="gsc-queries-body" class="divide-y divide-slate-100">
+              <tr><td colspan="5" class="py-6 text-center text-slate-400">Loading queries...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Top Pages -->
+      <div class="mt-8">
+        <h5 class="text-sm font-bold uppercase tracking-wide text-slate-500 mb-4 pl-1">Top Pages</h5>
+        <div id="gsc-pages" class="overflow-hidden rounded-xl border border-slate-200/60 bg-white/30 backdrop-blur-sm">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="border-b border-slate-200/60 bg-slate-50/50 text-xs uppercase tracking-wider font-semibold text-slate-500">
+                <th class="text-left py-3 px-4">Page</th>
+                <th class="text-right py-3 px-4 cursor-pointer hover:bg-slate-100/50 transition-colors select-none group" data-sort="clicks" data-table="pages">
+                  Clicks <span class="sort-indicator group-hover:text-slate-700">↓</span>
+                </th>
+                <th class="text-right py-3 px-4 cursor-pointer hover:bg-slate-100/50 transition-colors select-none group" data-sort="impressions" data-table="pages">
+                  Impressions <span class="sort-indicator group-hover:text-slate-700"></span>
+                </th>
+                <th class="text-right py-3 px-4 cursor-pointer hover:bg-slate-100/50 transition-colors select-none group" data-sort="ctr" data-table="pages">
+                  CTR <span class="sort-indicator group-hover:text-slate-700"></span>
+                </th>
+                <th class="text-right py-3 px-4 cursor-pointer hover:bg-slate-100/50 transition-colors select-none group" data-sort="position" data-table="pages">
+                  Position <span class="sort-indicator group-hover:text-slate-700"></span>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="gsc-pages-body" class="divide-y divide-slate-100">
+              <tr><td colspan="5" class="py-6 text-center text-slate-400">Loading pages...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 </AdminLayout>
 
+<script>
+  let currentSelection = { ga4PropertyId: null, searchConsoleSiteUrl: null };
+  let properties = { ga4Properties: [], searchConsoleSites: [] };
+  let queriesData: any[] = [];
+  let pagesData: any[] = [];
+  let queriesSort = { field: 'clicks', direction: 'desc' };
+  let pagesSort = { field: 'clicks', direction: 'desc' };
+  let keywordsData: any[] = [];
+  let opportunitiesData: any[] = [];
+  let keywordsSort = { field: 'volume', direction: 'desc' as 'asc' | 'desc' };
+
+  async function init() {
+    try {
+      // Check connection and get current selection
+      const selectionRes = await fetch('/api/admin/analytics/get-selection');
+      
+      if (!selectionRes.ok) {
+        console.error('Failed to check connection:', selectionRes.status);
+        showNotConnected();
+        return;
+      }
+      
+      const selectionData = await selectionRes.json();
+
+      if (!selectionData.connected) {
+        console.log('Google account not connected');
+        showNotConnected();
+        return;
+      }
+      
+      console.log('Connected as:', selectionData.connectedEmail);
+
+      currentSelection = {
+        ga4PropertyId: selectionData.ga4PropertyId,
+        searchConsoleSiteUrl: selectionData.searchConsoleSiteUrl,
+      };
+
+      // Show connection status
+      const statusEl = document.getElementById('connection-status');
+      if (statusEl && selectionData.connectedEmail) {
+        statusEl.innerHTML = `<span class="inline-flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Connected as ${selectionData.connectedEmail}</span>`;
+      }
+
+      // Load available properties
+      const propsRes = await fetch('/api/admin/analytics/list-properties');
+      const propsData = await propsRes.json();
+
+      if (propsData.error) {
+        console.error('Error loading properties:', propsData.error);
+      } else {
+        properties = propsData;
+        populateSelects();
+      }
+
+      // Show property selection
+      document.getElementById('property-selection')?.classList.remove('hidden');
+
+      // If we have selections, load the dashboard
+      if (currentSelection.ga4PropertyId || currentSelection.searchConsoleSiteUrl) {
+        document.getElementById('analytics-dashboard')?.classList.remove('hidden');
+        loadAnalyticsData();
+        loadLighthouseData();
+        loadKeywordsData();
+        loadCachedAIAnalysis();
+      }
+
+      hideLoading();
+    } catch (error) {
+      console.error('Init error:', error);
+      hideLoading();
+    }
+  }
+
+  function populateSelects() {
+    const ga4Select = document.getElementById('ga4-property-select') as HTMLSelectElement;
+    const gscSelect = document.getElementById('gsc-site-select') as HTMLSelectElement;
+
+    // Populate GA4 properties
+    if (ga4Select) {
+      ga4Select.innerHTML = '<option value="">Select a property...</option>';
+      for (const prop of properties.ga4Properties) {
+        const option = document.createElement('option');
+        option.value = prop.propertyId;
+        option.textContent = `${prop.displayName} (${prop.propertyId})`;
+        if (prop.propertyId === currentSelection.ga4PropertyId) {
+          option.selected = true;
+        }
+        ga4Select.appendChild(option);
+      }
+    }
+
+    // Populate Search Console sites
+    if (gscSelect) {
+      gscSelect.innerHTML = '<option value="">Select a site...</option>';
+      for (const site of properties.searchConsoleSites) {
+        const option = document.createElement('option');
+        option.value = site.siteUrl;
+        option.textContent = site.siteUrl;
+        if (site.siteUrl === currentSelection.searchConsoleSiteUrl) {
+          option.selected = true;
+        }
+        gscSelect.appendChild(option);
+      }
+    }
+  }
+
+  async function saveSelection() {
+    const ga4Select = document.getElementById('ga4-property-select') as HTMLSelectElement;
+    const gscSelect = document.getElementById('gsc-site-select') as HTMLSelectElement;
+    const saveBtn = document.getElementById('save-selection-btn') as HTMLButtonElement;
+    const saveStatus = document.getElementById('save-status');
+
+    const ga4PropertyId = ga4Select?.value || null;
+    const searchConsoleSiteUrl = gscSelect?.value || null;
+
+    if (saveBtn) saveBtn.disabled = true;
+    if (saveStatus) saveStatus.textContent = 'Saving...';
+
+    try {
+      const res = await fetch('/api/admin/analytics/save-selection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ga4PropertyId, searchConsoleSiteUrl }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        currentSelection = { ga4PropertyId, searchConsoleSiteUrl };
+        if (saveStatus) saveStatus.textContent = 'Saved!';
+        
+        // Show dashboard and load data
+        document.getElementById('analytics-dashboard')?.classList.remove('hidden');
+        loadAnalyticsData();
+        loadKeywordsData();
+      } else {
+        if (saveStatus) saveStatus.textContent = `Error: ${data.error}`;
+      }
+    } catch (error) {
+      if (saveStatus) saveStatus.textContent = 'Error saving';
+    }
+
+    if (saveBtn) saveBtn.disabled = false;
+    setTimeout(() => {
+      if (saveStatus) saveStatus.textContent = '';
+    }, 3000);
+  }
+
+  async function loadAnalyticsData() {
+    const dateRange = (document.getElementById('date-range') as HTMLSelectElement)?.value || '30';
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - parseInt(dateRange));
+
+    const startStr = startDate.toISOString().split('T')[0];
+    const endStr = endDate.toISOString().split('T')[0];
+
+    // Load GA4 data
+    if (currentSelection.ga4PropertyId) {
+      loadGA4Data(startStr, endStr);
+    }
+
+    // Load Search Console data
+    if (currentSelection.searchConsoleSiteUrl) {
+      loadSearchConsoleData(startStr, endStr);
+    }
+  }
+
+  async function loadGA4Data(startDate: string, endDate: string) {
+    try {
+      const res = await fetch(`/api/admin/analytics/ga4-data?startDate=${startDate}&endDate=${endDate}`);
+      const data = await res.json();
+
+      if (data.error) {
+        showGA4Error(data.error);
+        return;
+      }
+
+      const stats = data.data;
+      updateElement('ga4-sessions', formatNumber(stats.sessions));
+      updateElement('ga4-users', formatNumber(stats.users));
+      updateElement('ga4-pageviews', formatNumber(stats.pageviews));
+      updateElement('ga4-new-users', formatNumber(stats.newUsers));
+      updateElement('ga4-bounce-rate', `${stats.bounceRate.toFixed(1)}%`);
+      updateElement('ga4-avg-duration', formatDuration(stats.avgSessionDuration));
+      
+      document.getElementById('ga4-error')?.classList.add('hidden');
+    } catch (error) {
+      showGA4Error('Failed to load GA4 data');
+    }
+  }
+
+  async function loadSearchConsoleData(startDate: string, endDate: string) {
+    try {
+      const res = await fetch(`/api/admin/analytics/search-console-data?startDate=${startDate}&endDate=${endDate}`);
+      const data = await res.json();
+
+      if (data.error) {
+        showGSCError(data.error);
+        return;
+      }
+
+      const overview = data.data.overview;
+      updateElement('gsc-clicks', formatNumber(overview.clicks));
+      updateElement('gsc-impressions', formatNumber(overview.impressions));
+      updateElement('gsc-ctr', `${overview.ctr.toFixed(2)}%`);
+      updateElement('gsc-position', overview.position.toFixed(1));
+
+      // Store data for sorting
+      queriesData = data.data.topQueries || [];
+      pagesData = data.data.topPages || [];
+
+      // Render tables (will sort by default)
+      renderQueriesTable();
+      renderPagesTable();
+
+      document.getElementById('gsc-error')?.classList.add('hidden');
+    } catch (error) {
+      showGSCError('Failed to load Search Console data');
+    }
+  }
+
+  function showNotConnected() {
+    hideLoading();
+    document.getElementById('not-connected')?.classList.remove('hidden');
+  }
+
+  function hideLoading() {
+    document.getElementById('loading')?.classList.add('hidden');
+  }
+
+  function showGA4Error(message: string) {
+    const el = document.getElementById('ga4-error');
+    if (el) {
+      el.textContent = message;
+      el.classList.remove('hidden');
+    }
+  }
+
+  function showGSCError(message: string) {
+    const el = document.getElementById('gsc-error');
+    if (el) {
+      el.textContent = message;
+      el.classList.remove('hidden');
+    }
+  }
+
+  function updateElement(id: string, value: string) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  }
+
+  function formatNumber(num: number): string {
+    return num.toLocaleString();
+  }
+
+  function formatDuration(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  function escapeHtml(str: string): string {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function sortData(data: any[], field: string, direction: 'asc' | 'desc'): any[] {
+    return [...data].sort((a, b) => {
+      let aVal = a[field];
+      let bVal = b[field];
+      
+      // For position, lower is better, so reverse the sort
+      if (field === 'position') {
+        [aVal, bVal] = [bVal, aVal];
+      }
+      
+      if (direction === 'desc') {
+        return bVal - aVal;
+      } else {
+        return aVal - bVal;
+      }
+    });
+  }
+
+  function renderQueriesTable() {
+    const queriesBody = document.getElementById('gsc-queries-body');
+    if (!queriesBody) return;
+
+    if (queriesData.length === 0) {
+      queriesBody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-400">No data available</td></tr>';
+      return;
+    }
+
+    const sorted = sortData(queriesData, queriesSort.field, queriesSort.direction);
+    queriesBody.innerHTML = sorted.map((q: any) => `
+      <tr class="border-b border-slate-100/50 hover:bg-slate-50/50 transition-colors">
+        <td class="py-3 px-4 text-slate-700 font-medium">${escapeHtml(q.query)}</td>
+        <td class="text-right py-3 px-4 text-slate-600 metric-value">${formatNumber(q.clicks)}</td>
+        <td class="text-right py-3 px-4 text-slate-600 metric-value">${formatNumber(q.impressions)}</td>
+        <td class="text-right py-3 px-4 text-slate-600 metric-value">${q.ctr.toFixed(2)}%</td>
+        <td class="text-right py-3 px-4 text-slate-600 metric-value">${q.position.toFixed(1)}</td>
+      </tr>
+    `).join('');
+
+    updateSortIndicators('queries');
+  }
+
+  function renderPagesTable() {
+    const pagesBody = document.getElementById('gsc-pages-body');
+    if (!pagesBody) return;
+
+    if (pagesData.length === 0) {
+      pagesBody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-400">No data available</td></tr>';
+      return;
+    }
+
+    const sorted = sortData(pagesData, pagesSort.field, pagesSort.direction);
+    pagesBody.innerHTML = sorted.map((p: any) => `
+      <tr class="border-b border-slate-100/50 hover:bg-slate-50/50 transition-colors">
+        <td class="py-3 px-4 max-w-xs truncate text-slate-700" title="${escapeHtml(p.page)}">${escapeHtml(p.page.replace(/^https?:\/\/[^\/]+/, ''))}</td>
+        <td class="text-right py-3 px-4 text-slate-600 metric-value">${formatNumber(p.clicks)}</td>
+        <td class="text-right py-3 px-4 text-slate-600 metric-value">${formatNumber(p.impressions)}</td>
+        <td class="text-right py-3 px-4 text-slate-600 metric-value">${p.ctr.toFixed(2)}%</td>
+        <td class="text-right py-3 px-4 text-slate-600 metric-value">${p.position.toFixed(1)}</td>
+      </tr>
+    `).join('');
+
+    updateSortIndicators('pages');
+  }
+
+  function updateSortIndicators(table: 'queries' | 'pages') {
+    const sort = table === 'queries' ? queriesSort : pagesSort;
+    const headers = document.querySelectorAll(`[data-table="${table}"]`);
+    
+    headers.forEach((header) => {
+      const field = header.getAttribute('data-sort');
+      const indicator = header.querySelector('.sort-indicator');
+      if (indicator) {
+        if (field === sort.field) {
+          indicator.textContent = sort.direction === 'desc' ? '↓' : '↑';
+        } else {
+          indicator.textContent = '';
+        }
+      }
+    });
+  }
+
+  function handleSortClick(field: string, table: 'queries' | 'pages') {
+    if (table === 'queries') {
+      if (queriesSort.field === field) {
+        // Toggle direction
+        queriesSort.direction = queriesSort.direction === 'desc' ? 'asc' : 'desc';
+      } else {
+        // New field, default to desc
+        queriesSort.field = field;
+        queriesSort.direction = 'desc';
+      }
+      renderQueriesTable();
+    } else {
+      if (pagesSort.field === field) {
+        pagesSort.direction = pagesSort.direction === 'desc' ? 'asc' : 'desc';
+      } else {
+        pagesSort.field = field;
+        pagesSort.direction = 'desc';
+      }
+      renderPagesTable();
+    }
+  }
+
+  async function loadLighthouseData() {
+    try {
+      const res = await fetch('/api/admin/analytics/lighthouse');
+      const data = await res.json();
+
+      if (data.success && data.data) {
+        const scores = data.data.scores;
+        updateElement('lh-performance', formatScore(scores.performance));
+        updateElement('lh-accessibility', formatScore(scores.accessibility));
+        updateElement('lh-best-practices', formatScore(scores.bestPractices));
+        updateElement('lh-seo', formatScore(scores.seo));
+        
+        // Update timestamp
+        if (data.data.timestamp) {
+          const timestamp = new Date(data.data.timestamp);
+          const timestampEl = document.getElementById('lighthouse-timestamp');
+          if (timestampEl) {
+            timestampEl.textContent = `Last run: ${timestamp.toLocaleString()}`;
+          }
+        }
+
+        // Color code scores
+        colorCodeScore('lh-performance', scores.performance);
+        colorCodeScore('lh-accessibility', scores.accessibility);
+        colorCodeScore('lh-best-practices', scores.bestPractices);
+        colorCodeScore('lh-seo', scores.seo);
+      }
+    } catch (error) {
+      console.error('Error loading Lighthouse data:', error);
+    }
+  }
+
+  async function runLighthouse() {
+    const btn = document.getElementById('run-lighthouse-btn') as HTMLButtonElement;
+    const loading = document.getElementById('lighthouse-loading');
+    const error = document.getElementById('lighthouse-error');
+
+    if (btn) btn.disabled = true;
+    if (loading) loading.classList.remove('hidden');
+    if (error) error.classList.add('hidden');
+
+    try {
+      const res = await fetch('/api/admin/analytics/run-lighthouse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        const scores = data.data.scores;
+        updateElement('lh-performance', formatScore(scores.performance));
+        updateElement('lh-accessibility', formatScore(scores.accessibility));
+        updateElement('lh-best-practices', formatScore(scores.bestPractices));
+        updateElement('lh-seo', formatScore(scores.seo));
+
+        // Color code scores
+        colorCodeScore('lh-performance', scores.performance);
+        colorCodeScore('lh-accessibility', scores.accessibility);
+        colorCodeScore('lh-best-practices', scores.bestPractices);
+        colorCodeScore('lh-seo', scores.seo);
+
+        // Update timestamp
+        const timestampEl = document.getElementById('lighthouse-timestamp');
+        if (timestampEl) {
+          timestampEl.textContent = `Last run: ${new Date().toLocaleString()}`;
+        }
+      } else {
+        showLighthouseError(data.error || 'Failed to run Lighthouse audit');
+      }
+    } catch (error) {
+      showLighthouseError('Failed to run Lighthouse audit');
+    } finally {
+      if (btn) btn.disabled = false;
+      if (loading) loading.classList.add('hidden');
+    }
+  }
+
+  async function generateAISummary() {
+    const btn = document.getElementById('generate-ai-summary-btn') as HTMLButtonElement;
+    const loading = document.getElementById('ai-summary-loading');
+    const content = document.getElementById('ai-summary-content');
+    const empty = document.getElementById('ai-summary-empty');
+    const error = document.getElementById('ai-summary-error');
+    const text = document.getElementById('ai-summary-text');
+
+    if (btn) btn.disabled = true;
+    if (loading) loading.classList.remove('hidden');
+    if (content) content.classList.add('hidden');
+    if (empty) empty.classList.add('hidden');
+    if (error) error.classList.add('hidden');
+
+    try {
+      // Collect current KPI data
+      const ga4Data = await getCurrentGA4Data();
+      const searchConsoleData = await getCurrentSearchConsoleData();
+      const lighthouseData = await getCurrentLighthouseData();
+
+      // Add timeout for AI summary (60 seconds)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+      const res = await fetch('/api/admin/analytics/ai-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ga4Data,
+          searchConsoleData,
+          lighthouseData,
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        const errorMsg = data.error || 'Failed to generate AI summary';
+        const errorDetails = data.details ? `: ${data.details}` : '';
+        showAISummaryError(`${errorMsg}${errorDetails}`);
+        console.error('[AI Summary] API error:', data);
+        return;
+      }
+
+      if (data.success && data.summary) {
+        if (text) text.innerHTML = data.summary; // Use innerHTML to support formatted text/HTML
+        if (content) content.classList.remove('hidden');
+        if (empty) empty.classList.add('hidden');
+        if (error) error.classList.add('hidden');
+      } else {
+        showAISummaryError('Failed to generate AI summary: Invalid response format');
+        console.error('[AI Summary] Invalid response:', data);
+      }
+    } catch (error) {
+      console.error('[AI Summary] Fetch error:', error);
+      if (error instanceof Error && error.name === 'AbortError') {
+        showAISummaryError('Request timed out. Please try again.');
+      } else {
+        showAISummaryError(`Failed to generate AI summary: ${error instanceof Error ? error.message : 'Network error'}`);
+      }
+    } finally {
+      if (btn) btn.disabled = false;
+      if (loading) loading.classList.add('hidden');
+    }
+  }
+
+  async function getCurrentGA4Data() {
+    try {
+      const dateRange = (document.getElementById('date-range') as HTMLSelectElement)?.value || '30';
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - parseInt(dateRange));
+
+      const res = await fetch(`/api/admin/analytics/ga4-data?startDate=${startDate.toISOString().split('T')[0]}&endDate=${endDate.toISOString().split('T')[0]}`);
+      const data = await res.json();
+      return data.success ? data.data : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function getCurrentSearchConsoleData() {
+    try {
+      const dateRange = (document.getElementById('date-range') as HTMLSelectElement)?.value || '30';
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - parseInt(dateRange));
+
+      const res = await fetch(`/api/admin/analytics/search-console-data?startDate=${startDate.toISOString().split('T')[0]}&endDate=${endDate.toISOString().split('T')[0]}`);
+      const data = await res.json();
+      return data.success ? data.data : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function getCurrentLighthouseData() {
+    try {
+      const res = await fetch('/api/admin/analytics/lighthouse');
+      const data = await res.json();
+      return data.success && data.data ? data.data : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function formatScore(score: number): string {
+    return score !== null && score !== undefined ? `${score}` : '-';
+  }
+
+  function colorCodeScore(elementId: string, score: number) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    // Remove existing color classes
+    el.classList.remove('text-green-600', 'text-yellow-600', 'text-red-600');
+    
+    if (score >= 90) {
+      el.classList.add('text-green-600');
+    } else if (score >= 50) {
+      el.classList.add('text-yellow-600');
+    } else {
+      el.classList.add('text-red-600');
+    }
+  }
+
+  function showLighthouseError(message: string) {
+    const el = document.getElementById('lighthouse-error');
+    if (el) {
+      el.textContent = message;
+      el.classList.remove('hidden');
+    }
+  }
+
+  function showAISummaryError(message: string) {
+    const error = document.getElementById('ai-summary-error');
+    const content = document.getElementById('ai-summary-content');
+    const empty = document.getElementById('ai-summary-empty');
+    
+    if (error) {
+      error.textContent = message;
+      error.classList.remove('hidden');
+    }
+    if (content) content.classList.add('hidden');
+    if (empty) empty.classList.add('hidden');
+  }
+
+  async function loadCachedAIAnalysis() {
+    try {
+      const res = await fetch('/api/admin/analytics/get-cached-analysis');
+      const data = await res.json();
+      
+      if (data.success && data.analysis) {
+        const content = document.getElementById('ai-summary-content');
+        const empty = document.getElementById('ai-summary-empty');
+        const text = document.getElementById('ai-summary-text');
+        const timestamp = document.getElementById('ai-summary-timestamp');
+        
+        if (text) text.innerHTML = data.analysis.content; // Use innerHTML
+        if (content) content.classList.remove('hidden');
+        if (empty) empty.classList.add('hidden');
+        
+        if (timestamp && data.analysis.generated_at) {
+          const date = new Date(data.analysis.generated_at);
+          const daysAgo = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+          timestamp.textContent = daysAgo === 0 ? 'Generated today' : `Generated ${daysAgo} day${daysAgo > 1 ? 's' : ''} ago`;
+        }
+      }
+    } catch (error) {
+      console.log('[AI Analysis] No cached analysis available');
+    }
+  }
+
+  // Keywords functions
+  async function loadKeywordsData() {
+    try {
+      const res = await fetch('/api/admin/keywords/refresh');
+      const data = await res.json();
+
+      if (data.success) {
+        keywordsData = data.data.keywords || [];
+        opportunitiesData = data.data.opportunities || [];
+        
+        // Show stale warning if needed
+        if (data.data.is_stale) {
+          document.getElementById('keywords-stale-warning')?.classList.remove('hidden');
+        } else {
+          document.getElementById('keywords-stale-warning')?.classList.add('hidden');
+        }
+
+        // Update last updated timestamp
+        if (data.data.last_updated) {
+          const lastUpdated = new Date(data.data.last_updated);
+          const lastUpdatedEl = document.getElementById('keywords-last-updated');
+          if (lastUpdatedEl) {
+            const daysAgo = Math.floor((Date.now() - lastUpdated.getTime()) / (1000 * 60 * 60 * 24));
+            lastUpdatedEl.textContent = `Updated ${daysAgo === 0 ? 'today' : `${daysAgo} day${daysAgo > 1 ? 's' : ''} ago`}`;
+          }
+        }
+
+        if (keywordsData.length > 0 || opportunitiesData.length > 0) {
+          renderKeywordsTable();
+          renderOpportunitiesTable();
+          document.getElementById('keywords-content')?.classList.remove('hidden');
+          document.getElementById('keywords-empty')?.classList.add('hidden');
+        } else {
+          document.getElementById('keywords-content')?.classList.add('hidden');
+          document.getElementById('keywords-empty')?.classList.remove('hidden');
+        }
+
+        document.getElementById('keywords-error')?.classList.add('hidden');
+      } else {
+        showKeywordsError(`${data.error || 'Failed to load keywords'}${data.details ? `: ${data.details}` : ''}`);
+      }
+    } catch (error) {
+      showKeywordsError(`Failed to load keywords${error instanceof Error ? `: ${error.message}` : ''}`);
+    }
+  }
+
+  async function refreshKeywords() {
+    const btn = document.getElementById('refresh-keywords-btn') as HTMLButtonElement;
+    const loading = document.getElementById('keywords-loading');
+    const content = document.getElementById('keywords-content');
+    const empty = document.getElementById('keywords-empty');
+    const error = document.getElementById('keywords-error');
+
+    if (btn) btn.disabled = true;
+    if (loading) loading.classList.remove('hidden');
+    if (content) content.classList.add('hidden');
+    if (empty) empty.classList.add('hidden');
+    if (error) error.classList.add('hidden');
+
+    try {
+      const res = await fetch('/api/admin/keywords/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // Reload the data
+        await loadKeywordsData();
+      } else {
+        showKeywordsError(`${data.error || 'Failed to refresh keywords'}${data.details ? `: ${data.details}` : ''}`);
+        if (data.details) {
+          console.error('[Keywords] Details:', data.details);
+        }
+      }
+    } catch (error) {
+      showKeywordsError(`Failed to refresh keywords: ${error instanceof Error ? error.message : 'Network error'}`);
+    } finally {
+      if (btn) btn.disabled = false;
+      if (loading) loading.classList.add('hidden');
+    }
+  }
+
+  function renderKeywordsTable() {
+    const body = document.getElementById('keywords-table-body');
+    const countEl = document.getElementById('keywords-count');
+    const hiddenCountEl = document.getElementById('keywords-hidden-count');
+    const showZeroCheckbox = document.getElementById('show-zero-volume') as HTMLInputElement;
+    
+    if (!body) return;
+
+    if (keywordsData.length === 0) {
+      body.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-400">No keywords available. Click "Refresh" to fetch data.</td></tr>';
+      if (countEl) countEl.textContent = '0';
+      if (hiddenCountEl) hiddenCountEl.textContent = '';
+      return;
+    }
+
+    // Filter based on checkbox
+    const showZero = showZeroCheckbox?.checked ?? false;
+    const withVolume = keywordsData.filter((kw: any) => (kw.volume || 0) > 0);
+    const zeroVolume = keywordsData.filter((kw: any) => (kw.volume || 0) === 0);
+    
+    const displayData = showZero ? keywordsData : withVolume;
+    const sorted = sortKeywordsData(displayData, keywordsSort.field, keywordsSort.direction);
+    
+    // Update counts
+    if (countEl) countEl.textContent = String(withVolume.length);
+    if (hiddenCountEl) {
+      hiddenCountEl.textContent = showZero 
+        ? `(showing all ${keywordsData.length})` 
+        : `(${zeroVolume.length} hidden with zero volume)`;
+    }
+
+    if (sorted.length === 0) {
+      body.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-400">No keywords with monthly volume. Check "Show zero-volume" to see all.</td></tr>';
+      return;
+    }
+    
+    body.innerHTML = sorted.map((kw: any) => {
+      const competitionColor = {
+        low: 'text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full text-xs font-medium',
+        medium: 'text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full text-xs font-medium',
+        high: 'text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full text-xs font-medium'
+      }[kw.competition] || 'text-slate-500 bg-slate-50 px-2 py-0.5 rounded-full text-xs font-medium';
+      
+      const intentColor = {
+        transactional: 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-600/20',
+        commercial: 'bg-blue-100 text-blue-700 ring-1 ring-blue-600/20',
+        informational: 'bg-slate-100 text-slate-700 ring-1 ring-slate-600/20',
+        navigational: 'bg-purple-100 text-purple-700 ring-1 ring-purple-600/20'
+      }[kw.intent] || 'bg-slate-100 text-slate-700 ring-1 ring-slate-600/20';
+
+      return `
+        <tr class="border-b border-slate-100/50 hover:bg-slate-50/50 transition-colors group">
+          <td class="py-3 px-4 font-medium text-slate-700">${escapeHtml(kw.term || '')}</td>
+          <td class="text-right py-3 px-4 text-slate-900 font-semibold metric-value">${formatNumber(kw.volume || 0)}</td>
+          <td class="text-right py-3 px-4 text-slate-600 metric-value">$${(typeof kw.cpc === 'number' ? kw.cpc : parseFloat(kw.cpc) || 0).toFixed(2)}</td>
+          <td class="text-right py-3 px-4"><span class="${competitionColor}">${(kw.competition || 'medium').toUpperCase()}</span></td>
+          <td class="text-left py-3 px-4"><span class="px-2.5 py-1 ${intentColor} rounded-full text-[10px] uppercase tracking-wide font-bold shadow-sm">${kw.intent || 'informational'}</span></td>
+        </tr>
+      `;
+    }).join('');
+
+    // Update sort indicators
+    updateKeywordsSortIndicators();
+  }
+  
+  // Add event listener for the checkbox
+  document.getElementById('show-zero-volume')?.addEventListener('change', () => {
+    renderKeywordsTable();
+  });
+
+  function renderOpportunitiesTable() {
+    const section = document.getElementById('opportunities-section');
+    const body = document.getElementById('opportunities-table-body');
+    const countEl = document.getElementById('opportunities-count');
+    
+    if (!body || !section) return;
+
+    // Only show opportunities with volume > 0
+    const validOpportunities = opportunitiesData.filter((kw: any) => (kw.volume || 0) > 0);
+    
+    if (validOpportunities.length === 0) {
+      section.classList.add('hidden');
+      return;
+    }
+    
+    section.classList.remove('hidden');
+    if (countEl) countEl.textContent = `${validOpportunities.length} NEW IDEAS`;
+
+    // Sort by volume descending
+    const sorted = [...validOpportunities].sort((a: any, b: any) => (b.volume || 0) - (a.volume || 0));
+    
+    body.innerHTML = sorted.slice(0, 20).map((kw: any) => {
+      const competitionColor = {
+        low: 'text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full text-xs font-medium',
+        medium: 'text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full text-xs font-medium',
+        high: 'text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full text-xs font-medium'
+      }[kw.competition] || 'text-slate-500 bg-slate-50 px-2 py-0.5 rounded-full text-xs font-medium';
+      
+      const intentColor = {
+        transactional: 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-600/20',
+        commercial: 'bg-blue-100 text-blue-700 ring-1 ring-blue-600/20',
+        informational: 'bg-slate-100 text-slate-700 ring-1 ring-slate-600/20',
+        navigational: 'bg-purple-100 text-purple-700 ring-1 ring-purple-600/20'
+      }[kw.intent] || 'bg-slate-100 text-slate-700 ring-1 ring-slate-600/20';
+
+      return `
+        <tr class="border-b border-emerald-50 hover:bg-emerald-50/30 transition-colors">
+          <td class="py-3 px-4 font-medium text-slate-700">${escapeHtml(kw.term || '')}</td>
+          <td class="text-right py-3 px-4 font-bold text-emerald-600 metric-value">${formatNumber(kw.volume || 0)}</td>
+          <td class="text-right py-3 px-4 text-slate-600 metric-value">$${(typeof kw.cpc === 'number' ? kw.cpc : parseFloat(kw.cpc) || 0).toFixed(2)}</td>
+          <td class="text-right py-3 px-4"><span class="${competitionColor}">${(kw.competition || 'medium').toUpperCase()}</span></td>
+          <td class="text-left py-3 px-4"><span class="px-2.5 py-1 ${intentColor} rounded-full text-[10px] uppercase tracking-wide font-bold shadow-sm">${kw.intent || 'informational'}</span></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function sortKeywordsData(data: any[], field: string, direction: 'asc' | 'desc'): any[] {
+    return [...data].sort((a, b) => {
+      let aVal: any = a[field];
+      let bVal: any = b[field];
+      
+      // Handle string comparisons for competition
+      if (field === 'competition') {
+        const order = { low: 0, medium: 1, high: 2 };
+        aVal = order[aVal as keyof typeof order] ?? 1;
+        bVal = order[bVal as keyof typeof order] ?? 1;
+      } else if (field === 'term') {
+        // String sort
+        aVal = String(aVal).toLowerCase();
+        bVal = String(bVal).toLowerCase();
+        if (direction === 'desc') {
+          return bVal.localeCompare(aVal);
+        } else {
+          return aVal.localeCompare(bVal);
+        }
+      }
+      
+      // Numeric sort
+      if (direction === 'desc') {
+        return bVal - aVal;
+      } else {
+        return aVal - bVal;
+      }
+    });
+  }
+
+  function updateKeywordsSortIndicators() {
+    const headers = document.querySelectorAll('#keywords-content [data-sort]');
+    headers.forEach((header) => {
+      const field = header.getAttribute('data-sort');
+      const indicator = header.querySelector('.sort-indicator');
+      if (indicator) {
+        if (field === keywordsSort.field) {
+          indicator.textContent = keywordsSort.direction === 'desc' ? '↓' : '↑';
+        } else {
+          indicator.textContent = '';
+        }
+      }
+    });
+  }
+
+  function handleKeywordsSortClick(field: string) {
+    if (keywordsSort.field === field) {
+      keywordsSort.direction = keywordsSort.direction === 'desc' ? 'asc' : 'desc';
+    } else {
+      keywordsSort.field = field;
+      keywordsSort.direction = 'desc';
+    }
+    renderKeywordsTable();
+  }
+
+  function showKeywordsError(message: string) {
+    const el = document.getElementById('keywords-error');
+    if (el) {
+      el.textContent = message;
+      el.classList.remove('hidden');
+    }
+  }
+
+  // Event listeners
+  document.getElementById('save-selection-btn')?.addEventListener('click', saveSelection);
+  document.getElementById('refresh-btn')?.addEventListener('click', loadAnalyticsData);
+  document.getElementById('date-range')?.addEventListener('change', loadAnalyticsData);
+  document.getElementById('run-lighthouse-btn')?.addEventListener('click', runLighthouse);
+  document.getElementById('generate-ai-summary-btn')?.addEventListener('click', generateAISummary);
+  document.getElementById('refresh-keywords-btn')?.addEventListener('click', refreshKeywords);
+  document.getElementById('keywords-empty-refresh-btn')?.addEventListener('click', refreshKeywords);
+
+  // Add sort click handlers for queries/pages tables
+  document.querySelectorAll('#gsc-queries [data-sort], #gsc-pages [data-sort]').forEach((header) => {
+    header.addEventListener('click', () => {
+      const field = header.getAttribute('data-sort');
+      const table = header.getAttribute('data-table') as 'queries' | 'pages';
+      if (field && table) {
+        handleSortClick(field, table);
+      }
+    });
+  });
+
+  // Add sort click handlers for keywords table
+  document.querySelectorAll('#keywords-content [data-sort]').forEach((header) => {
+    header.addEventListener('click', () => {
+      const field = header.getAttribute('data-sort');
+      if (field) {
+        handleKeywordsSortClick(field);
+      }
+    });
+  });
+
+  // Initialize
+  init();
+</script>

@@ -5,6 +5,10 @@ import {
   exchangeCodeForTokens, 
   getUserInfo 
 } from '@virgo/shared-oauth';
+import { getEnv } from '../../../../../lib/env-loader';
+
+// Prevent static prerendering
+export const prerender = false;
 
 const BLUE_LAWNS_COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -15,8 +19,8 @@ const BLUE_LAWNS_COMPANY_ID = '00000000-0000-0000-0000-000000000001';
  * GET /api/admin/oauth/google/callback?code=xxx&state=xxx
  */
 export const GET: APIRoute = async ({ request, cookies, redirect }) => {
-  const supabaseUrl = import.meta.env.SUPABASE_URL;
-  const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY;
+  const supabaseUrl = getEnv('SUPABASE_URL');
+  const supabaseAnonKey = getEnv('SUPABASE_ANON_KEY');
 
   if (!supabaseUrl || !supabaseAnonKey) {
     return redirect('/admin/settings?oauth=error&message=supabase_not_configured', 302);
