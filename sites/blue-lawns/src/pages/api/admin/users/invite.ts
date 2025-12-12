@@ -62,8 +62,25 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const { createClient } = await import('@supabase/supabase-js');
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get site URL for redirect
-    const siteUrl = getEnv('PUBLIC_SITE_URL') || 'https://www.bluelawns.com';
+    // Get site URL from request origin (works for multiple sites sharing the same database)
+    const requestOrigin = request.headers.get('origin') || request.headers.get('referer');
+    let siteUrl = getEnv('PUBLIC_SITE_URL');
+    
+    // If we have an origin/referer, use that (for multi-site support)
+    if (requestOrigin) {
+      try {
+        const url = new URL(requestOrigin);
+        siteUrl = `${url.protocol}//${url.host}`;
+      } catch (e) {
+        // Fallback to env var if origin parsing fails
+        console.warn('[User Invite] Failed to parse origin, using env var');
+      }
+    }
+    
+    // Fallback to hardcoded URL if nothing else works (backwards compatibility)
+    if (!siteUrl) {
+      siteUrl = 'https://www.bluelawns.com';
+    }
 
     // Send invite email via Supabase Auth
     const { data, error } = await adminClient.auth.admin.inviteUserByEmail(email, {

@@ -44,8 +44,26 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    // Get site URL for redirect
-    const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://www.bluelawns.com';
+    // Get site URL from request origin (works for multiple sites sharing the same database)
+    // This ensures each site redirects to its own domain
+    const requestOrigin = request.headers.get('origin') || request.headers.get('referer');
+    let siteUrl = import.meta.env.PUBLIC_SITE_URL;
+    
+    // If we have an origin/referer, use that (for multi-site support)
+    if (requestOrigin) {
+      try {
+        const url = new URL(requestOrigin);
+        siteUrl = `${url.protocol}//${url.host}`;
+      } catch (e) {
+        // Fallback to env var if origin parsing fails
+        console.warn('[Forgot Password] Failed to parse origin, using env var');
+      }
+    }
+    
+    // Fallback to hardcoded URL if nothing else works (backwards compatibility)
+    if (!siteUrl) {
+      siteUrl = 'https://www.bluelawns.com';
+    }
     
     // Request password reset
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
