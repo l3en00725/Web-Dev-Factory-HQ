@@ -60,6 +60,9 @@ export const GET: APIRoute = async ({ cookies }) => {
       );
     }
 
+    // Extract mobile scores from report_data JSONB if available
+    const mobileScores = report.report_data?.mobileScores || null;
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -71,6 +74,7 @@ export const GET: APIRoute = async ({ cookies }) => {
             bestPractices: report.best_practices_score,
             seo: report.seo_score,
           },
+          mobileScores: mobileScores, // Include mobile scores
           timestamp: report.created_at,
         },
       }),
@@ -87,3 +91,4 @@ export const GET: APIRoute = async ({ cookies }) => {
     );
   }
 };
+

@@ -1,187 +1,172 @@
 import type { APIRoute } from 'astro';
 import { getEnv } from '../../../../lib/env-loader';
 import { createClient } from '@supabase/supabase-js';
-import lighthouse from 'lighthouse';
-import * as chromeLauncher from 'chrome-launcher';
+import { OpenAI } from 'openai';
+import { discoverKeywordOpportunities } from '../../../../lib/keywords-everywhere';
 
 export const prerender = false;
 
 const BLUE_LAWNS_COMPANY_ID = '00000000-0000-0000-0000-000000000001';
 const TARGET_URL = 'https://www.bluelawns.com';
 
-/**
- * Combined Cron Job: Runs Lighthouse Daily + AI Analysis Weekly
- * 
- * - Lighthouse: Runs every day at 2 AM UTC
- * - AI Analysis: Runs only on Mondays (checks day of week)
- * 
- * This endpoint is called automatically by Vercel Cron
- * No authentication required (protected by Vercel Cron secret)
- * 
- * POST /api/admin/analytics/run-combined-cron
- */
 export const POST: APIRoute = async ({ request }) => {
-  // Verify this is coming from Vercel Cron (security)
+  // Verify Cron Request
   const authHeader = request.headers.get('authorization');
-  const cronSecret = getEnv('CRON_SECRET') || getEnv('VERCEL_CRON_SECRET');
+  const cronSecret = getEnv('CRON_SECRET');
   
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    return new Response(
-      JSON.stringify({ error: 'Unauthorized' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
+  // Vercel Cron sends auth header: Bearer [CRON_SECRET]
+  const isValidAuth = 
+    (authHeader === `Bearer ${cronSecret}`) || 
+    (request.headers.get('x-vercel-cron') === 'true' && !cronSecret); // Dev fallback if no secret
+
+  if (!isValidAuth) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
   }
 
   const supabaseUrl = getEnv('SUPABASE_URL');
   const supabaseAnonKey = getEnv('SUPABASE_ANON_KEY');
   const supabaseServiceKey = getEnv('SUPABASE_SERVICE_ROLE_KEY');
+  const openaiKey = getEnv('OPENAI_API_KEY');
+  const psiApiKey = getEnv('PAGESPEED_INSIGHTS_API_KEY') || getEnv('GOOGLE_PAGESPEED_API_KEY');
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('[Combined Cron] Supabase not configured');
+  if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey || !openaiKey) {
     return new Response(
-      JSON.stringify({ error: 'Supabase not configured' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: 'Missing configuration' }),
+      { status: 500 }
     );
   }
 
   const supabase = createClient(supabaseUrl, supabaseAnonKey);
-  const supabaseAdmin = supabaseServiceKey ? createClient(supabaseUrl, supabaseServiceKey) : supabase;
+  const adminClient = createClient(supabaseUrl, supabaseServiceKey);
 
-  const now = new Date();
-  const dayOfWeek = now.getUTCDay(); // 0 = Sunday, 1 = Monday, etc.
-  const isMonday = dayOfWeek === 1;
+  const today = new Date();
+  const dayOfWeek = today.getUTCDay(); // Sunday - 0, Monday - 1, etc.
+  
+  const results = {
+    lighthouse: { ran: false, success: false, error: null as any },
+    aiAnalysis: { ran: false, success: false, error: null as any }
+  };
 
-  const results: {
-    lighthouse?: { success: boolean; scores?: any; error?: string };
-    aiAnalysis?: { success: boolean; error?: string };
-  } = {};
-
-  // Always run Lighthouse (daily)
+  // ==========================================
+  // 1. RUN LIGHTHOUSE AUDIT (Daily)
+  // ==========================================
   try {
-    console.log('[Combined Cron] Running Lighthouse audit for:', TARGET_URL);
+    results.lighthouse.ran = true;
+    console.log('[Combined Cron] Starting Lighthouse audit via PageSpeed API...');
+    
+    // Fetch Desktop scores
+    const desktopData = await fetchPageSpeedData(TARGET_URL, 'DESKTOP', psiApiKey);
+    const mobileData = await fetchPageSpeedData(TARGET_URL, 'MOBILE', psiApiKey);
 
-    const chrome = await chromeLauncher.launch({
-      chromeFlags: ['--headless', '--no-sandbox', '--disable-gpu'],
-    });
-
-    try {
-      const options = {
-        logLevel: 'info' as const,
-        output: 'json' as const,
-        onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo'],
-        port: chrome.port,
-      };
-
-      const runnerResult = await lighthouse(TARGET_URL, options);
-
-      const categories = runnerResult?.lhr?.categories || {};
-      const scores = {
-        performance: Math.round((categories.performance?.score || 0) * 100),
-        accessibility: Math.round((categories.accessibility?.score || 0) * 100),
-        bestPractices: Math.round((categories['best-practices']?.score || 0) * 100),
-        seo: Math.round((categories.seo?.score || 0) * 100),
-      };
-
-      const { error: dbError } = await supabase
-        .from('website_lighthouse_reports')
-        .insert({
-          company_id: BLUE_LAWNS_COMPANY_ID,
-          url: TARGET_URL,
-          performance_score: scores.performance,
-          accessibility_score: scores.accessibility,
-          best_practices_score: scores.bestPractices,
-          seo_score: scores.seo,
-          report_data: runnerResult?.lhr ? {
-            finalUrl: runnerResult.lhr.finalUrl,
-            fetchTime: runnerResult.lhr.fetchTime,
-          } : null,
-          created_at: new Date().toISOString(),
-        });
-
-      if (dbError) {
-        console.error('[Combined Cron] Lighthouse DB error:', dbError);
-        results.lighthouse = { success: false, error: dbError.message };
-      } else {
-        results.lighthouse = { success: true, scores };
-        console.log('[Combined Cron] Lighthouse audit complete:', scores);
-      }
-    } finally {
-      await chrome.kill();
-    }
-  } catch (error) {
-    console.error('[Combined Cron] Lighthouse error:', error);
-    results.lighthouse = {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+    const scores = {
+      performance: Math.round((desktopData.lighthouseResult?.categories?.performance?.score || 0) * 100),
+      accessibility: Math.round((desktopData.lighthouseResult?.categories?.accessibility?.score || 0) * 100),
+      bestPractices: Math.round((desktopData.lighthouseResult?.categories?.['best-practices']?.score || 0) * 100),
+      seo: Math.round((desktopData.lighthouseResult?.categories?.seo?.score || 0) * 100),
     };
+    
+    const mobileScores = {
+       performance: Math.round((mobileData.lighthouseResult?.categories?.performance?.score || 0) * 100),
+       accessibility: Math.round((mobileData.lighthouseResult?.categories?.accessibility?.score || 0) * 100),
+       bestPractices: Math.round((mobileData.lighthouseResult?.categories?.['best-practices']?.score || 0) * 100),
+       seo: Math.round((mobileData.lighthouseResult?.categories?.seo?.score || 0) * 100),
+    };
+
+    const reportData = {
+      url: TARGET_URL,
+      scores,
+      mobileScores,
+      timestamp: new Date().toISOString(),
+      fullReport: {
+        finalUrl: desktopData.lighthouseResult?.finalUrl || TARGET_URL,
+        fetchTime: desktopData.lighthouseResult?.fetchTime || new Date().toISOString(),
+      },
+    };
+
+    // Store in database
+    await adminClient
+      .from('website_lighthouse_reports')
+      .insert({
+        company_id: BLUE_LAWNS_COMPANY_ID,
+        url: TARGET_URL,
+        performance_score: scores.performance,
+        accessibility_score: scores.accessibility,
+        best_practices_score: scores.bestPractices,
+        seo_score: scores.seo,
+        report_data: { 
+             ...reportData.fullReport,
+             mobileScores 
+        },
+        created_at: new Date().toISOString(),
+      });
+      
+    results.lighthouse.success = true;
+    console.log('[Combined Cron] Lighthouse audit complete:', scores);
+  } catch (error) {
+    console.error('[Combined Cron] Lighthouse Error:', error);
+    results.lighthouse.error = error instanceof Error ? error.message : String(error);
   }
 
-  // Run AI Analysis only on Mondays
-  if (isMonday) {
+  // ==========================================
+  // 2. RUN AI ANALYSIS (Weekly - Monday)
+  // ==========================================
+  if (dayOfWeek === 1) { // Monday
     try {
-      console.log('[Combined Cron] Running weekly AI analysis...');
+      results.aiAnalysis.ran = true;
+      console.log('[Combined Cron] Starting AI Analysis...');
+      
+      // 1. Fetch current data
+      // Get latest lighthouse report (from just now)
+      const { data: lhReport } = await supabase
+        .from('website_lighthouse_reports')
+        .select('*')
+        .eq('company_id', BLUE_LAWNS_COMPANY_ID)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+        
+      // Get keyword cache
+      const { data: settingsData } = await supabase
+        .from('website_settings')
+        .select('settings')
+        .eq('company_id', BLUE_LAWNS_COMPANY_ID)
+        .single();
+        
+      const keywordCache = settingsData?.settings?.keywordCache || {};
+      const keywords = keywordCache.keywords || [];
+      const opportunities = keywordCache.opportunities || [];
+      
+      // Build KPI Summary
+      const kpiSummary = `
+Lighthouse Scores:
+- Performance: ${lhReport?.performance_score || 'N/A'}
+- Accessibility: ${lhReport?.accessibility_score || 'N/A'}
+- SEO: ${lhReport?.seo_score || 'N/A'}
+- Best Practices: ${lhReport?.best_practices_score || 'N/A'}
 
-      const openaiKey = getEnv('OPENAI_API_KEY');
-      if (!openaiKey) {
-        results.aiAnalysis = { success: false, error: 'OpenAI API key not configured' };
-      } else {
-        // Fetch latest data for analysis
-        const [settingsResult, lighthouseResult, leadsResult] = await Promise.all([
-          supabaseAdmin
-            .from('website_settings')
-            .select('settings')
-            .eq('company_id', BLUE_LAWNS_COMPANY_ID)
-            .single(),
-          supabaseAdmin
-            .from('website_lighthouse_reports')
-            .select('*')
-            .eq('company_id', BLUE_LAWNS_COMPANY_ID)
-            .order('created_at', { ascending: false })
-            .limit(7),
-          supabaseAdmin
-            .from('leads')
-            .select('created_at, source, status')
-            .eq('company_id', BLUE_LAWNS_COMPANY_ID)
-            .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
-        ]);
+Keyword Tracking:
+- Tracked Keywords: ${keywords.length}
+- Top Keyword: ${keywords[0]?.term || 'N/A'} (Vol: ${keywords[0]?.volume || 0})
 
-        const settings = settingsResult.data?.settings || {};
-        const keywordCache = settings.keywordCache || { keywords: [], opportunities: [] };
-        const lighthouseReports = lighthouseResult.data || [];
-        const recentLeads = leadsResult.data || [];
-
-        const latestLighthouse = lighthouseReports[0];
-        const keywordsWithVolume = (keywordCache.keywords || []).filter((k: any) => k.volume > 0);
-        const opportunities = (keywordCache.opportunities || []).filter((k: any) => k.volume > 0);
-
-        const prompt = `You are a helpful business consultant for Blue Lawns, a local landscaping company. You speak in plain English to a busy business owner, avoiding technical jargon.
-
-Analyze the website data below and provide a concise update.
+Keyword Opportunities:
+${opportunities.slice(0, 5).map((k: any) => `- ${k.term} (Vol: ${k.volume}, Diff: ${k.competition})`).join('\n')}
+      `;
+      
+      // 2. Generate AI Analysis
+      const openai = new OpenAI({ apiKey: openaiKey });
+      
+      const system = `You are a helpful business consultant for Blue Lawns, a local landscaping company. You speak in plain English to a busy business owner, avoiding technical jargon.`;
+      
+      const prompt = `Analyze the website data below and provide a concise update.
 
 [DATA]
-
-## Lighthouse Performance (Latest)
-${latestLighthouse ? `
-- Performance: ${latestLighthouse.performance_score}/100
-- Accessibility: ${latestLighthouse.accessibility_score}/100
-- Best Practices: ${latestLighthouse.best_practices_score}/100
-- SEO: ${latestLighthouse.seo_score}/100
-` : 'No Lighthouse data available'}
-
-## Leads (Last 30 Days)
-- Total leads: ${recentLeads.length}
-- Sources: ${[...new Set(recentLeads.map((l: any) => l.source))].join(', ') || 'N/A'}
-
-## Current Keywords (with search volume)
-${keywordsWithVolume.slice(0, 10).map((k: any) => `- "${k.term}": ${k.volume} monthly searches, $${typeof k.cpc === 'number' ? k.cpc.toFixed(2) : (parseFloat(k.cpc) || 0).toFixed(2)} CPC, ${k.competition} competition`).join('\n') || 'No keyword data'}
-
-## Keyword Opportunities (NOT currently on site)
-${opportunities.slice(0, 15).map((k: any) => `- "${k.keyword || k.term}": ${k.searchVolume || k.volume} monthly searches, $${typeof k.cpc === 'number' ? k.cpc.toFixed(2) : (parseFloat(k.cpc) || 0).toFixed(2)} CPC, ${k.competition} competition, ${k.intent} intent`).join('\n') || 'No opportunities found'}
+${kpiSummary}
 
 [STRICT OUTPUT RULES]
 1. Main response must be under 120 words (excluding the Details section).
 2. Use simple, plain English (no "optimizations", "leverage", "synergy").
 3. No lists longer than 3 items.
+4. If you see Keyword Opportunities, suggest specifically WHERE to add them (e.g., "Add 'lawn aeration' to your Services page").
 
 [REQUIRED FORMAT]
 
@@ -199,89 +184,68 @@ ${opportunities.slice(0, 15).map((k: any) => `- "${k.keyword || k.term}": ${k.se
   <span>See Technical Details & Reasoning</span>
 </summary>
 <div class="mt-2 p-4 bg-slate-50 rounded-lg border border-slate-100 text-sm text-slate-600 space-y-2">
-  [Include specific data points, keyword metrics, and technical SEO reasoning here. This section can include the specific keyword opportunities and where to place them.]
+  [Include specific data points, keyword metrics, and technical SEO reasoning here. This section can be longer.]
 </div>
-</details>`;
+</details>
+`;
 
-        const aiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${openaiKey}`,
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            messages: [
-              { role: 'system', content: 'You are a helpful business consultant for Blue Lawns.' },
-              { role: 'user', content: prompt },
-            ],
-            max_tokens: 1000,
-            temperature: 0.7,
-          }),
+      const completion = await openai.chat.completions.create({
+        messages: [
+            { role: "system", content: system },
+            { role: "user", content: prompt }
+        ],
+        model: "gpt-4o-mini",
+      });
+
+      const analysisContent = completion.choices[0].message.content;
+
+      // 3. Store Analysis
+      await adminClient
+        .from('website_ai_analysis')
+        .insert({
+          company_id: BLUE_LAWNS_COMPANY_ID,
+          content: analysisContent,
+          created_at: new Date().toISOString(),
+          metadata: { 
+            lighthouse_id: lhReport?.id,
+            keywords_count: keywords.length
+          }
         });
+        
+      results.aiAnalysis.success = true;
+      console.log('[Combined Cron] AI Analysis complete');
 
-        if (!aiResponse.ok) {
-          throw new Error(`OpenAI API error: ${aiResponse.status}`);
-        }
-
-        const aiData = await aiResponse.json();
-        const analysis = aiData.choices?.[0]?.message?.content || 'Analysis unavailable';
-
-        const updatedSettings = {
-          ...settings,
-          aiAnalysis: {
-            content: analysis,
-            generated_at: new Date().toISOString(),
-            type: 'weekly_cron',
-            data_sources: {
-              lighthouse: !!latestLighthouse,
-              keywords: keywordsWithVolume.length,
-              opportunities: opportunities.length,
-              leads: recentLeads.length,
-            },
-          },
-        };
-
-        const { error: updateError } = await supabaseAdmin
-          .from('website_settings')
-          .upsert({
-            company_id: BLUE_LAWNS_COMPANY_ID,
-            settings: updatedSettings,
-            updated_at: new Date().toISOString(),
-          }, { onConflict: 'company_id' });
-
-        if (updateError) {
-          console.error('[Combined Cron] AI Analysis save error:', updateError);
-          results.aiAnalysis = { success: false, error: updateError.message };
-        } else {
-          results.aiAnalysis = { success: true };
-          console.log('[Combined Cron] Weekly AI analysis complete');
-        }
-      }
     } catch (error) {
-      console.error('[Combined Cron] AI Analysis error:', error);
-      results.aiAnalysis = {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
+      console.error('[Combined Cron] AI Analysis Error:', error);
+      results.aiAnalysis.error = error instanceof Error ? error.message : String(error);
     }
-  } else {
-    console.log('[Combined Cron] Skipping AI analysis (not Monday)');
   }
 
   return new Response(
     JSON.stringify({
       success: true,
-      message: 'Combined cron job completed',
-      timestamp: new Date().toISOString(),
-      dayOfWeek: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek],
-      isMonday,
+      message: 'Combined cron job executed',
       results,
+      timestamp: new Date().toISOString(),
     }),
     { status: 200, headers: { 'Content-Type': 'application/json' } }
   );
 };
 
-// Also allow GET for manual testing
 export const GET = POST;
 
+async function fetchPageSpeedData(url: string, strategy: 'DESKTOP' | 'MOBILE', apiKey?: string) {
+  let apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=${strategy}&category=PERFORMANCE&category=ACCESSIBILITY&category=BEST_PRACTICES&category=SEO`;
+  
+  if (apiKey) {
+    apiUrl += `&key=${apiKey}`;
+  }
+
+  const response = await fetch(apiUrl);
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`PageSpeed API failed (${response.status}): ${errorText}`);
+  }
+  
+  return await response.json();
+}
