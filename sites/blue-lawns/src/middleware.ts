@@ -3,9 +3,10 @@ import { createServerClient } from '@supabase/ssr';
 import { getEnv } from './lib/env-loader';
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  // Only protect /admin routes (except /admin/login)
+  // Only protect /admin routes (except /admin/login, /admin/forgot-password, /admin/reset-password)
+  const publicAdminRoutes = ['/admin/login', '/admin/forgot-password', '/admin/reset-password'];
   if (context.url.pathname.startsWith('/admin') && 
-      context.url.pathname !== '/admin/login') {
+      !publicAdminRoutes.includes(context.url.pathname)) {
     
     // Use env-loader which checks both process.env and import.meta.env
     const supabaseUrl = getEnv('SUPABASE_URL');
