@@ -5,7 +5,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://www.bluelawns.com/sitemap.xml
+Sitemap: https://www.bluelawns.com/sitemap-index.xml
 
 # Disallow admin/internal areas
 Disallow: /api/
