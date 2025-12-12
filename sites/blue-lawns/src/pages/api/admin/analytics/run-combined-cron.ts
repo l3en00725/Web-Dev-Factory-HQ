@@ -197,7 +197,10 @@ ${kpiSummary}
         model: "gpt-4o-mini",
       });
 
-      const analysisContent = completion.choices[0].message.content;
+      let analysisContent = completion.choices[0].message.content || '';
+      
+      // Strip markdown code blocks if present (regex handles ```html, ```, and trailing ```)
+      analysisContent = analysisContent.replace(/^```(?:html)?\s*/i, '').replace(/```\s*$/, '').trim();
 
       // 3. Store Analysis
       await adminClient

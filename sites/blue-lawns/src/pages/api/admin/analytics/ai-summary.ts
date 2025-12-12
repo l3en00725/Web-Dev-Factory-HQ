@@ -157,6 +157,9 @@ ${kpiSummary}
       timeoutMs: 60_000,
     });
 
+    // Strip markdown code blocks if present (regex handles ```html, ```, and trailing ```)
+    const cleanText = text.replace(/^```(?:html)?\s*/i, '').replace(/```\s*$/, '').trim();
+
     console.log('[AI Summary] OpenAI response received:', meta);
 
     console.log('[AI Summary] Successfully generated summary');
@@ -173,7 +176,7 @@ ${kpiSummary}
       const updatedSettings = {
         ...currentSettings,
         aiAnalysis: {
-          content: text,
+          content: cleanText,
           generated_at: new Date().toISOString(),
           type: 'manual',
         },
@@ -193,7 +196,7 @@ ${kpiSummary}
     return new Response(
       JSON.stringify({
         success: true,
-        summary: text,
+        summary: cleanText,
         timestamp: new Date().toISOString(),
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }

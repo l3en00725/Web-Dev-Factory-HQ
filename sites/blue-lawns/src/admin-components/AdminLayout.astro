@@ -29,11 +29,46 @@ const { title, description, activePath = Astro.url.pathname } = Astro.props;
       <AdminNav activePath={activePath} />
       
       <main class="admin-main">
+        <!-- Mobile Header -->
+        <div class="mobile-header md:hidden">
+          <button id="mobile-nav-toggle" class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <span class="font-bold text-slate-800">Blue Lawns Admin</span>
+        </div>
+
         <div class="admin-content">
           <slot />
         </div>
       </main>
+      
+      <!-- Mobile Overlay -->
+      <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden glass-overlay"></div>
     </div>
+    
+    <script>
+      const mobileToggle = document.getElementById('mobile-nav-toggle');
+      const mobileOverlay = document.getElementById('mobile-overlay');
+      const nav = document.getElementById('admin-nav');
+      
+      function toggleMobileNav() {
+        nav?.classList.toggle('open');
+        mobileOverlay?.classList.toggle('hidden');
+        document.body.classList.toggle('overflow-hidden');
+      }
+      
+      mobileToggle?.addEventListener('click', toggleMobileNav);
+      mobileOverlay?.addEventListener('click', toggleMobileNav);
+      
+      // Close nav on link click (mobile)
+      nav?.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth < 768) {
+            toggleMobileNav();
+          }
+        });
+      });
+    </script>
   </body>
 </html>
 
@@ -85,7 +120,28 @@ const { title, description, activePath = Astro.url.pathname } = Astro.props;
     transition: padding 0.3s cubic-bezier(0.2, 0, 0, 1);
   }
   
+  .mobile-header {
+    display: none;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    position: sticky;
+    top: 0;
+    z-index: 90;
+  }
+
+  .glass-overlay {
+    backdrop-filter: blur(4px);
+  }
+
   @media (max-width: 768px) {
+    .mobile-header {
+      display: flex;
+    }
+
     .admin-main {
       margin-left: 0;
       width: 100%;
