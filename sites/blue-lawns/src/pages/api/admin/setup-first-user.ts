@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getEnv } from '../../../../lib/env-loader';
+import { getEnv } from '../../../lib/env-loader';
 import { createClient } from '@supabase/supabase-js';
 
 export const prerender = false;
