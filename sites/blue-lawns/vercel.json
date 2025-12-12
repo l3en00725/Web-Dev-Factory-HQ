@@ -4,12 +4,8 @@
   "trailingSlash": false,
   "crons": [
     {
-      "path": "/api/admin/analytics/run-lighthouse-cron",
+      "path": "/api/admin/analytics/run-combined-cron",
       "schedule": "0 2 * * *"
-    },
-    {
-      "path": "/api/admin/analytics/run-ai-analysis-cron",
-      "schedule": "0 3 * * 1"
     }
   ],
   "redirects": [
